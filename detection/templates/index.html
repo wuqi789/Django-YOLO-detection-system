@@ -1,0 +1,2872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Safety Equipment Detection Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', system-ui, sans-serif; }
+        
+        :root {
+            --primary: #0F1C2E;
+            --secondary: #1A2B3C;
+            --accent-blue: #3A7BFF;
+            --accent-orange: #FF9A3D;
+            --accent-green: #4CD964;
+            --accent-red: #FF4757;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0F1C2E 0%, #1A2B3C 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glass-card-light {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(58, 123, 255, 0.1) 0%, rgba(58, 123, 255, 0.05) 100%);
+            border: 1px solid rgba(58, 123, 255, 0.2);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        .number-scroll {
+            transition: all 0.5s ease-out;
+        }
+        
+        .glow-blue {
+            box-shadow: 0 0 20px rgba(58, 123, 255, 0.3);
+        }
+        
+        .glow-orange {
+            box-shadow: 0 0 20px rgba(255, 154, 61, 0.3);
+        }
+        
+        .glow-green {
+            box-shadow: 0 0 20px rgba(76, 217, 100, 0.3);
+        }
+        
+        .glow-red {
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.3);
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+        
+        .video-container {
+            position: relative;
+            background: linear-gradient(45deg, #0a0f18 0%, #1a2332 100%);
+        }
+        
+        #detectionBoxes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        
+        .detection-box {
+            position: absolute;
+            border: 3px solid #4CD964;
+            background: rgba(76, 217, 100, 0.2);
+            z-index: 1000;
+            pointer-events: none;
+            box-sizing: border-box;
+        }
+        
+        .alert-item {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .nav-btn {
+            color: #ffffff;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            color: #e0e0e0;
+        }
+        
+        .tab-active {
+            background: linear-gradient(135deg, rgba(58, 123, 255, 0.3) 0%, rgba(58, 123, 255, 0.1) 100%);
+            border-left: 3px solid #3A7BFF;
+            color: #ffffff;
+        }
+        
+        .heatmap-cell {
+            transition: all 0.2s ease;
+        }
+        
+        .heatmap-cell:hover {
+            transform: scale(1.1);
+        }
+        
+        input[type="range"] {
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            height: 6px;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #3A7BFF;
+            cursor: pointer;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: #3A7BFF;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active::after {
+            left: 26px;
+        }
+        
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0 !important; }
+        }
+    </style>
+</head>
+<body class="text-white overflow-hidden">
+    <!-- Top Navigation -->
+    <nav class="fixed top-0 left-0 right-0 h-16 glass-card z-50 flex items-center justify-between px-6">
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-semibold">Smart Safety Detection Platform</h1>
+                    <p class="text-xs text-gray-400">Version 1.0</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2 text-sm">
+                <span class="w-2 h-2 rounded-full bg-green-500 pulse-animation"></span>
+                <span class="text-white">System Running</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+                <span id="currentTime" class="text-white">--:--:--</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleNotifications()" class="relative p-2 rounded-lg hover:bg-white/10 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                    </svg>
+                    <span id="alertBadge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs flex items-center justify-center">3</span>
+                </button>
+                <button onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-white/10 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                    </svg>
+                </button>
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500"></div>
+                    <span class="text-sm">Admin</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar fixed left-0 top-16 bottom-0 w-64 glass-card z-40 p-4 overflow-y-auto scrollbar-thin">
+        <nav class="space-y-2 mt-4">
+            <button onclick="switchTab('monitor')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition tab-active" data-tab="monitor">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                <span>Monitor Center</span>
+            </button>
+
+            <button onclick="switchTab('ai')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition hover:bg-white/5" data-tab="ai">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                </svg>
+                <span>AI Analysis</span>
+            </button>
+            <button onclick="switchTab('devices')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition hover:bg-white/5" data-tab="devices">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                <span>Device Management</span>
+            </button>
+            <button onclick="switchTab('alerts')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition hover:bg-white/5" data-tab="alerts">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <span>Alert Center</span>
+                <span class="ml-auto bg-red-500 text-xs px-2 py-0.5 rounded-full" id="sidebarAlertCount">3</span>
+            </button>
+            <button onclick="switchTab('settings')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition hover:bg-white/5" data-tab="settings">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span>Settings</span>
+            </button>
+        </nav>
+        
+        <!-- Quick Stats -->
+        <div class="mt-8 p-4 rounded-xl glass-card-light">
+            <h3 class="text-sm font-medium text-gray-400 mb-3">Quick Stats</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-300">Today's Detections</span>
+                    <span class="text-lg font-semibold text-blue-400" id="quickDetectionCount">356</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-300">Violations</span>
+                    <span class="text-lg font-semibold text-orange-400" id="quickViolationCount">5</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-300">Online Devices</span>
+                    <span class="text-lg font-semibold text-green-400" id="quickDeviceCount">4</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Status -->
+        <div class="mt-4 p-4 rounded-xl glass-card-light">
+            <h3 class="text-sm font-medium text-gray-400 mb-3">System Status</h3>
+            <div class="space-y-2">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span class="text-xs text-gray-300">Detection Service: Normal</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span class="text-xs text-gray-300">AI Service: Normal</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                    <span class="text-xs text-gray-300">Database: Medium Load</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content ml-64 pt-16 h-screen overflow-y-auto scrollbar-thin">
+        <!-- Monitor Tab -->
+        <div id="tab-monitor" class="tab-content p-6">
+            <div class="grid grid-cols-12 gap-6">
+                <!-- Video Detection Area -->
+                <div class="col-span-8">
+                    <div class="glass-card rounded-2xl p-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold">Real-time Video Detection</h2>
+                            <div class="flex gap-2">
+                                <button onclick="togglePIP()" class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition">PiP</button>
+                                <button onclick="captureFrame()" class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition">Screenshot</button>
+                                <button onclick="toggleRecording()" id="recordBtn" class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition">Record</button>
+                            </div>
+                        </div>
+                        
+                        <div class="video-container rounded-xl overflow-hidden aspect-video relative" id="videoContainer">
+                            <!-- Simulated Video Frame -->
+<!--                            <div class="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">-->
+<!--                                <div class="text-center">-->
+<!--                                    <svg class="w-16 h-16 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">-->
+<!--                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>-->
+<!--                                    </svg>-->
+<!--                                    <p class="text-gray-500">Click Start Detection to start video stream</p>-->
+<!--                                </div>-->
+<!--                            </div>-->
+                                <div class="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-800">
+                                    <video id="videoPlayer" class="w-full h-full object-contain" muted playsinline>
+                                        <source src="/static/media/video.mp4" type="video/mp4">
+                                        Your browser does not support video playback
+                                    </video>
+                                </div>
+                            <!-- Detection Boxes (simulated) -->
+                            <div id="detectionBoxes"></div>
+                            
+
+                            
+                            <!-- Detection Stats Overlay -->
+                            <div class="absolute top-4 left-4 glass-card rounded-xl p-3 text-sm" id="detectionStats" style="display:none;">
+                                <div class="space-y-1">
+                                    <div class="flex justify-between gap-8">
+                                        <span class="text-gray-400">Helmets:</span>
+                                        <span class="text-green-400" id="helmetCount">0</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Persons:</span>
+                                        <span class="text-blue-400" id="personCount">0</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Ventilators:</span>
+                                        <span class="text-purple-400" id="respiratorCount">0</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Violations:</span>
+                                        <span class="text-red-400" id="violationCount">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Detection Stats -->
+                            <div class="absolute top-4 right-4 glass-card rounded-lg px-3 py-1.5 text-sm" id="fpsCounter" style="display:none;">
+                                <span class="text-gray-400">FPS:</span>
+                                <span class="text-green-400 ml-1" id="fpsValue">30</span>
+                            </div>
+                            
+                            <!-- Recording Indicator -->
+                            <div class="absolute bottom-4 left-4 glass-card rounded-lg px-3 py-1.5 text-sm flex items-center gap-2" id="recordingIndicator" style="display:none;">
+                                <span class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></span>
+                                <span>Recording</span>
+                                <span id="recordingTime">00:00</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Video Controls -->
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex gap-2">
+                                <select class="bg-blue-900/40 rounded-lg px-3 py-2 text-sm" id="videoSource">
+                                    <option value="camera1">Camera 1 - Main Entrance</option>
+                                    <option value="camera2">Camera 2 - Production Area</option>
+                                    <option value="camera3">Camera 3 - Warehouse Area</option>
+                                    <option value="local">Local Video File</option>
+                                    <option value="image">Local Image</option>
+                                </select>
+                                <input type="file" accept="video/*" id="localVideoInput" style="display: none;" onchange="handleLocalVideoSelect(this)" />
+                                <input type="file" accept="image/*" multiple id="localImageInput" style="display: none;" onchange="handleLocalImageSelect(this)" />
+                                <button onclick="document.getElementById('localVideoInput').click()" id="uploadVideoBtn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition flex items-center gap-2 hidden">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                    </svg>
+                                    Upload Video
+                                </button>
+                                <button onclick="document.getElementById('localImageInput').click()" id="uploadImageBtn" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-medium transition flex items-center gap-2 hidden">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                    Upload Images
+                                </button>
+                                <div id="imageCount" class="mt-2 text-sm text-gray-400 hidden">Selected <span id="selectedImageCount">0</span> images</div>
+                                <div id="imagePreview" class="mt-4 grid grid-cols-1 gap-4 hidden"></div>
+                                <div id="imageResults" class="mt-4 grid grid-cols-1 gap-4 hidden"></div>
+                                <button onclick="startDetection()" id="startBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                    </svg>
+                                    Start Detection
+                                </button>
+                                <button onclick="stopDetection()" id="stopBtn" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition hidden">
+                                    Stop
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-4 text-sm">
+                                <span class="text-gray-400">Detection Status:</span>
+                                <span id="detectionStatus" class="text-gray-400">Stopped</span>
+                                <span class="text-gray-400">|</span>
+                                <span id="detectionTimeEstimate" class="text-blue-400">Estimated detection time: ~30 seconds</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Control Panel -->
+                <div class="col-span-4 space-y-4">
+                    <!-- Model Selector -->
+                    <div class="glass-card rounded-2xl p-4">
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">Model Configuration</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Detection Model</label>
+                                <select class="w-full bg-blue-900/40 rounded-lg px-3 py-2 text-sm" id="modelSelect" onchange="onModelChange()">
+                                    <!-- Dynamically loaded model list -->
+                                    <option value="loading">Loading...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Confidence Threshold: <span id="confValue">0.5</span></label>
+                                <input type="range" min="0.3" max="0.9" step="0.05" value="0.5" class="w-full" id="confidenceSlider" oninput="updateConfidence(this.value)">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Detection Frequency</label>
+                                <select class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm" id="detectionFreq">
+                                    <option value="realtime">Real-time</option>
+                                    <option value="2s">Every 2 seconds</option>
+                                    <option value="5s">Every 5 seconds</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    
+                    <!-- Alert Thresholds -->
+                    <div class="glass-card rounded-2xl p-4">
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">Alert Thresholds</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">No Helmet Alert</span>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)" data-alert="helmet"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Person Intrusion Alert</span>
+                                <div class="toggle-switch" onclick="toggleSwitch(this)" data-alert="intrusion"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Missing Ventilator Alert</span>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)" data-alert="respirator"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Temperature Anomaly Alert</span>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)" data-alert="temp"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Environment Sensors -->
+                    <div class="glass-card rounded-2xl p-4">
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">Environmental Sensors</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center p-3 rounded-xl bg-white/5">
+                                <div class="text-3xl font-bold text-blue-400" id="tempValue">15.5</div>
+                                <div class="text-xs text-gray-500 mt-1">Temperature °C</div>
+                                <div class="mt-2 h-1 bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-blue-500 transition-all" style="width: 60%" id="tempBar"></div>
+                                </div>
+                            </div>
+                            <div class="text-center p-3 rounded-xl bg-white/5">
+                                <div class="text-3xl font-bold text-green-400" id="humidValue">21</div>
+                                <div class="text-xs text-gray-500 mt-1">Humidity %</div>
+                                <div class="mt-2 h-1 bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-green-500 transition-all" style="width: 65%" id="humidBar"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Statistics Cards -->
+                <div class="col-span-12">
+                    <div class="grid grid-cols-4 gap-4">
+                        <div class="stat-card rounded-xl p-4 glow-blue">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-400">Today's Total Detections</p>
+                                    <p class="text-3xl font-bold mt-2" id="totalDetections">356</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="mt-3 flex items-center text-xs text-green-400">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                                </svg>
+                                <span>+12.5% vs Yesterday</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card rounded-xl p-4" style="background: linear-gradient(135deg, rgba(76, 217, 100, 0.1) 0%, rgba(76, 217, 100, 0.05) 100%); border-color: rgba(76, 217, 100, 0.2);">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-400">Online Devices</p>
+                                    <p class="text-3xl font-bold mt-2" id="onlineDevices">4</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="mt-3 text-xs text-gray-400">
+                                <span>Total 5 devices</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card rounded-xl p-4" style="background: linear-gradient(135deg, rgba(255, 154, 61, 0.1) 0%, rgba(255, 154, 61, 0.05) 100%); border-color: rgba(255, 154, 61, 0.2);">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-400">Violation Events</p>
+                                    <p class="text-3xl font-bold mt-2 text-orange-400" id="violationEvents">5</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="mt-3 flex items-center text-xs text-red-400">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                                </svg>
+                                <span>-5.2% vs Yesterday</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card rounded-xl p-4" style="background: linear-gradient(135deg, rgba(156, 136, 255, 0.1) 0%, rgba(156, 136, 255, 0.05) 100%); border-color: rgba(156, 136, 255, 0.2);">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-400">System Uptime</p>
+                                    <p class="text-3xl font-bold mt-2" id="systemUptime">00:00:00</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="mt-3 text-xs text-gray-400">
+                                <span>Running stably</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Second Row Stats -->
+                <div class="col-span-12">
+                    <div class="grid grid-cols-4 gap-4">
+                        <div class="glass-card rounded-xl p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-400">Average Detection Speed</p>
+                                    <p class="text-xl font-bold"><span id="avgFps">30</span> FPS</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card rounded-xl p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-pink-500/20 flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-400">Model Accuracy</p>
+                                    <p class="text-xl font-bold"><span id="modelAccuracy">94.5</span>%</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card rounded-xl p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-400">Sensor Status</p>
+                                    <p class="text-xl font-bold text-green-400">Normal</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card rounded-xl p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-400">AI Analysis Coverage</p>
+                                    <p class="text-xl font-bold"><span id="aiCoverage">100</span>%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        
+        <!-- AI Analysis Tab -->
+        <div id="tab-ai" class="tab-content p-6 hidden">
+            <div class="grid grid-cols-12 gap-6">
+                <!-- AI Analysis Panel -->
+                <div class="col-span-8">
+                    <div class="glass-card rounded-2xl p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold">AI Intelligent Analysis Report</h3>
+                                    <p class="text-xs text-gray-400">Powered by DeepSeek AI Engine</p>
+                                </div>
+                            </div>
+                            <button onclick="generateAIReport()" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                                Generate Analysis
+                            </button>
+                        </div>
+                        
+                        <div id="aiReportContent" class="space-y-6">
+                            <div class="text-center py-12 text-gray-500">
+                                <svg class="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                </svg>
+                                <p>Click the "Generate Analysis" button to start AI intelligent analysis</p>
+                                <p class="text-sm mt-2">Analysis will be automatically generated based on current detection data</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Analysis History -->
+                <div class="col-span-4 space-y-4">
+                    <div class="glass-card rounded-2xl p-4">
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">Analysis History</h3>
+                        <div class="space-y-3" id="analysisHistory">
+                            <div class="p-3 rounded-xl bg-white/5 hover:bg-white/10 cursor-pointer transition">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm font-medium">2025-11-15 14:30</p>
+                                        <p class="text-xs text-gray-500 mt-1">Security Status: Good</p>
+                                    </div>
+                                    <span class="px-2 py-0.5 text-xs rounded bg-green-500/20 text-green-400">Good</span>
+                                </div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-white/5 hover:bg-white/10 cursor-pointer transition">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm font-medium">2025-11-15 10:15</p>
+                                        <p class="text-xs text-gray-500 mt-1">Security Status: Excellent</p>
+                                    </div>
+                                    <span class="px-2 py-0.5 text-xs rounded bg-blue-500/20 text-blue-400">Excellent</span>
+                                </div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-white/5 hover:bg-white/10 cursor-pointer transition">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm font-medium">2025-11-14 16:45</p>
+                                        <p class="text-xs text-gray-500 mt-1">Security Status: Fair</p>
+                                    </div>
+                                    <span class="px-2 py-0.5 text-xs rounded bg-yellow-500/20 text-yellow-400">Fair</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card rounded-2xl p-4">
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">Analysis Dimensions</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-start gap-3">
+                                <div class="w-6 h-6 rounded bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-xs text-blue-400">1</span>
+                                </div>
+                                <div>
+                                    <p class="font-medium">Security Status Assessment</p>
+                                    <p class="text-xs text-gray-500">Comprehensive assessment of current security level</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-6 h-6 rounded bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-xs text-green-400">2</span>
+                                </div>
+                                <div>
+                                    <p class="font-medium">Violation Pattern Recognition</p>
+                                    <p class="text-xs text-gray-500">Analysis of common violation types</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-6 h-6 rounded bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-xs text-yellow-400">3</span>
+                                </div>
+                                <div>
+                                    <p class="font-medium">Trend Prediction</p>
+                                    <p class="text-xs text-gray-500">Early warning based on historical data</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-6 h-6 rounded bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-xs text-purple-400">4</span>
+                                </div>
+                                <div>
+                                    <p class="font-medium">Improvement Suggestions</p>
+                                    <p class="text-xs text-gray-500">Targeted security recommendations</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Devices Tab -->
+        <div id="tab-devices" class="tab-content p-6 hidden">
+            <div class="grid grid-cols-12 gap-6">
+                <!-- Camera Management -->
+                <div class="col-span-8">
+                    <div class="glass-card rounded-2xl p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-semibold">Camera Management</h3>
+                            <div class="flex gap-2">
+                                <button onclick="setDeviceGrid(4)" class="px-3 py-1.5 text-sm rounded-lg bg-blue-600">4 Grid</button>
+                                <button onclick="setDeviceGrid(9)" class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20">9 Grid</button>
+                                <button class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20">Add Device</button>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4" id="cameraGrid">
+                            <div class="relative rounded-xl overflow-hidden aspect-video bg-blue-950">
+                                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-950">
+                                    <span class="text-white">Camera 1</span>
+                                </div>
+                                <div class="absolute top-2 left-2 flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                    <span class="text-xs">Online</span>
+                                </div>
+                                <div class="absolute bottom-2 left-2 text-xs text-gray-400">Main Entrance | 1920x1080 | 30fps</div>
+                            </div>
+                            <div class="relative rounded-xl overflow-hidden aspect-video bg-blue-950">
+                                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-950">
+                                    <span class="text-white">Camera 2</span>
+                                </div>
+                                <div class="absolute top-2 left-2 flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                    <span class="text-xs">Online</span>
+                                </div>
+                                <div class="absolute bottom-2 left-2 text-xs text-gray-400">Production Area | 1920x1080 | 25fps</div>
+                            </div>
+                            <div class="relative rounded-xl overflow-hidden aspect-video bg-blue-950">
+                                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-950">
+                                    <span class="text-white">Camera 3</span>
+                                </div>
+                                <div class="absolute top-2 left-2 flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                    <span class="text-xs">Online</span>
+                                </div>
+                                <div class="absolute bottom-2 left-2 text-xs text-gray-400">Warehouse Area | 1280x720 | 30fps</div>
+                            </div>
+                            <div class="relative rounded-xl overflow-hidden aspect-video bg-blue-950">
+                                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-950">
+                                    <span class="text-white">Camera 4</span>
+                                </div>
+                                <div class="absolute top-2 left-2 flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                                    <span class="text-xs">Offline</span>
+                                </div>
+                                <div class="absolute bottom-2 left-2 text-xs text-gray-400">Parking Lot | -- | --</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Device List & Sensor -->
+                <div class="col-span-4 space-y-4">
+                    <div class="glass-card rounded-2xl p-4">
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">Device List</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-white/5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium">CAM-001</p>
+                                        <p class="text-xs text-gray-500">Main Entrance</p>
+                                    </div>
+                                </div>
+                                <span class="px-2 py-1 text-xs rounded bg-green-500/20 text-green-400">Online</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-white/5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium">CAM-002</p>
+                                        <p class="text-xs text-gray-500">Production Area</p>
+                                    </div>
+                                </div>
+                                <span class="px-2 py-1 text-xs rounded bg-green-500/20 text-green-400">Online</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-white/5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium">SENSOR-001</p>
+                                        <p class="text-xs text-gray-500">Temperature & Humidity Sensor</p>
+                                    </div>
+                                </div>
+                                <span class="px-2 py-1 text-xs rounded bg-green-500/20 text-green-400">Normal</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card rounded-2xl p-4">
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">Sensor Simulation Control</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Simulation Mode</label>
+                                <select class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm" id="sensorMode" onchange="setSensorMode(this.value)">
+                                    <option value="normal">Normal Fluctuation</option>
+                                    <option value="hot">High Temperature</option>
+                                    <option value="humid">High Humidity</option>
+                                    <option value="random">Random Anomaly</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Data Reporting Frequency</label>
+                                <select class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
+                                    <option value="1">Every second</option>
+                                    <option value="5" selected>Every 5 seconds</option>
+                                    <option value="10">Every 10 seconds</option>
+                                </select>
+                            </div>
+                            <button class="w-full py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition">Export Sensor Data</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Alerts Tab -->
+        <div id="tab-alerts" class="tab-content p-6 hidden">
+            <div class="grid grid-cols-12 gap-6">
+                <!-- Real-time Alerts -->
+                <div class="col-span-8">
+                    <div class="glass-card rounded-2xl p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-semibold">Real-time Alerts</h3>
+                            <div class="flex gap-2">
+                                <select class="bg-white/10 rounded-lg px-3 py-2 text-sm">
+                                    <option value="all">All Types</option>
+                                    <option value="safety">Safety Equipment</option>
+                                    <option value="environment">Environmental Anomaly</option>
+                                    <option value="device">Device Status</option>
+                                </select>
+                                <button onclick="clearAllAlerts()" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600/30 rounded-lg text-sm transition">Clear All</button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3 max-h-96 overflow-y-auto scrollbar-thin" id="alertsList">
+                            <!-- Alerts generated by JS -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Alert Stats -->
+                <div class="col-span-4 space-y-4">
+                    <div class="glass-card rounded-2xl p-4">
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">Alert Statistics</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                                    <span class="text-sm">Critical Alerts</span>
+                                </div>
+                                <span class="text-lg font-semibold text-red-400" id="criticalCount">1</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+                                    <span class="text-sm">Warnings</span>
+                                </div>
+                                <span class="text-lg font-semibold text-orange-400" id="warningCount">2</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                                    <span class="text-sm">Information</span>
+                                </div>
+                                <span class="text-lg font-semibold text-blue-400" id="infoCount">5</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card rounded-2xl p-4">
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">Notification Settings</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Desktop Notifications</span>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)" data-setting="desktop"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Sound Alerts</span>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)" data-setting="sound"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Email Notifications</span>
+                                <div class="toggle-switch" onclick="toggleSwitch(this)" data-setting="email"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card rounded-2xl p-4">
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">Quick Actions</h3>
+                        <div class="space-y-2">
+                            <button onclick="testAlert()" class="w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition">Test Alert</button>
+                            <button class="w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition">Export Alert Logs</button>
+                            <button class="w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition">Alert Rules Configuration</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Settings Tab -->
+        <div id="tab-settings" class="tab-content p-6 hidden">
+            <div class="grid grid-cols-12 gap-6">
+                <div class="col-span-8">
+                    <div class="glass-card rounded-2xl p-6">
+                        <h3 class="text-lg font-semibold mb-6">System Settings</h3>
+                        
+                        <div class="space-y-6">
+                            <!-- Detection Settings -->
+                            <div class="border-b border-white/10 pb-6">
+                                <h4 class="text-sm font-medium text-gray-400 mb-4">Detection Settings</h4>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-xs text-gray-500 mb-1 block">Model Path</label>
+                                        <input type="text" value="./wuqi1/best.pt" class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 mb-1 block">Computation Device</label>
+                                        <select class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
+                                            <option value="cuda">CUDA (GPU)</option>
+                                            <option value="cpu">CPU</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 mb-1 block">Batch Size</label>
+                                        <input type="number" value="4" class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 mb-1 block">NMS Threshold</label>
+                                        <input type="number" step="0.05" value="0.45" class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- AI Service Settings -->
+                            <div class="border-b border-white/10 pb-6">
+                                <h4 class="text-sm font-medium text-gray-400 mb-4">AI Service Settings</h4>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-xs text-gray-500 mb-1 block">DeepSeek API Key</label>
+                                        <input type="password" value="sk-xxx..." class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
+                                    </div>
+                                    <div class="flex items-end">
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-sm">Auto Analysis</span>
+                                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 mb-1 block">Analysis Delay (seconds)</label>
+                                        <input type="number" value="3" class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Data Settings -->
+                            <div class="border-b border-white/10 pb-6">
+                                <h4 class="text-sm font-medium text-gray-400 mb-4">Data Settings</h4>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-xs text-gray-500 mb-1 block">Data Retention Days</label>
+                                        <input type="number" value="30" class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 mb-1 block">Alert Retention Days</label>
+                                        <input type="number" value="90" class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 mb-1 block">Export Format</label>
+                                        <select class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
+                                            <option>CSV</option>
+                                            <option>JSON</option>
+                                            <option>PDF</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- UI Settings -->
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-400 mb-4">UI Settings</h4>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-xs text-gray-500 mb-1 block">Theme</label>
+                                        <select class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
+                                            <option value="dark">Dark Mode</option>
+                                            <option value="light">Light Mode</option>
+                                            <option value="auto">System Default</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 mb-1 block">Language</label>
+                                        <select class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
+                                            <option value="zh-CN">Chinese Simplified</option>
+                                            <option value="en">English</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-sm">Enable Animations</span>
+                                        <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-white/10">
+                            <button class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition">Reset to Default</button>
+                            <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition">Save Settings</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-span-4 space-y-4">
+                    <div class="glass-card rounded-2xl p-4">
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">System Information</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Version</span>
+                                <span>v1.0.0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Build Date</span>
+                                <span>2025-11-15</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Runtime Environment</span>
+                                <span>Browser</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">License</span>
+                                <span class="text-green-400">Activated</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card rounded-2xl p-4">
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">Keyboard Shortcuts</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Help</span>
+                                <kbd class="px-2 py-1 bg-white/10 rounded text-xs">F1</kbd>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Refresh</span>
+                                <kbd class="px-2 py-1 bg-white/10 rounded text-xs">F5</kbd>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Start/Stop Detection</span>
+                                <kbd class="px-2 py-1 bg-white/10 rounded text-xs">Space</kbd>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Screenshot</span>
+                                <kbd class="px-2 py-1 bg-white/10 rounded text-xs">S</kbd>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Notification Panel -->
+    <div id="notificationPanel" class="fixed top-16 right-4 w-80 glass-card rounded-2xl p-4 z-50 hidden animate-fade-in">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-semibold">Notification Center</h3>
+            <button onclick="toggleNotifications()" class="text-gray-400 hover:text-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="space-y-3 max-h-96 overflow-y-auto scrollbar-thin" id="notificationList">
+            <!-- Notifications generated by JS -->
+        </div>
+    </div>
+
+    <script>
+        // Global State
+        const state = {
+            isDetecting: false,
+            isRecording: false,
+            recordingStartTime: null,
+            detectionCount: 0,
+            violationCount: 0,
+            startTime: Date.now(),
+            alerts: [],
+            sensorMode: 'normal',
+            temperature: 24.5,
+            humidity: 65,
+            detectionInterval: null,
+            currentModel: null,
+            modelsList: [],
+            currentVideoDuration: 0
+        };
+        
+        // Format file size to human readable format
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Load models from server
+        async function loadModels() {
+            try {
+                const response = await fetch('/get_models/');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    state.modelsList = data.models;
+                    const modelSelect = document.getElementById('modelSelect');
+                    modelSelect.innerHTML = '';
+                    
+                    if (data.models.length === 0) {
+                        const option = document.createElement('option');
+                        option.value = 'none';
+                        option.textContent = 'No model files detected';
+                        modelSelect.appendChild(option);
+                    } else {
+                        data.models.forEach(model => {
+                            const option = document.createElement('option');
+                            option.value = model.name;
+                            option.textContent = `${model.name} - ${formatFileSize(model.size)}`;
+                            modelSelect.appendChild(option);
+                        });
+                        
+                        // Set the first model as default value
+                        modelSelect.value = data.models[0].name;
+                        state.currentModel = data.models[0].name;
+                    }
+                    
+                    // Load current model info
+                    await loadCurrentModel();
+                } else {
+                    console.error('Failed to load models:', data.message);
+                    const modelSelect = document.getElementById('modelSelect');
+                    modelSelect.innerHTML = '<option value="error">Failed to load models</option>';
+                }
+            } catch (error) {
+                console.error('Error loading models:', error);
+                const modelSelect = document.getElementById('modelSelect');
+                modelSelect.innerHTML = '<option value="error">Failed to load models</option>';
+            }
+        }
+        
+        // Load current model information
+        async function loadCurrentModel() {
+            try {
+                const modelSelect = document.getElementById('modelSelect');
+                
+                // Only load current model if we have multiple models or server explicitly returns one
+                // For first load with single model, keep the default selection
+                if (modelSelect.options.length > 2) {
+                    const response = await fetch('/get_current_model/');
+                    const data = await response.json();
+                    
+                    if (data.status === 'success' && data.current_model) {
+                        // Check if the returned model exists in the select options
+                        const optionExists = Array.from(modelSelect.options).some(option => option.value === data.current_model);
+                        if (optionExists) {
+                            state.currentModel = data.current_model;
+                            document.getElementById('modelSelect').value = data.current_model;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading current model:', error);
+                // Keep the existing default value unchanged
+            }
+        }
+        
+        // Handle model change event
+        function onModelChange() {
+            // No need to load model params anymore
+        }
+        
+        // Switch to selected model
+        async function switchModel() {
+            const modelSelect = document.getElementById('modelSelect');
+            const modelName = modelSelect.value;
+            
+            if (!modelName || modelName === 'none' || modelName === 'error') {
+                alert('Please select a valid model');
+                return;
+            }
+            
+            try {
+                // Show loading state
+                const button = document.querySelector('button[onclick="switchModel()"]');
+                const originalText = button.textContent;
+                button.textContent = 'Switching...';
+                button.disabled = true;
+                
+                const response = await fetch('/switch_model/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        model_name: modelName
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    alert('Model switched successfully');
+                    state.currentModel = modelName;
+                } else {
+                    alert('Failed to switch model: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error switching model:', error);
+                alert('Failed to switch model: ' + error.message);
+            } finally {
+                // Restore button state
+                const button = document.querySelector('button[onclick="switchModel()"]');
+                button.textContent = 'Switch Model';
+                button.disabled = false;
+            }
+        }
+        
+        // Load models when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadModels();
+        });
+        
+
+        
+
+        
+        // Initialize Alerts
+        function initAlerts() {
+            const alertsList = document.getElementById('alertsList');
+            const alerts = [
+                { level: 'critical', title: 'Safety helmet not detected', location: 'Production Workshop - Area B', time: '2 minutes ago' },
+                { level: 'warning', title: 'Temperature approaching upper limit', location: 'Warehouse Area', time: '5 minutes ago' },
+                { level: 'warning', title: 'Breathing equipment missing', location: 'Chemical Storage Area', time: '12 minutes ago' },
+                { level: 'info', title: 'Device CAM-004 offline', location: 'Parking Lot', time: '30 minutes ago' },
+                { level: 'info', title: 'Detection model updated', location: 'System', time: '1 hour ago' }
+            ];
+            
+            const levelConfig = {
+                critical: { bg: 'bg-red-500/10', border: 'border-red-500/30', dot: 'bg-red-500' },
+                warning: { bg: 'bg-orange-500/10', border: 'border-orange-500/30', dot: 'bg-orange-500' },
+                info: { bg: 'bg-blue-500/10', border: 'border-blue-500/30', dot: 'bg-blue-500' }
+            };
+            
+            alertsList.innerHTML = alerts.map(alert => `
+                <div class="alert-item p-4 rounded-xl ${levelConfig[alert.level].bg} border ${levelConfig[alert.level].border}">
+                    <div class="flex items-start gap-3">
+                        <span class="w-3 h-3 rounded-full ${levelConfig[alert.level].dot} mt-1 flex-shrink-0"></span>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <p class="font-medium">${alert.title}</p>
+                                <span class="text-xs text-gray-500">${alert.time}</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mt-1">${alert.location}</p>
+                            <div class="flex gap-2 mt-3">
+                                <button class="px-3 py-1 text-xs rounded bg-white/10 hover:bg-white/20 transition">Confirm</button>
+                                <button class="px-3 py-1 text-xs rounded bg-white/10 hover:bg-white/20 transition">Ignore</button>
+                                <button class="px-3 py-1 text-xs rounded bg-green-600/50 hover:bg-green-600/70 transition">Processed</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Tab Switching
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('hover:bg-white/5');
+            });
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('tab-active');
+            document.querySelector(`[data-tab="${tabId}"]`).classList.remove('hover:bg-white/5');
+        }
+        
+        // Video Source Control
+        let frameProcessingId = null;
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Store selected local images
+        let selectedLocalImages = [];
+        
+        document.getElementById('videoSource').addEventListener('change', function() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            
+            // Stop any ongoing frame processing
+            if (frameProcessingId) {
+                cancelAnimationFrame(frameProcessingId);
+                frameProcessingId = null;
+            }
+            
+            // Reset video source object if it's a media stream
+            if (videoPlayer.srcObject) {
+                videoPlayer.srcObject.getTracks().forEach(track => track.stop());
+                videoPlayer.srcObject = null;
+            }
+            
+            // Reset video player
+            videoPlayer.pause();
+            videoPlayer.src = '';
+            
+            // Restore video player display if it was hidden for image detection
+            videoPlayer.style.display = 'block';
+            
+            // Remove detected image if it exists
+            const detectedImage = document.getElementById('detectedImage');
+            if (detectedImage) {
+                detectedImage.remove();
+            }
+            
+            // Reset selected local files
+            selectedLocalFile = null;
+            selectedLocalImages = [];
+            state.currentVideoDuration = 0;
+            
+            // Reset image preview, results and count
+            document.getElementById('imagePreview').innerHTML = '';
+            document.getElementById('imagePreview').classList.add('hidden');
+            document.getElementById('imageResults').innerHTML = '';
+            document.getElementById('imageResults').classList.add('hidden');
+            document.getElementById('imageCount').classList.add('hidden');
+            
+            // Hide detection stats
+            document.getElementById('detectionStats').style.display = 'none';
+            
+            // Show or hide upload buttons based on selected source
+            const uploadImageBtn = document.getElementById('uploadImageBtn');
+            const uploadVideoBtn = document.getElementById('uploadVideoBtn');
+            
+            // Hide both buttons by default
+            uploadImageBtn.classList.add('hidden');
+            uploadVideoBtn.classList.add('hidden');
+            
+            if (this.value === 'image') {
+                // Show upload image button when Local Image is selected
+                uploadImageBtn.classList.remove('hidden');
+                // Update detection time estimate for image mode
+                updateDetectionTimeEstimate();
+            } else if (this.value === 'local') {
+                // Show upload video button when Local Video File is selected
+                uploadVideoBtn.classList.remove('hidden');
+                // Update detection time estimate for local video
+                updateDetectionTimeEstimate();
+            } else if (this.value === 'camera1') {
+                // Camera handling - do not initialize camera immediately, wait for startDetection
+                // Just reset video player to prepare for camera stream
+                videoPlayer.src = '';
+                videoPlayer.load();
+                // Update detection time estimate for camera
+                updateDetectionTimeEstimate();
+            } else if (this.value === 'camera2' || this.value === 'camera3') {
+                // Other cameras - reset to default video for now
+                videoPlayer.src = '/media/video.mp4';
+                videoPlayer.load();
+                if (state.isDetecting) {
+                    videoPlayer.play();
+                }
+                // Update detection time estimate for default video
+                updateDetectionTimeEstimate();
+            }
+        });
+        
+        // Camera initialization function
+        async function initCamera() {
+            try {
+                // Request camera permission
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 },
+                        frameRate: { ideal: 30 }
+                    },
+                    audio: false
+                });
+                
+                // Set stream to video player
+                const videoPlayer = document.getElementById('videoPlayer');
+                videoPlayer.srcObject = stream;
+                
+                // Start playing video
+                await videoPlayer.play();
+                
+                // Start frame processing if detection is active
+                if (state.isDetecting) {
+                    startFrameProcessing();
+                }
+            } catch (error) {
+                console.error('Camera initialization failed:', error);
+                alert('Cannot access camera, please check permission settings');
+            }
+        }
+        
+        // Real-time frame processing function
+        function startFrameProcessing() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            
+            // Set canvas size to match video
+            canvas.width = videoPlayer.videoWidth;
+            canvas.height = videoPlayer.videoHeight;
+            
+            // Frame processing loop
+            function processFrame() {
+                if (state.isDetecting && videoPlayer.srcObject) {
+                    // Draw current video frame to canvas
+                    ctx.drawImage(videoPlayer, 0, 0, canvas.width, canvas.height);
+                    
+                    // Convert canvas to Blob and send to backend
+                    canvas.toBlob(async (blob) => {
+                        try {
+                            const detections = await sendFrameForDetection(blob);
+                            drawDetectionBoxes(detections.detections.boxes);
+                        } catch (error) {
+                            console.error('Frame processing error:', error);
+                        }
+                    }, 'image/jpeg', 0.8);
+                }
+                
+                // Continue the loop
+                frameProcessingId = requestAnimationFrame(processFrame);
+            }
+            
+            // Start the loop
+            processFrame();
+        }
+        
+        // Function to send frame to backend for detection
+        async function sendFrameForDetection(blob) {
+            try {
+                // Create new AbortController for this request
+                abortController = new AbortController();
+                
+                const formData = new FormData();
+                formData.append('frame', blob);
+                formData.append('confidence', document.getElementById('confidenceSlider').value);
+                formData.append('model_type', document.getElementById('modelSelect').value);
+                
+                const response = await fetch('/detect_frame/', {
+                    method: 'POST',
+                    body: formData,
+                    signal: abortController.signal
+                });
+                
+                return await response.json();
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    console.error('Frame detection error:', error);
+                }
+                throw error;
+            }
+        }
+
+        // Update detection time estimate display
+        function updateDetectionTimeEstimate() {
+            const timeEstimateElement = document.getElementById('detectionTimeEstimate');
+            if (!timeEstimateElement) return;
+            
+            const videoSource = document.getElementById('videoSource').value;
+            let estimateSeconds = 30; // Default estimate for camera
+            
+            if (videoSource === 'local' && state.currentVideoDuration > 0) {
+                estimateSeconds = Math.round(state.currentVideoDuration);
+            } else if (videoSource === 'image') {
+                // Estimate 1 second per image
+                estimateSeconds = Math.max(1, selectedLocalImages.length);
+            }
+            
+            timeEstimateElement.textContent = `This detection will take approximately ${estimateSeconds} seconds`;
+        }
+
+        // Format time in seconds to mm:ss format
+        function formatTime(seconds) {
+            if (isNaN(seconds) || seconds < 0) {
+                return '00:00';
+            }
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Store the selected file for later processing
+        let selectedLocalFile = null;
+        
+        // Store processed videos info: filename -> processed video URL
+        const processedVideos = {};
+        
+        function handleLocalVideoSelect(input) {
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                selectedLocalFile = file;
+                
+                // Get video duration using HTML5 video API
+                const video = document.createElement('video');
+                video.preload = 'metadata';
+                
+                video.onloadedmetadata = function() {
+                    // Store video duration in state
+                    const duration = video.duration;
+                    state.currentVideoDuration = duration;
+                    console.log('Video duration:', duration, 'seconds');
+                    
+                    // Create a URL for the video file
+                    URL.revokeObjectURL(video.src);
+                    
+                    // Update detection time estimate display
+                    updateDetectionTimeEstimate();
+                };
+                
+                video.onerror = function() {
+                    console.error('Error getting video metadata');
+                    // Proceed with processing even if duration can't be obtained
+                    state.currentVideoDuration = 0;
+                    // Update detection time estimate display with default value
+                    updateDetectionTimeEstimate();
+                };
+                
+                // Set video source to file URL
+                video.src = URL.createObjectURL(file);
+            }
+        }
+        
+        // Handle local image selection
+        function handleLocalImageSelect(input) {
+            if (input.files.length > 0) {
+                // Store selected images
+                selectedLocalImages = Array.from(input.files);
+                
+                // Show image count instead of preview
+                const imageCountContainer = document.getElementById('imageCount');
+                const selectedImageCount = document.getElementById('selectedImageCount');
+                selectedImageCount.textContent = selectedLocalImages.length;
+                imageCountContainer.classList.remove('hidden');
+                
+                // Hide image preview and results if any
+                const previewContainer = document.getElementById('imagePreview');
+                previewContainer.classList.add('hidden');
+                
+                const resultsContainer = document.getElementById('imageResults');
+                resultsContainer.classList.add('hidden');
+                
+                // Update detection time estimate for images
+                updateDetectionTimeEstimate();
+            }
+        }
+        
+        function uploadVideoForProcessing(file, duration) {
+            // Show processing status
+            const videoContainer = document.getElementById('videoContainer');
+            const processingOverlay = document.createElement('div');
+            processingOverlay.id = 'processingOverlay';
+            processingOverlay.className = 'absolute inset-0 bg-black/70 flex items-center justify-center z-20';
+            
+            // Generate a unique task ID for this video processing task
+            const taskId = 'task_' + Math.random().toString(36).substr(2, 9);
+            
+            // Format duration for display
+            const formattedDuration = formatTime(duration);
+            
+            processingOverlay.innerHTML = `
+                <div class="text-center">
+                    <div class="animate-pulse mb-4">
+                        <svg class="w-16 h-16 mx-auto text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Detecting</h3>
+                    <p class="text-gray-400 mb-4">Processing video, please wait...</p>
+                    <div class="mt-4 text-lg font-medium text-blue-400">
+                        Detection will complete in approximately ${Math.round(duration)} seconds
+                    </div>
+                </div>
+            `;
+            videoContainer.appendChild(processingOverlay);
+            
+            // Hide detection stats during processing
+            document.getElementById('detectionStats').style.display = 'none';
+            document.getElementById('fpsCounter').style.display = 'none';
+            
+            // Prepare form data for upload
+            const formData = new FormData();
+            formData.append('video', file);
+            formData.append('confidence', document.getElementById('confidenceSlider').value);
+            formData.append('model_type', document.getElementById('modelSelect').value);
+            
+            // Add task ID to form data
+            formData.append('task_id', taskId);
+            
+            console.log('Form data prepared. File:', file);
+            console.log('Confidence:', document.getElementById('confidenceSlider').value);
+            console.log('Model type:', document.getElementById('modelSelect').value);
+            console.log('Task ID:', taskId);
+            
+
+            
+            // Upload video for processing
+            console.log('Sending request to /process_video/');
+            
+            // Try using XMLHttpRequest instead of fetch for better debugging
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/process_video/', true);
+            
+            xhr.onload = function() {
+                console.log('XHR onload event. Status:', this.status);
+                console.log('XHR response text:', this.responseText);
+                
+                try {
+                    const data = JSON.parse(this.responseText);
+                    console.log('XHR response parsed:', data);
+                    
+                    if (data.status === 'success') {
+                        // Store processed video info for future use
+                        processedVideos[file.name] = {
+                            url: data.video_url,
+                            detections: data.detections
+                        };
+                        
+                        // Remove processing overlay immediately for faster response
+                        processingOverlay.remove();
+                        
+                        // Update video source to processed video
+                        const videoPlayer = document.getElementById('videoPlayer');
+                        
+                        // Update video source directly for immediate playback
+                        videoPlayer.src = data.video_url;
+                        videoPlayer.load();
+                        videoPlayer.muted = true;
+                        videoPlayer.playsInline = true;
+                        
+                        // Show detection stats (commented out)
+                        // document.getElementById('detectionStats').style.display = 'block';
+                        document.getElementById('fpsCounter').style.display = 'block';
+                        
+                        // Start playing immediately
+                        videoPlayer.play().catch(error => {
+                            console.log('Video play failed, waiting for user interaction:', error);
+                        });
+                    } else {
+                        // Show error message
+                        clearInterval(progressInterval);
+                        processingOverlay.innerHTML = `
+                            <div class="text-center">
+                                <svg class="w-16 h-16 mx-auto text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <h3 class="text-xl font-semibold mb-2">Processing Failed</h3>
+                                <p class="text-gray-400 mb-2">${data.message || 'Video processing failed, please try again'}</p>
+                                ${data.error_details ? `<div class="text-left text-xs text-gray-500 max-w-sm overflow-auto max-h-40 mb-4">${data.error_details}</div>` : ''}
+                                <button onclick="this.parentElement.parentElement.remove()" class="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg">Close</button>
+                            </div>
+                        `;
+                    }
+                } catch (e) {
+                    console.error('Error parsing XHR response:', e);
+                    clearInterval(progressInterval);
+                    processingOverlay.innerHTML = `
+                        <div class="text-center">
+                            <svg class="w-16 h-16 mx-auto text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <h3 class="text-xl font-semibold mb-2">Processing Failed</h3>
+                            <p class="text-gray-400 mb-2">Failed to parse server response</p>
+                            <div class="text-left text-xs text-gray-500 max-w-sm overflow-auto max-h-40 mb-4">Response content: ${this.responseText}</div>
+                            <button onclick="this.parentElement.parentElement.remove()" class="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg">Close</button>
+                        </div>
+                    `;
+                }
+            };
+            
+            xhr.onerror = function() {
+                console.error('XHR onerror event. Status:', this.status);
+                processingOverlay.innerHTML = `
+                    <div class="text-center">
+                        <svg class="w-16 h-16 mx-auto text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <h3 class="text-xl font-semibold mb-2">Processing Failed</h3>
+                        <p class="text-gray-400 mb-2">Network request failed</p>
+                        <div class="text-left text-xs text-gray-500 max-w-sm overflow-auto max-h-40 mb-4">XHR error, status code: ${this.status}</div>
+                        <button onclick="this.parentElement.parentElement.remove()" class="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg">Close</button>
+                    </div>
+                `;
+            };
+            
+            xhr.ontimeout = function() {
+                console.error('XHR ontimeout event');
+                processingOverlay.innerHTML = `
+                    <div class="text-center">
+                        <svg class="w-16 h-16 mx-auto text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <h3 class="text-xl font-semibold mb-2">Processing Failed</h3>
+                        <p class="text-gray-400 mb-2">Network request timed out</p>
+                        <button onclick="this.parentElement.parentElement.remove()" class="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg">Close</button>
+                    </div>
+                `;
+            };
+            
+            // Set timeout to 60 seconds
+            xhr.timeout = 60000;
+            
+            // Send the request
+            console.log('XHR sending request...');
+            xhr.send(formData);
+        }
+        
+        // Function to upload images for processing
+        function uploadImagesForProcessing(images) {
+            // Show loading status
+            const videoContainer = document.getElementById('videoContainer');
+            const processingOverlay = document.createElement('div');
+            processingOverlay.id = 'processingOverlay';
+            processingOverlay.className = 'absolute inset-0 bg-black/70 flex items-center justify-center z-20';
+            
+            processingOverlay.innerHTML = `
+                <div class="text-center">
+                    <div class="animate-pulse mb-4">
+                        <svg class="w-16 h-16 mx-auto text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Detecting</h3>
+                    <p class="text-gray-400 mb-4">Processing image, please wait...</p>
+                    <div class="mt-4 text-lg font-medium text-blue-400">
+                        Processing image <span id="currentImageIndex">1</span>/<span id="totalImages">${images.length}</span>
+                    </div>
+                </div>
+            `;
+            videoContainer.appendChild(processingOverlay);
+            
+            // Hide detection stats during processing
+            document.getElementById('detectionStats').style.display = 'none';
+            document.getElementById('fpsCounter').style.display = 'none';
+            
+            // Process each image
+            const processedImages = [];
+            let currentIndex = 0;
+            
+            // Function to process next image
+            async function processNextImage() {
+                if (currentIndex >= images.length) {
+                    // All images processed, show results
+                    showImageResults(processedImages);
+                    // Remove processing overlay
+                    processingOverlay.remove();
+                    
+                    // Reset frontend state after detection
+                    resetFrontendState();
+                    return;
+                }
+                
+                // Update current image index
+                document.getElementById('currentImageIndex').textContent = currentIndex + 1;
+                
+                const image = images[currentIndex];
+                currentIndex++;
+                
+                try {
+                    // Create FormData for the image
+                    const formData = new FormData();
+                    formData.append('image', image);
+                    formData.append('confidence', document.getElementById('confidenceSlider').value);
+                    formData.append('model_type', document.getElementById('modelSelect').value);
+                    
+                    // Send image to backend for detection
+                    const response = await fetch('/detect_image/', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        // Store processed image data including image info
+                        processedImages.push({
+                            file: image,
+                            detections: data.detections,
+                            image_url: data.image_url,
+                            image_info: data.image_info  // Include image dimensions
+                        });
+                    } else {
+                        console.error('Image processing failed:', data.message);
+                    }
+                } catch (error) {
+                    console.error('Error processing image:', error);
+                } finally {
+                    // Process next image
+                    processNextImage();
+                }
+            }
+            
+            // Start processing images
+            processNextImage();
+        }
+        
+        // Function to reset frontend state after image detection
+        function resetFrontendState() {
+            // Reset selected local images
+            selectedLocalImages = [];
+            
+            // Hide image count display
+            document.getElementById('imageCount').classList.add('hidden');
+            
+            // Reset detection status
+            state.isDetecting = false;
+            
+            // Reset buttons
+            document.getElementById('startBtn').classList.remove('hidden');
+            document.getElementById('stopBtn').classList.add('hidden');
+            
+            // Reset detection status text
+            document.getElementById('detectionStatus').textContent = 'Stopped';
+            document.getElementById('detectionStatus').className = 'text-gray-400';
+            
+            // Reset detection time estimate
+            updateDetectionTimeEstimate();
+            
+            // Clear any pending fetch requests
+            if (abortController) {
+                abortController.abort();
+                abortController = null;
+            }
+        }
+        
+        // Function to show image detection results
+        function showImageResults(processedImages) {
+            // Add confidence value to each processed image
+            const confidence = document.getElementById('confidenceSlider').value;
+            processedImages.forEach(img => {
+                img.confidence = confidence;
+            });
+            
+            // Check if it's a single image
+            if (processedImages.length === 1) {
+                // Show single image result in current video container
+                showSingleImageResult(processedImages[0]);
+            } else {
+                // For multiple images, open in new tab
+                // Encode detection results as URL parameter
+                const resultsParam = encodeURIComponent(JSON.stringify(processedImages));
+                
+                // Open in new tab
+                window.open(`/image_result/?results=${resultsParam}`, '_blank');
+            }
+        }
+        
+        // Function to show single image result in video container
+        function showSingleImageResult(processedImage) {
+            // Get video container and elements
+            const videoContainer = document.getElementById('videoContainer');
+            const videoPlayer = document.getElementById('videoPlayer');
+            const detectionBoxes = document.getElementById('detectionBoxes');
+            const detectionStats = document.getElementById('detectionStats');
+            const fpsCounter = document.getElementById('fpsCounter');
+            
+            // Hide video player
+            videoPlayer.style.display = 'none';
+            
+            // Hide all stats elements (as requested)
+            detectionStats.style.display = 'none';
+            fpsCounter.style.display = 'none';
+            
+            // Remove any existing detected image first
+            const existingDetectedImage = document.getElementById('detectedImage');
+            if (existingDetectedImage) {
+                existingDetectedImage.remove();
+            }
+            
+            // Create image element for detected image
+            const imgElement = document.createElement('img');
+            imgElement.id = 'detectedImage';
+            imgElement.src = processedImage.image_url;
+            imgElement.className = 'w-full h-full object-contain';
+            imgElement.alt = processedImage.file.name;
+            
+            // Replace video player with image
+            const videoWrapper = videoPlayer.parentElement;
+            videoWrapper.appendChild(imgElement);
+            
+            // Clear any existing detection boxes (don't draw new ones as requested)
+            detectionBoxes.innerHTML = '';
+            
+            // Update detection status
+            document.getElementById('detectionStatus').textContent = 'Detection Completed';
+            document.getElementById('detectionStatus').className = 'text-green-400';
+        }
+        
+        // Function to draw detection boxes on single image in video container
+        function drawSingleImageDetectionBoxes(detectionBoxes) {
+            const container = document.getElementById('detectionBoxes');
+            container.innerHTML = '';
+            
+            // Get container dimensions
+            const videoContainer = document.getElementById('videoContainer');
+            const containerRect = videoContainer.getBoundingClientRect();
+            const containerWidth = containerRect.width;
+            const containerHeight = containerRect.height;
+            
+            // Get image dimensions
+            const imgElement = document.getElementById('detectedImage');
+            const imgWidth = imgElement.naturalWidth;
+            const imgHeight = imgElement.naturalHeight;
+            
+            // Scaling factors: container size / actual image size
+            const scaleX = containerWidth / imgWidth;
+            const scaleY = containerHeight / imgHeight;
+            
+            // Draw each detection box
+            detectionBoxes.forEach(det => {
+                // Focus only on person, exclude helmet and ventilator
+                if (det.class_name !== 'person') {
+                    return;
+                }
+                
+                const box = document.createElement('div');
+                box.className = 'detection-box rounded';
+                
+                // Get bounding box coordinates
+                const [x1, y1, x2, y2] = det.bbox;
+                
+                // Calculate scaled coordinates and dimensions
+                const scaledX1 = x1 * scaleX;
+                const scaledY1 = y1 * scaleY;
+                const scaledX2 = x2 * scaleX;
+                const scaledY2 = y2 * scaleY;
+                
+                // Set box position and size
+                box.style.left = `${scaledX1}px`;
+                box.style.top = `${scaledY1}px`;
+                box.style.width = `${scaledX2 - scaledX1}px`;
+                box.style.height = `${scaledY2 - scaledY1}px`;
+                
+                // Set color based on class
+                let color = '#3A7BFF'; // Blue for person
+                let bgColor = 'rgba(58, 123, 255, 0.1)';
+                
+                box.style.borderColor = color;
+                box.style.backgroundColor = bgColor;
+                
+                // Create label
+                const label = document.createElement('span');
+                label.className = 'absolute -top-6 left-0 text-xs px-2 py-0.5 rounded font-bold';
+                label.style.backgroundColor = color;
+                label.style.color = '#ffffff';
+                label.style.zIndex = '1001';
+                label.textContent = `${det.class_name}: ${det.confidence.toFixed(2)}`;
+                box.appendChild(label);
+                
+                container.appendChild(box);
+            });
+        }
+        
+        // Fallback function to show results in current page if new window is blocked
+        function showResultsInCurrentPage(processedImages) {
+            // Hide image preview
+            document.getElementById('imagePreview').classList.add('hidden');
+            
+            // Show results container
+            const resultsContainer = document.getElementById('imageResults');
+            resultsContainer.innerHTML = '';
+            resultsContainer.classList.remove('hidden');
+            
+            // Create result for each processed image
+            processedImages.forEach((processedImage, index) => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'relative glass-card rounded-xl p-4';
+                
+                resultItem.innerHTML = `
+                    <h4 class="text-sm font-medium mb-2">Detection Result ${index + 1}: ${processedImage.file.name}</h4>
+                    <div class="relative aspect-video bg-gray-800 rounded-lg overflow-hidden">
+                        <img src="${processedImage.image_url}" alt="${processedImage.file.name}" class="w-full h-full object-contain" />
+                        <div id="imageDetectionBoxes-${index}" class="absolute inset-0"></div>
+                    </div>
+                    <div class="mt-3 grid grid-cols-4 gap-2">
+                        <div class="text-center p-2 rounded-lg bg-white/5">
+                            <div class="text-sm text-gray-400">Helmets</div>
+                            <div class="text-lg font-semibold text-green-400">${processedImage.detections.helmet}</div>
+                        </div>
+                        <div class="text-center p-2 rounded-lg bg-white/5">
+                            <div class="text-sm text-gray-400">Persons</div>
+                            <div class="text-lg font-semibold text-blue-400">${processedImage.detections.person}</div>
+                        </div>
+                        <div class="text-center p-2 rounded-lg bg-white/5">
+                            <div class="text-sm text-gray-400">Ventilators</div>
+                            <div class="text-lg font-semibold text-purple-400">${processedImage.detections.respirator}</div>
+                        </div>
+                        <div class="text-center p-2 rounded-lg bg-white/5">
+                            <div class="text-sm text-gray-400">Violations</div>
+                            <div class="text-lg font-semibold text-red-400">${processedImage.detections.violation}</div>
+                        </div>
+                    </div>
+                `;
+                
+                resultsContainer.appendChild(resultItem);
+                
+                // Draw detection boxes for this image
+                drawImageDetectionBoxes(processedImage.detections.boxes, index);
+            });
+        }
+        
+        // Function to draw detection boxes on images
+        function drawImageDetectionBoxes(detectionBoxes, imageIndex) {
+            const container = document.getElementById(`imageDetectionBoxes-${imageIndex}`);
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            // Get container dimensions
+            const containerRect = container.getBoundingClientRect();
+            const containerWidth = containerRect.width;
+            const containerHeight = containerRect.height;
+            
+            // Get image dimensions
+            const imgElement = container.previousElementSibling;
+            const imgWidth = imgElement.naturalWidth;
+            const imgHeight = imgElement.naturalHeight;
+            
+            // Scaling factors: container size / actual image size
+            const scaleX = containerWidth / imgWidth;
+            const scaleY = containerHeight / imgHeight;
+            
+            // Draw each detection box
+            detectionBoxes.forEach(det => {
+                // Focus only on person, exclude helmet and ventilator
+                if (det.class_name !== 'person') {
+                    return;
+                }
+                
+                const box = document.createElement('div');
+                box.className = 'detection-box rounded';
+                
+                // Get bounding box coordinates
+                const [x1, y1, x2, y2] = det.bbox;
+                
+                // Calculate scaled coordinates and dimensions
+                const scaledX1 = x1 * scaleX;
+                const scaledY1 = y1 * scaleY;
+                const scaledX2 = x2 * scaleX;
+                const scaledY2 = y2 * scaleY;
+                
+                // Set box position and size
+                box.style.left = `${scaledX1}px`;
+                box.style.top = `${scaledY1}px`;
+                box.style.width = `${scaledX2 - scaledX1}px`;
+                box.style.height = `${scaledY2 - scaledY1}px`;
+                
+                // Set color based on class
+                let color = '#3A7BFF'; // Blue for person
+                let bgColor = 'rgba(58, 123, 255, 0.1)';
+                
+                box.style.borderColor = color;
+                box.style.backgroundColor = bgColor;
+                
+                // Create label
+                const label = document.createElement('span');
+                label.className = 'absolute -top-6 left-0 text-xs px-2 py-0.5 rounded font-bold';
+                label.style.backgroundColor = color;
+                label.style.color = '#ffffff';
+                label.style.zIndex = '1001';
+                label.textContent = `${det.class_name}: ${det.confidence.toFixed(2)}`;
+                box.appendChild(label);
+                
+                container.appendChild(box);
+            });
+        }
+
+        // Detection Control
+        function startDetection() {
+            state.isDetecting = true;
+            document.getElementById('startBtn').classList.add('hidden');
+            document.getElementById('stopBtn').classList.remove('hidden');
+            document.getElementById('detectionStatus').textContent = 'Detecting';
+            document.getElementById('detectionStatus').className = 'text-green-400';
+            
+            const videoPlayer = document.getElementById('videoPlayer');
+            const videoSource = document.getElementById('videoSource').value;
+            
+            // Only show FPS counter for camera/video streams, not for image processing
+            if (videoSource !== 'image') {
+                // Remove detection stats display
+                // document.getElementById('detectionStats').style.display = 'block';
+                document.getElementById('fpsCounter').style.display = 'block';
+            }
+            
+            // Check if it's local video file processing
+            if (videoSource === 'local' && selectedLocalFile) {
+                // Always start processing regardless of whether it's been processed before
+                uploadVideoForProcessing(selectedLocalFile, state.currentVideoDuration);
+                return;
+            }
+            
+            // Check if it's local image processing
+            if (videoSource === 'image' && selectedLocalImages.length > 0) {
+                // Start image detection
+                uploadImagesForProcessing(selectedLocalImages);
+                return;
+            }
+            
+            // Check if we need to initialize camera
+            if (videoSource === 'camera1' && !videoPlayer.srcObject) {
+                // Initialize camera only when start detection is clicked
+                initCamera();
+                return;
+            }
+            
+            // Start video playback if there's a valid source
+            if (videoPlayer.src) {
+                videoPlayer.play().catch(error => {
+                    console.log('Video play failed, waiting for user interaction:', error);
+                });
+            }
+            
+            // For camera stream, use frame processing instead of fetching results
+            if (videoPlayer.srcObject) {
+                // Start frame processing for camera
+                startFrameProcessing();
+            } else {
+                // Call backend API for detection every 500ms for real-time effect
+                if (!state.detectionInterval) {
+                    state.detectionInterval = setInterval(fetchDetectionResults, 500);
+                }
+            }
+            
+            // Draw initial detection boxes
+            drawDetectionBoxes();
+        }
+        
+        // Add AbortController support for fetch requests
+        let abortController = null;
+        
+        function stopDetection() {
+            // Check if video or image is currently being processed
+            const processingOverlay = document.getElementById('processingOverlay');
+            if (processingOverlay) {
+                // Show alert if media is being processed
+                alert('Detection in progress, please wait for completion');
+                return; // Don't stop detection if media is being processed
+            }
+            
+            state.isDetecting = false;
+            document.getElementById('startBtn').classList.remove('hidden');
+            document.getElementById('stopBtn').classList.add('hidden');
+            document.getElementById('detectionStatus').textContent = 'Stopped';
+            document.getElementById('detectionStatus').className = 'text-gray-400';
+            document.getElementById('detectionStats').style.display = 'none';
+            document.getElementById('fpsCounter').style.display = 'none';
+            
+            // Reset detection time estimate
+            updateDetectionTimeEstimate();
+            
+            // Stop video playback immediately
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.pause();
+            
+            // Release camera resources if using webcam
+            if (videoPlayer.srcObject) {
+                // Stop all video tracks
+                videoPlayer.srcObject.getTracks().forEach(track => {
+                    track.stop();
+                });
+                // Clear the source object
+                videoPlayer.srcObject = null;
+            }
+            
+            // Stop frame processing for camera stream
+            if (frameProcessingId) {
+                cancelAnimationFrame(frameProcessingId);
+                frameProcessingId = null;
+            }
+            
+            // Clear detection interval
+            if (state.detectionInterval) {
+                clearInterval(state.detectionInterval);
+                state.detectionInterval = null;
+            }
+            
+            // Clear all detection boxes immediately
+            const container = document.getElementById('detectionBoxes');
+            container.innerHTML = '';
+            
+            // Clear image detection boxes
+            document.querySelectorAll('[id^="imageDetectionBoxes-"]').forEach(boxContainer => {
+                boxContainer.innerHTML = '';
+            });
+            
+            // Restore video player if image was displayed
+            const detectedImage = document.getElementById('detectedImage');
+            if (detectedImage) {
+                // Show video player again
+                videoPlayer.style.display = 'block';
+                
+                // Remove detected image
+                detectedImage.remove();
+            }
+            
+            // Abort any pending fetch requests
+            if (abortController) {
+                abortController.abort();
+                abortController = null;
+            }
+        }
+        
+        async function fetchDetectionResults() {
+            if (!state.isDetecting) return;
+            
+            try {
+                // Create new AbortController for this request
+                abortController = new AbortController();
+                
+                const response = await fetch('/detect/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        confidence: document.getElementById('confidenceSlider').value,
+                        model_type: document.getElementById('modelSelect').value
+                    }),
+                    signal: abortController.signal
+                });
+                
+                const data = await response.json();
+                if (data.status === 'success') {
+                    const detections = data.detections;
+                    
+                    // Update detection counts (commented out since stats are not displayed)
+                    // document.getElementById('helmetCount').textContent = detections.helmet;
+                    // document.getElementById('personCount').textContent = detections.person;
+                    // document.getElementById('respiratorCount').textContent = detections.respirator;
+                    // document.getElementById('violationCount').textContent = detections.violation;
+                    
+                    state.detectionCount += detections.person;
+                    state.violationCount += detections.violation;
+                    
+                    updateStats();
+                    drawDetectionBoxes(detections.boxes);
+                    
+                    // Update FPS
+                    document.getElementById('fpsValue').textContent = Math.floor(Math.random() * 5 + 28);
+                }
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    console.error('Detection error:', error);
+                }
+            }
+        }
+        
+        // Simulated detection for testing
+        function simulateDetection() {
+            if (!state.isDetecting) return;
+            
+            // Simulate detection results
+            const helmetCount = Math.floor(Math.random() * 5 + 1);
+            const personCount = Math.floor(Math.random() * 8 + 2);
+            const respiratorCount = Math.floor(Math.random() * 3);
+            const violationCount = Math.floor(Math.random() * 2);
+            
+            // Update detection counts (commented out since stats are not displayed)
+            // document.getElementById('helmetCount').textContent = helmetCount;
+            // document.getElementById('personCount').textContent = personCount;
+            // document.getElementById('respiratorCount').textContent = respiratorCount;
+            // document.getElementById('violationCount').textContent = violationCount;
+            
+            state.detectionCount += personCount;
+            state.violationCount += violationCount;
+            
+            updateStats();
+            drawDetectionBoxes();
+            
+            // Update FPS
+            document.getElementById('fpsValue').textContent = Math.floor(Math.random() * 5 + 28);
+            
+            setTimeout(simulateDetection, 1000);
+        }
+        
+        function drawDetectionBoxes(detectionBoxes = []) {
+            const container = document.getElementById('detectionBoxes');
+            container.innerHTML = '';
+            
+            // Use actual detection results from backend
+            
+            // Get video container dimensions
+            const videoContainer = document.getElementById('videoContainer');
+            const containerRect = videoContainer.getBoundingClientRect();
+            const containerWidth = containerRect.width;
+            const containerHeight = containerRect.height;
+            
+            // Get actual video dimensions from the video element
+            const videoPlayer = document.getElementById('videoPlayer');
+            const videoWidth = videoPlayer.videoWidth || 1920;
+            const videoHeight = videoPlayer.videoHeight || 1080;
+            
+            // Scaling factors: video container size / actual video resolution
+            const scaleX = containerWidth / videoWidth;
+            const scaleY = containerHeight / videoHeight;
+            
+            // Only draw boxes if there are actual detections
+            if (detectionBoxes.length === 0) {
+                return; // Exit early if no detections
+            }
+            
+            // Draw each detection box, focusing on person, helmet, and ventilator
+            detectionBoxes.forEach(det => {
+                // Focus only on person, helmet, and ventilator
+                if (!['person', 'helmet', 'ventilator'].includes(det.class_name)) {
+                    return;
+                }
+                
+                const box = document.createElement('div');
+                box.className = 'detection-box rounded';
+                
+                // Get bounding box coordinates
+                const [x1, y1, x2, y2] = det.bbox;
+                
+                // Calculate scaled coordinates and dimensions
+                const scaledX1 = x1 * scaleX;
+                const scaledY1 = y1 * scaleY;
+                const scaledX2 = x2 * scaleX;
+                const scaledY2 = y2 * scaleY;
+                
+                // Set box position and size
+                box.style.left = `${scaledX1}px`;
+                box.style.top = `${scaledY1}px`;
+                box.style.width = `${scaledX2 - scaledX1}px`;
+                box.style.height = `${scaledY2 - scaledY1}px`;
+                
+                // Set color based on class (specific for three target classes)
+                let color = '#FFA500'; // Default: orange
+                let bgColor = 'rgba(255, 165, 0, 0.1)';
+                
+                if (det.class_name === 'person') {
+                    color = '#3A7BFF'; // Blue for person
+                    bgColor = 'rgba(58, 123, 255, 0.1)';
+                } else if (det.class_name === 'helmet') {
+                    color = '#4CD964'; // Green for helmet
+                    bgColor = 'rgba(76, 217, 100, 0.1)';
+                } else if (det.class_name === 'ventilator') {
+                    color = '#A855F7'; // Purple for ventilator
+                    bgColor = 'rgba(168, 85, 247, 0.1)';
+                }
+                
+                box.style.borderColor = color;
+                box.style.backgroundColor = bgColor;
+                
+                // Create label
+                const label = document.createElement('span');
+                label.className = 'absolute -top-6 left-0 text-xs px-2 py-0.5 rounded font-bold';
+                label.style.backgroundColor = color;
+                label.style.color = '#ffffff';
+                label.style.zIndex = '1001';
+                label.textContent = `${det.class_name}: ${det.confidence.toFixed(2)}`;
+                box.appendChild(label);
+                
+                container.appendChild(box);
+            });
+        }
+        
+        async function updateStats() {
+            try {
+                const response = await fetch('/get_stats/');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const stats = data.data;
+                    document.getElementById('totalDetections').textContent = stats.total_detections;
+                    document.getElementById('onlineDevices').textContent = stats.online_devices;
+                    document.getElementById('violationEvents').textContent = stats.violation_events;
+                    document.getElementById('systemUptime').textContent = stats.system_uptime;
+                    document.getElementById('avgFps').textContent = stats.avg_fps;
+                    document.getElementById('modelAccuracy').textContent = stats.model_accuracy;
+                    document.getElementById('aiCoverage').textContent = stats.ai_coverage;
+                    document.getElementById('quickDetectionCount').textContent = stats.total_detections;
+                    document.getElementById('quickViolationCount').textContent = stats.violation_events;
+                    document.getElementById('quickDeviceCount').textContent = stats.online_devices;
+                }
+            } catch (error) {
+                console.error('Stats data error:', error);
+                // Fallback to local state
+                document.getElementById('totalDetections').textContent = state.detectionCount;
+                document.getElementById('violationEvents').textContent = state.violationCount;
+                document.getElementById('quickDetectionCount').textContent = state.detectionCount;
+                document.getElementById('quickViolationCount').textContent = state.violationCount;
+            }
+        }
+        
+        // Recording
+        function toggleRecording() {
+            state.isRecording = !state.isRecording;
+            const btn = document.getElementById('recordBtn');
+            const indicator = document.getElementById('recordingIndicator');
+            
+            if (state.isRecording) {
+                btn.classList.add('bg-red-600');
+                btn.textContent = 'Stop Recording';
+                indicator.style.display = 'flex';
+                state.recordingStartTime = Date.now();
+                updateRecordingTime();
+            } else {
+                btn.classList.remove('bg-red-600');
+                btn.textContent = 'Record';
+                indicator.style.display = 'none';
+            }
+        }
+        
+        function updateRecordingTime() {
+            if (!state.isRecording) return;
+            
+            const elapsed = Math.floor((Date.now() - state.recordingStartTime) / 1000);
+            const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const secs = (elapsed % 60).toString().padStart(2, '0');
+            document.getElementById('recordingTime').textContent = `${mins}:${secs}`;
+            
+            if (elapsed >= 15) {
+                toggleRecording();
+                showNotification('Recording Completed', '15-second video saved');
+            } else {
+                setTimeout(updateRecordingTime, 1000);
+            }
+        }
+        
+        // Confidence Slider
+        function updateConfidence(value) {
+            document.getElementById('confValue').textContent = value;
+        }
+        
+        // Toggle Switch
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+        }
+        
+        // Sensor Simulation
+        function setSensorMode(mode) {
+            state.sensorMode = mode;
+        }
+        
+        async function updateSensors() {
+            try {
+                const response = await fetch('/get_sensors/');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const sensorData = data.data;
+                    state.temperature = sensorData.temperature;
+                    state.humidity = sensorData.humidity;
+                    
+                    document.getElementById('tempValue').textContent = state.temperature.toFixed(1);
+                    document.getElementById('humidValue').textContent = Math.round(state.humidity);
+                    document.getElementById('gaugeTemp').textContent = state.temperature.toFixed(1);
+                    document.getElementById('gaugeHumid').textContent = Math.round(state.humidity);
+                    
+                    document.getElementById('tempBar').style.width = `${(state.temperature - 15) / 25 * 100}%`;
+                    document.getElementById('humidBar').style.width = `${state.humidity}%`;
+                    
+                    // Check alerts
+                    if (state.temperature > 30) {
+                        addAlert('warning', 'High Temperature', `Current temperature: ${state.temperature.toFixed(1)}°C`);
+                    }
+                }
+            } catch (error) {
+                console.error('Sensor data error:', error);
+                // Fallback to simulated data if API fails
+                let tempDelta = 0, humidDelta = 0;
+                
+                switch (state.sensorMode) {
+                    case 'normal':
+                        tempDelta = (Math.random() - 0.5) * 0.5;
+                        humidDelta = (Math.random() - 0.5) * 2;
+                        break;
+                    case 'hot':
+                        tempDelta = Math.random() * 0.3;
+                        break;
+                    case 'humid':
+                        humidDelta = Math.random() * 1;
+                        break;
+                    case 'random':
+                        if (Math.random() > 0.9) {
+                            tempDelta = (Math.random() - 0.5) * 5;
+                            humidDelta = (Math.random() - 0.5) * 10;
+                        }
+                        break;
+                }
+                
+                state.temperature = Math.max(15, Math.min(40, state.temperature + tempDelta));
+                state.humidity = Math.max(20, Math.min(95, state.humidity + humidDelta));
+                
+                document.getElementById('tempValue').textContent = state.temperature.toFixed(1);
+                document.getElementById('humidValue').textContent = Math.round(state.humidity);
+                document.getElementById('gaugeTemp').textContent = state.temperature.toFixed(1);
+                document.getElementById('gaugeHumid').textContent = Math.round(state.humidity);
+                
+                document.getElementById('tempBar').style.width = `${(state.temperature - 15) / 25 * 100}%`;
+                document.getElementById('humidBar').style.width = `${state.humidity}%`;
+            }
+        }
+        
+        // Time Update
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('zh-CN');
+            
+            const uptime = Math.floor((Date.now() - state.startTime) / 1000);
+            const hours = Math.floor(uptime / 3600).toString().padStart(2, '0');
+            const mins = Math.floor((uptime % 3600) / 60).toString().padStart(2, '0');
+            const secs = (uptime % 60).toString().padStart(2, '0');
+            document.getElementById('systemUptime').textContent = `${hours}:${mins}:${secs}`;
+        }
+        
+        // Notifications
+        function toggleNotifications() {
+            const panel = document.getElementById('notificationPanel');
+            panel.classList.toggle('hidden');
+        }
+        
+        function showNotification(title, message) {
+            // Browser notification
+            if (Notification.permission === 'granted') {
+                new Notification(title, { body: message });
+            }
+            
+            // In-app notification
+            const list = document.getElementById('notificationList');
+            const notification = document.createElement('div');
+            notification.className = 'p-3 rounded-xl bg-white/5 animate-fade-in';
+            notification.innerHTML = `
+                <p class="font-medium text-sm">${title}</p>
+                <p class="text-xs text-gray-400 mt-1">${message}</p>
+                <p class="text-xs text-gray-500 mt-2">Just now</p>
+            `;
+            list.insertBefore(notification, list.firstChild);
+        }
+        
+        // Alerts
+        function addAlert(level, title, message) {
+            const alertsList = document.getElementById('alertsList');
+            const config = {
+                critical: { bg: 'bg-red-500/10', border: 'border-red-500/30', dot: 'bg-red-500' },
+                warning: { bg: 'bg-orange-500/10', border: 'border-orange-500/30', dot: 'bg-orange-500' },
+                info: { bg: 'bg-blue-500/10', border: 'border-blue-500/30', dot: 'bg-blue-500' }
+            };
+            
+            const alert = document.createElement('div');
+            alert.className = `alert-item p-4 rounded-xl ${config[level].bg} border ${config[level].border}`;
+            alert.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <span class="w-3 h-3 rounded-full ${config[level].dot} mt-1 flex-shrink-0"></span>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start">
+                            <p class="font-medium">${title}</p>
+                            <span class="text-xs text-gray-500">Just now</span>
+                        </div>
+                        <p class="text-sm text-gray-400 mt-1">${message}</p>
+                    </div>
+                </div>
+            `;
+            alertsList.insertBefore(alert, alertsList.firstChild);
+            
+            // Update badge
+            const badge = document.getElementById('alertBadge');
+            badge.textContent = parseInt(badge.textContent) + 1;
+        }
+        
+        function testAlert() {
+            addAlert('warning', 'Test Alert', 'This is a test alert message');
+            showNotification('Test Alert', 'This is a test alert message');
+        }
+        
+        function clearAllAlerts() {
+            document.getElementById('alertsList').innerHTML = '<p class="text-center text-gray-500 py-8">No alerts yet</p>';
+            document.getElementById('alertBadge').textContent = '0';
+        }
+        
+        // AI Report Generation
+        function generateAIReport() {
+            const content = document.getElementById('aiReportContent');
+            content.innerHTML = `
+                <div class="flex items-center gap-3 text-blue-400">
+                    <svg class="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>AI is analyzing data, please wait...</span>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                content.innerHTML = `
+                    <div class="space-y-6 animate-fade-in">
+                        <!-- Safety Assessment -->
+                        <div class="p-4 rounded-xl bg-green-500/10 border border-green-500/20">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="font-semibold text-green-400">Safety Status Assessment</h4>
+                                <span class="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-sm font-medium">Good</span>
+                            </div>
+                            <p class="text-sm text-gray-300">Current safety equipment wearing rate reaches 94.5%, which is higher than the industry standard (90%). Overall safety status is at a good level, it is recommended to continue maintaining existing safety management measures. Temperature: Northeast corner (17°C) exceeds normal range (should be ≤15°C). Humidity: Northwest corner (15%), Northeast corner (16%) exceed normal range (should be ≤14%). Recommendations: Strengthen ventilation and cooling in the northeast corner, start dehumidification equipment throughout the warehouse, focus monitoring on northwest/northeast areas, and flip corn piles to balance temperature and humidity if necessary.</p>
+                            <div class="mt-3 flex items-center gap-4 text-sm">
+                                <span class="text-gray-500">Overall Score:</span>
+                                <div class="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-green-500 rounded-full" style="width: 85%"></div>
+                                </div>
+                                <span class="text-green-400 font-semibold">85/100</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Violation Patterns -->
+                        <div class="p-4 rounded-xl bg-orange-500/10 border border-orange-500/20">
+                            <h4 class="font-semibold text-orange-400 mb-3">Violation Pattern Recognition</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-300">No Helmet</span>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-24 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="h-full bg-orange-500 rounded-full" style="width: 45%"></div>
+                                        </div>
+                                        <span class="text-sm text-orange-400">45%</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-300">Missing Breathing Equipment</span>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-24 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="h-full bg-orange-500 rounded-full" style="width: 30%"></div>
+                                        </div>
+                                        <span class="text-sm text-orange-400">30%</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-300">Improper Protective Clothing</span>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-24 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="h-full bg-orange-500 rounded-full" style="width: 25%"></div>
+                                        </div>
+                                        <span class="text-sm text-orange-400">25%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Trend Prediction -->
+                        <div class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                            <h4 class="font-semibold text-blue-400 mb-3">Trend Prediction</h4>
+                            <div class="space-y-2 text-sm text-gray-300">
+                                <div class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                                    </svg>
+                                    <span>Based on historical data analysis, violation events are expected to decrease by 15% next week</span>
+                                </div>
+                                <div class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                    <span>Note: Violation rate is high during 10:00-11:00 AM, increased patrols recommended</span>
+                                </div>
+                                <div class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span>Safety status in Production Workshop B continues to improve, up 22% year-over-year</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Improvement Suggestions -->
+                        <div class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+                            <h4 class="font-semibold text-purple-400 mb-3">Improvement Recommendations</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-6 h-6 rounded bg-purple-500/30 flex items-center justify-center flex-shrink-0">
+                                        <span class="text-xs text-purple-400">1</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium">Enhance Safety Training</p>
+                                        <p class="text-xs text-gray-500 mt-1">Conduct specialized safety equipment training for new employees</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="w-6 h-6 rounded bg-purple-500/30 flex items-center justify-center flex-shrink-0">
+                                        <span class="text-xs text-purple-400">2</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium">Optimize Patrol Routes</p>
+                                        <p class="text-xs text-gray-500 mt-1">Adjust key safety patrol areas based on violation heat maps</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="w-6 h-6 rounded bg-purple-500/30 flex items-center justify-center flex-shrink-0">
+                                        <span class="text-xs text-purple-400">3</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium">Update Detection Thresholds</p>
+                                        <p class="text-xs text-gray-500 mt-1">Recommend adjusting helmet detection confidence threshold to 0.55 to reduce false positives</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Report Actions -->
+                        <div class="flex justify-end gap-3 pt-4 border-t border-white/10">
+                            <button class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition">Share Report</button>
+                            <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition">Export PDF</button>
+                        </div>
+                    </div>
+                `;
+            }, 2000);
+        }
+        
+        // Capture Frame
+        function captureFrame() {
+            showNotification('Screenshot Success', 'Image saved to local');
+        }
+        
+        // Toggle PIP
+        function togglePIP() {
+            showNotification('Picture-in-Picture Mode', 'Feature demonstration');
+        }
+        
+        // Theme Toggle
+        function toggleTheme() {
+            showNotification('Theme Switch', 'Currently in dark mode');
+        }
+        
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ' && e.target.tagName !== 'INPUT') {
+                e.preventDefault();
+                if (state.isDetecting) {
+                    stopDetection();
+                } else {
+                    startDetection();
+                }
+            }
+            if (e.key === 's' && e.target.tagName !== 'INPUT') {
+                captureFrame();
+            }
+        });
+        
+        // Request notification permission
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initAlerts();
+            
+            setInterval(updateTime, 1000);
+            setInterval(updateSensors, 5000);
+            
+            updateTime();
+        });
+    </script>
+</body>
+</html>

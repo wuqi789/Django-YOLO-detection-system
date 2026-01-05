@@ -1,0 +1,7 @@
+django==4.2.27
+ultralytics
+opencv-python
+torch
+numpy
+torchvision
+pillow

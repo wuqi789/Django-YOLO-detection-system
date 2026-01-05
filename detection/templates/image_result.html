@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Detection Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', system-ui, sans-serif; }
+        
+        :root {
+            --primary: #0F1C2E;
+            --secondary: #1A2B3C;
+            --accent-blue: #3A7BFF;
+            --accent-orange: #FF9A3D;
+            --accent-green: #4CD964;
+            --accent-red: #FF4757;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0F1C2E 0%, #1A2B3C 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .detection-box {
+            position: absolute;
+            border: 3px solid #4CD964;
+            background: rgba(76, 217, 100, 0.2);
+            z-index: 1000;
+            pointer-events: none;
+            box-sizing: border-box;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="text-white p-6">
+    <!-- Header -->
+    <header class="glass-card rounded-2xl p-6 mb-8 fade-in">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold">Image Detection Results</h1>
+                <p class="text-sm text-gray-400 mt-1">Smart Safety Detection Platform</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="downloadAllImages()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                    </svg>
+                    Download All Images
+                </button>
+                <button onclick="window.close()" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Close Window
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto">
+        <!-- Image Detection Results -->
+        <div id="imageResultsContainer" class="space-y-8"></div>
+    </main>
+    
+    <script>
+        // Get detection results from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const detectionResults = JSON.parse(decodeURIComponent(urlParams.get('results')));
+        
+        // Function to draw detection boxes on images
+        function drawDetectionBoxes(detectionBoxes, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            // Get container dimensions
+            const containerRect = container.getBoundingClientRect();
+            const containerWidth = containerRect.width;
+            const containerHeight = containerRect.height;
+            
+            // Get image dimensions
+            const imgElement = container.previousElementSibling;
+            const imgWidth = imgElement.naturalWidth;
+            const imgHeight = imgElement.naturalHeight;
+            
+            // Scaling factors: container size / actual image size
+            const scaleX = containerWidth / imgWidth;
+            const scaleY = containerHeight / imgHeight;
+            
+            // Draw each detection box
+            detectionBoxes.forEach(det => {
+                // Focus only on person, exclude helmet and ventilator
+                if (det.class_name !== 'person') {
+                    return;
+                }
+                
+                const box = document.createElement('div');
+                box.className = 'detection-box rounded';
+                
+                // Get bounding box coordinates
+                const [x1, y1, x2, y2] = det.bbox;
+                
+                // Calculate scaled coordinates and dimensions
+                const scaledX1 = x1 * scaleX;
+                const scaledY1 = y1 * scaleY;
+                const scaledX2 = x2 * scaleX;
+                const scaledY2 = y2 * scaleY;
+                
+                // Set box position and size
+                box.style.left = `${scaledX1}px`;
+                box.style.top = `${scaledY1}px`;
+                box.style.width = `${scaledX2 - scaledX1}px`;
+                box.style.height = `${scaledY2 - scaledY1}px`;
+                
+                // Set color based on class
+                let color = '#3A7BFF'; // Blue for person
+                let bgColor = 'rgba(58, 123, 255, 0.1)';
+                
+                box.style.borderColor = color;
+                box.style.backgroundColor = bgColor;
+                
+                // Create label
+                const label = document.createElement('span');
+                label.className = 'absolute -top-6 left-0 text-xs px-2 py-0.5 rounded font-bold';
+                label.style.backgroundColor = color;
+                label.style.color = '#ffffff';
+                label.style.zIndex = '1001';
+                label.textContent = `${det.class_name}: ${det.confidence.toFixed(2)}`;
+                box.appendChild(label);
+                
+                container.appendChild(box);
+            });
+        }
+        
+        // Function to show image detection results
+        function showImageResults(processedImages) {
+            const resultsContainer = document.getElementById('imageResultsContainer');
+            
+            // Create result for each processed image
+            processedImages.forEach((processedImage, index) => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'glass-card rounded-2xl p-8 fade-in';
+                resultItem.style.animationDelay = `${index * 0.2}s`;
+                
+                resultItem.innerHTML = `
+                    <h2 class="text-xl font-semibold mb-6">Detection Result ${index + 1}: ${processedImage.file.name}</h2>
+                    
+                    <!-- Image with Detection Boxes -->
+                    <div class="relative rounded-xl overflow-hidden mb-6 aspect-video bg-gray-800">
+                        <img src="${processedImage.image_url}" alt="${processedImage.file.name}" class="w-full h-full object-contain" />
+                        <div id="imageDetectionBoxes-${index}" class="absolute inset-0"></div>
+                    </div>
+                    
+                    <!-- Detection Statistics -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div class="text-center p-4 rounded-xl bg-white/5">
+                            <div class="text-3xl font-bold text-green-400">${processedImage.detections.helmet}</div>
+                            <div class="text-sm text-gray-400 mt-1">Helmets</div>
+                        </div>
+                        <div class="text-center p-4 rounded-xl bg-white/5">
+                            <div class="text-3xl font-bold text-blue-400">${processedImage.detections.person}</div>
+                            <div class="text-sm text-gray-400 mt-1">Persons</div>
+                        </div>
+                        <div class="text-center p-4 rounded-xl bg-white/5">
+                            <div class="text-3xl font-bold text-purple-400">${processedImage.detections.respirator}</div>
+                            <div class="text-sm text-gray-400 mt-1">Ventilators</div>
+                        </div>
+                        <div class="text-center p-4 rounded-xl bg-white/5">
+                            <div class="text-3xl font-bold text-red-400">${processedImage.detections.violation}</div>
+                            <div class="text-sm text-gray-400 mt-1">Violations</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Save Button -->
+                    <div class="flex justify-end">
+                        <button onclick="saveImage('${processedImage.image_url}', '${processedImage.file.name}')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                            </svg>
+                            Save Image
+                        </button>
+                    </div>
+                `;
+                
+                resultsContainer.appendChild(resultItem);
+                
+                // Draw detection boxes for this image
+                drawDetectionBoxes(processedImage.detections.boxes, `imageDetectionBoxes-${index}`);
+            });
+        }
+        
+        // Function to save image
+        function saveImage(imageUrl, fileName) {
+            return fetch(imageUrl)
+                .then(response => response.blob())
+                .then(blob => {
+                    // Create a download link
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    
+                    // Set download filename
+                    const baseName = fileName.split('.')[0];
+                    const extension = imageUrl.split('.').pop();
+                    a.download = `${baseName}_detected.${extension}`;
+                    
+                    // Trigger download
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    // Clean up
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                })
+                .catch(error => {
+                    console.error('Failed to save image:', error);
+                    alert('Failed to save image: ' + error.message);
+                });
+        }
+        
+        // Function to download all images
+        function downloadAllImages() {
+            // Use the detectionResults variable that's already loaded from URL params
+            if (!detectionResults || detectionResults.length === 0) {
+                alert('No images to download');
+                return;
+            }
+            
+            // Show a notification that download is starting
+            alert(`Starting download of ${detectionResults.length} images...`);
+            
+            // Download each image
+            const downloadPromises = detectionResults.map((result, index) => {
+                // Use original filename if available, otherwise use a generic name
+                const fileName = result.file.name || `image_${index + 1}`;
+                return saveImage(result.image_url, fileName);
+            });
+            
+            // Wait for all downloads to complete
+            Promise.all(downloadPromises)
+                .then(() => {
+                    alert('All images downloaded successfully!');
+                })
+                .catch(() => {
+                    alert('Some images failed to download. Please try again.');
+                });
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show image detection results
+            showImageResults(detectionResults);
+        });
+    </script>
+</body>
+</html>
