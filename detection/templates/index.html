@@ -1213,7 +1213,6 @@
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
-        
         // Load models from server
         async function loadModels() {
             try {
@@ -1234,7 +1233,7 @@
                         data.models.forEach(model => {
                             const option = document.createElement('option');
                             option.value = model.name;
-                            option.textContent = `${model.name} - ${formatFileSize(model.size)}`;
+                            option.textContent = `${model.name}`;
                             modelSelect.appendChild(option);
                         });
                         
