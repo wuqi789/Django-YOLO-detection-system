@@ -4,7 +4,7 @@ import os
 import random
 import cv2
 from .yolo_detector import get_detector, YOLODetector
-from ultralytics import YOLO
+from .ultralytics import YOLO
 import time
 
 # Global variables

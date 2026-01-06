@@ -1,14 +1,15 @@
-from ultralytics import YOLO
+from .ultralytics import YOLO
 import cv2
 import numpy as np
 import os
+import torch
 
 class YOLODetector:
     def __init__(self, model_path):
         self.model = YOLO(model_path)
         self.class_names = self.model.names
         self.conf_threshold = 0.5
-        self.device = 'cpu'  # Use CPU if CUDA is not available
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Use GPU if available, otherwise CPU
         
     def set_conf_threshold(self, threshold):
         self.conf_threshold = threshold
@@ -67,6 +68,6 @@ detector = None
 def get_detector():
     global detector
     if detector is None:
-        model_path = os.path.join(os.path.dirname(__file__), 'static', 'models', 'best.pt')
+        model_path = os.path.join(os.path.dirname(__file__), 'static', 'models', 'yolov8-best.pt')
         detector = YOLODetector(model_path)
     return detector
