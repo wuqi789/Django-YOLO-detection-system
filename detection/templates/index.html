@@ -1514,26 +1514,67 @@
         // Real-time frame processing function
         function startFrameProcessing() {
             const videoPlayer = document.getElementById('videoPlayer');
+            const detectionBoxes = document.getElementById('detectionBoxes');
             
             // Set canvas size to match video
             canvas.width = videoPlayer.videoWidth;
             canvas.height = videoPlayer.videoHeight;
             
+            // Hide original video and detection boxes
+            videoPlayer.style.opacity = '0';
+            detectionBoxes.style.display = 'none';
+            
+            // Create or get the annotated image element
+            let annotatedImage = document.getElementById('annotatedImage');
+            if (!annotatedImage) {
+                annotatedImage = document.createElement('img');
+                annotatedImage.id = 'annotatedImage';
+                annotatedImage.className = 'w-full h-full object-contain';
+                annotatedImage.style.position = 'absolute';
+                annotatedImage.style.top = '0';
+                annotatedImage.style.left = '0';
+                annotatedImage.style.zIndex = '10';
+                videoPlayer.parentElement.appendChild(annotatedImage);
+            }
+            
+            // Frame counter for controlling detection frequency
+            let frameCounter = 0;
+            const detectionInterval = 1; // Detect every N frames, lower value = higher frequency
+            
+            // Last processed frame timestamp to limit processing rate
+            let lastProcessedTime = 0;
+            const minProcessInterval = 33; // Minimum interval between processing (ms), ~30fps
+            
             // Frame processing loop
             function processFrame() {
+                const currentTime = performance.now();
+                
                 if (state.isDetecting && videoPlayer.srcObject) {
-                    // Draw current video frame to canvas
+                    // Draw current video frame to canvas - always update canvas for smooth display
                     ctx.drawImage(videoPlayer, 0, 0, canvas.width, canvas.height);
                     
-                    // Convert canvas to Blob and send to backend
-                    canvas.toBlob(async (blob) => {
-                        try {
-                            const detections = await sendFrameForDetection(blob);
-                            drawDetectionBoxes(detections.detections.boxes);
-                        } catch (error) {
-                            console.error('Frame processing error:', error);
+                    // Control processing rate to avoid overwhelming the backend
+                    if (currentTime - lastProcessedTime >= minProcessInterval) {
+                        // Only send frame for detection every N frames
+                        if (frameCounter % detectionInterval === 0) {
+                            // Convert canvas to Blob and send to backend
+                            canvas.toBlob(async (blob) => {
+                                try {
+                                    const result = await sendFrameForDetection(blob);
+                                    // Display annotated image directly using requestAnimationFrame for sync
+                                    requestAnimationFrame(() => {
+                                        annotatedImage.src = 'data:image/jpeg;base64,' + result.annotated_image;
+                                    });
+                                } catch (error) {
+                                    console.error('Frame processing error:', error);
+                                }
+                            }, 'image/jpeg', 0.8);
+                            
+                            lastProcessedTime = currentTime;
                         }
-                    }, 'image/jpeg', 0.8);
+                        
+                        frameCounter++;
+                    }
                 }
                 
                 // Continue the loop
@@ -1995,8 +2036,8 @@
             const videoWrapper = videoPlayer.parentElement;
             videoWrapper.appendChild(imgElement);
             
-            // Clear any existing detection boxes (don't draw new ones as requested)
-            detectionBoxes.innerHTML = '';
+            // Hide detection boxes container since we already have boxes in the image
+            detectionBoxes.style.display = 'none';
             
             // Update detection status
             document.getElementById('detectionStatus').textContent = 'Detection Completed';

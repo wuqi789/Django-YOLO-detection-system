@@ -16,3 +16,4 @@ tqdm
 pyyaml
 scipy
 duckdb
+IPython

@@ -1,4 +1,4 @@
-# Django-YOLO  实时视频检测系统
+# Django-YOLO 实时视频与图片检测系统
 ## 1. 项目概述
 
 ### 1 项目背景
@@ -126,12 +126,13 @@
 - **异步处理**：视频检测采用异步处理，避免阻塞主线程
 - **实时通信**：前端通过轮询或 WebSocket 获取检测结果
 ### 3.3 运行截图
- ![test1](images/1.png)
- ![test1](images/2.png)
- ![test1](images/3.png)
- ![test1](images/4.png)
- ![test1](images/5.png)
-
+ ![test1](images/1.jpg)
+ ![test1](images/2.jpg)
+ ![test1](images/3.jpg)
+ ![test1](images/4.jpg)
+ ![test1](images/5.jpg)
+ ![test1](images/6.jpg)
+ ![test1](images/7.jpg)
 ## 4. 安装部署指南
 
 ### 4.1 环境要求
@@ -268,12 +269,13 @@ yolosecurity/
 ├── detection/                 # 检测应用
 │   ├── migrations/            # 数据库迁移文件
 │   ├── static/                # 静态文件
-│   │   ├── css/               # CSS 文件
-│   │   ├── js/                # JavaScript 文件
+│   │   ├── media/             # 媒体文件
 │   │   └── models/            # YOLO 模型文件
 │   ├── media/                 # 媒体文件存储
 │   ├── templates/             # HTML 模板
-│   │   └── index.html         # 主页面模板
+│   │   ├── index.html         # 主页面模板
+│   │   └── image_result.html  # 图片检测结果模板
+│   ├── ultralytics/           # 本地 ultralytics 库
 │   ├── __init__.py            # 应用初始化文件
 │   ├── admin.py               # 后台管理配置
 │   ├── apps.py                # 应用配置
@@ -282,16 +284,12 @@ yolosecurity/
 │   ├── urls.py                # 应用路由
 │   ├── views.py               # 视图函数
 │   └── yolo_detector.py       # YOLO检测封装
-├── yolosecurity/              # 项目配置
-│   ├── __init__.py            # 项目初始化文件
-│   ├── asgi.py                # ASGI 配置
-│   ├── settings.py            # 项目设置
-│   ├── urls.py                # 项目路由
-│   └── wsgi.py                # WSGI 配置
+├── ultralytics/               # 本地 ultralytics 库
 ├── media/                     # 媒体文件存储
 ├── static/                    # 收集的静态文件
 ├── manage.py                  # 项目管理脚本
-└── requirements.txt           # 依赖列表
+├── requirements.txt           # 依赖列表
+└── db.sqlite3                 # SQLite 数据库
 ```
 
 ## 7. 关键功能实现解析
@@ -319,6 +317,23 @@ yolosecurity/
    - 实时显示检测视频
    - 显示检测统计信息
    - 生成告警信息
+
+### 7.6 单(多)张图片检测流程
+1. **图片上传**
+   - 选择本地图片文件
+   - 点击开始检测按钮
+
+2. **检测处理**
+   - 前端发送图片到后端
+   - 后端使用 YOLOv8 模型进行检测
+   - 直接生成带标注的图片
+   - 返回 Base64 编码的检测结果图片
+
+3. **结果显示**
+   - 在当前页面实时显示检测结果
+   - 不跳转新标签页(多张图片则跳转)
+   - 显示检测统计信息
+   - 图片上直接显示检测框和标签
 
 ### 7.2 模型加载与切换
 1. **模型加载**
@@ -458,9 +473,15 @@ yolosecurity/
 - **v1.7.0**：添加AI大模型集成，提供智能建议和分析
 - **v1.8.0**：优化传感器数据可视化，添加趋势图显示
 - **v1.9.0**：增强AI建议功能，支持多种建议类型
+- **v2.0.0**：
+  - 优化单张图片检测功能，直接在当前页面显示检测结果
+  - 添加实时摄像头检测优化，使用后端直接生成带标注的图片
+  - 优化前端显示逻辑，确保检测结果与视频流高度同步
+  - 调整检测参数，降低延迟，提高实时性
+  - 优化视频检测流程，直接生成带标注的图片
 
 ---
 
-**版本**：v1.9.0  
-**更新日期**：2026-01-01  
+**版本**：v2.0.0  
+**更新日期**：2026-01-08  
 **开发者**：吴棋(wuqi)

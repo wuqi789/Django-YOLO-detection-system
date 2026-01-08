@@ -464,7 +464,7 @@ def process_progress(request):
 @csrf_exempt
 def detect_frame(request):
     """
-    API endpoint to process a single video frame and return detection results, focusing on person, helmet, and ventilator
+    API endpoint to process a single video frame and return detection results with annotated image
     """
     if request.method == 'POST':
         # Get the frame from request
@@ -482,12 +482,13 @@ def detect_frame(request):
         try:
             # Read frame from file
             import numpy as np
+            import base64
             frame_bytes = frame_file.read()
             nparr = np.frombuffer(frame_bytes, np.uint8)
             frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
             
-            # Run detection
-            detections = detector.detect_frame(frame)
+            # Run detection and generate annotated image
+            detected_frame, detections = detector.detect_and_plot(frame)
             
             # Filter detections to focus on person, helmet, and ventilator
             filtered_detections = [d for d in detections if d['class_name'] in ['person', 'helmet', 'ventilator']]
@@ -498,7 +499,11 @@ def detect_frame(request):
             respirator_count = sum(1 for d in filtered_detections if d['class_name'] == 'ventilator')  # Map ventilator to respirator for frontend compatibility
             violation_count = sum(1 for d in filtered_detections if d['class_name'] not in ['helmet', 'person', 'ventilator'])
             
-            # Return detection results
+            # Convert detected frame to Base64 for faster transmission
+            _, buffer = cv2.imencode('.jpg', detected_frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
+            img_base64 = base64.b64encode(buffer).decode('utf-8')
+            
+            # Return detection results with annotated image
             return JsonResponse({
                 'status': 'success',
                 'detections': {
@@ -507,7 +512,8 @@ def detect_frame(request):
                     'respirator': respirator_count,
                     'violation': violation_count,
                     'boxes': filtered_detections
-                }
+                },
+                'annotated_image': img_base64
             })
         except Exception as e:
             import traceback
@@ -661,11 +667,8 @@ def detect_image(request):
             # Convert RGB to BGR for OpenCV
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             
-            # Run detection
-            detections = detector.detect_frame(frame)
-            
-            # Draw detections on the frame
-            frame_with_boxes = detector.draw_detections(frame.copy(), detections)
+            # 使用新的detect_and_plot方法，直接生成带标注的图片
+            frame_with_boxes, detections = detector.detect_and_plot(frame)
             
             # Generate unique filename for the processed image
             image_uuid = str(uuid.uuid4())
