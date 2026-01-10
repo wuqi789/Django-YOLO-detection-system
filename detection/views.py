@@ -6,6 +6,7 @@ import cv2
 from .yolo_detector import get_detector, YOLODetector
 from .ultralytics import YOLO
 import time
+from weasyprint import HTML
 
 # Global variables
 models_cache = {}
@@ -734,3 +735,191 @@ def image_result(request):
     View to display image detection results in a new window
     """
     return render(request, 'image_result.html')
+
+# AI Analysis API
+from django.views.decorators.csrf import csrf_exempt
+import random
+import sys
+import os
+
+# 添加项目根目录到Python路径
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from deepseek import get_ai_suggestion
+
+@csrf_exempt
+def get_ai_analysis(request):
+    """
+    API endpoint to get AI analysis based on sensor data
+    """
+    if request.method == 'GET':
+        try:
+            # 生成模拟传感器数据（实际应用中应从真实传感器获取）
+            sensor_data = {
+                "sensor1": {
+                    "temperature": round(random.uniform(15.0, 25.0), 1),
+                    "humidity": random.randint(50, 80)
+                },
+                "sensor2": {
+                    "temperature": round(random.uniform(15.0, 25.0), 1),
+                    "humidity": random.randint(50, 80)
+                },
+                "sensor3": {
+                    "temperature": round(random.uniform(15.0, 25.0), 1),
+                    "humidity": random.randint(50, 80)
+                }
+            }
+            
+            # 调用AI建议生成函数
+            suggestion = get_ai_suggestion(sensor_data)
+            
+            # 返回JSON响应
+            return JsonResponse({
+                'status': 'success',
+                'suggestion': suggestion,
+                'sensor_data': sensor_data
+            })
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Failed to get AI analysis: {str(e)}'
+            })
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Method not allowed'
+    })
+
+@csrf_exempt
+def export_ai_pdf(request):
+    """
+    API endpoint to export AI analysis as PDF
+    """
+    if request.method == 'POST':
+        try:
+            import json
+            from datetime import datetime
+            
+            # 获取POST请求中的数据
+            data = json.loads(request.body)
+            suggestion = data.get('suggestion', '')
+            sensor_data = data.get('sensor_data', {})
+            
+            if not suggestion or not sensor_data:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Missing required data'
+                })
+            
+            # 生成HTML模板
+            html_content = f"""
+            <!DOCTYPE html>
+            <html lang="zh-CN">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>AI智能分析报告</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                        padding: 20px;
+                    }
+                    h1 {
+                        color: #2c3e50;
+                        text-align: center;
+                        border-bottom: 2px solid #3498db;
+                        padding-bottom: 10px;
+                    }
+                    h2 {
+                        color: #3498db;
+                        margin-top: 30px;
+                    }
+                    .sensor-container {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 20px;
+                        margin: 20px 0;
+                    }
+                    .sensor-card {
+                        background-color: #f8f9fa;
+                        border: 1px solid #e9ecef;
+                        border-radius: 8px;
+                        padding: 15px;
+                        width: 200px;
+                    }
+                    .sensor-card h3 {
+                        margin-top: 0;
+                        color: #495057;
+                    }
+                    .suggestion {
+                        background-color: #e3f2fd;
+                        border: 1px solid #bbdefb;
+                        border-radius: 8px;
+                        padding: 15px;
+                        margin: 20px 0;
+                    }
+                    .timestamp {
+                        text-align: right;
+                        color: #6c757d;
+                        font-style: italic;
+                        margin-top: 30px;
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>AI智能分析报告</h1>
+                
+                <h2>传感器数据</h2>
+                <div class="sensor-container">
+                    {sensor_html}
+                </div>
+                
+                <h2>AI分析建议</h2>
+                <div class="suggestion">
+                    {suggestion}
+                </div>
+                
+                <div class="timestamp">
+                    生成时间: {current_time}
+                </div>
+            </body>
+            </html>
+            """
+            
+            # 生成传感器数据的HTML
+            sensor_html = ''
+            for sensor_name, data in sensor_data.items():
+                sensor_html += f"""
+                <div class="sensor-card">
+                    <h3>{sensor_name}</h3>
+                    <p>温度: {data['temperature']}°C</p>
+                    <p>湿度: {data['humidity']}%</p>
+                </div>
+                """
+            
+            # 填充HTML模板
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            html = html_content.format(
+                sensor_html=sensor_html,
+                suggestion=suggestion,
+                current_time=current_time
+            )
+            
+            # 使用weasyprint生成PDF
+            pdf = HTML(string=html).write_pdf()
+            
+            # 返回PDF响应
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="AI_Report_{datetime.now().strftime("%Y-%m-%d")}.pdf"'
+            
+            return response
+            
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Failed to generate PDF: {str(e)}'
+            })
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Method not allowed'
+    })

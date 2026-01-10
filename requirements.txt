@@ -17,3 +17,5 @@ pyyaml
 scipy
 duckdb
 IPython
+weasyprint
+html2pdf

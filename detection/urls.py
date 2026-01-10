@@ -16,4 +16,7 @@ urlpatterns = [
     path('get_model_params/', views.get_model_params_api, name='get_model_params'),
     path('switch_model/', views.switch_model, name='switch_model'),
     path('get_current_model/', views.get_current_model, name='get_current_model'),
+    # AI Analysis API endpoint
+    path('get_ai_analysis/', views.get_ai_analysis, name='get_ai_analysis'),
+    path('export_ai_pdf/', views.export_ai_pdf, name='export_ai_pdf'),
 ] 
