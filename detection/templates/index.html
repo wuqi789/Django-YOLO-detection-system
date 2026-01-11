@@ -3153,7 +3153,7 @@
                             
                             <!-- Report Actions -->
                             <div class="flex justify-end gap-4 pt-5 border-t border-white/10">
-                                <button onclick="exportAIReportToPDF()" class="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2">
+                                <button id="export-pdf-btn" onclick="exportAIReportToPDF()" class="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                                     </svg>
@@ -3223,55 +3223,89 @@
             Notification.requestPermission();
         }
         
-        // Export AI Report to PDF
-        async function exportAIReportToPDF() {
-            console.log('PDF Export Initiated');
+        // Export AI Report to PDF - exposed to global scope for onclick access
+        window.exportAIReportToPDF = async function() {
+            console.log('🚀 PDF Export Initiated');
+            
+            // Add a visual indicator that the export is starting
+            const exportBtn = document.getElementById('export-pdf-btn');
+            if (exportBtn) {
+                exportBtn.disabled = true;
+                exportBtn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Exporting...';
+            }
             
             try {
+                console.log('📋 Checking AI report data...');
                 // Check if we have AI report data
-                if (!window.aiReportData) {
-                    console.error('No AI report data found');
+                if (!window.aiReportData || !window.aiReportData.suggestion || !window.aiReportData.sensor_data) {
+                    console.error('❌ No AI report data found or incomplete:', window.aiReportData);
                     showNotification('Export Failed', 'Please generate AI report first');
-                    return;
+                    // Auto-generate report if data is missing
+                    console.log('🔄 Auto-generating AI report...');
+                    await generateAIReport();
+                    // Check again if data is now available
+                    if (!window.aiReportData || !window.aiReportData.suggestion || !window.aiReportData.sensor_data) {
+                        console.error('❌ Failed to generate AI report automatically');
+                        showNotification('Export Failed', 'Failed to generate AI report automatically');
+                        return;
+                    }
                 }
                 
+                console.log('📋 AI report data found:', window.aiReportData);
+                
                 // Show loading notification
+                console.log('🔔 Showing loading notification...');
                 showNotification('Exporting PDF', 'Please wait while we generate your report...');
                 
-                // Send POST request to backend API
+                // 使用fetch API发送JSON数据，而不是表单提交，这样可以处理错误响应
+                console.log('📡 Sending request to generate PDF...');
                 const response = await fetch('/export_ai_pdf/', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(window.aiReportData)
                 });
                 
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+                    // 处理错误响应
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to generate PDF');
                 }
                 
-                console.log('PDF generated successfully');
-                
-                // Get the PDF blob and download it
+                // 处理成功响应，获取PDF数据
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `AI_Report_${new Date().toISOString().slice(0, 10)}.pdf`;
+                a.download = `AI_Report_${new Date().toISOString().split('T')[0]}.pdf`;
                 document.body.appendChild(a);
                 a.click();
-                window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
                 
-                // Show success notification
-                showNotification('Export Successful', 'AI report has been exported to PDF');
+                // Show success notification immediately
+                console.log('🔔 Showing success notification...');
+                showNotification('Export Successful', 'AI report has been generated and downloaded successfully');
                 
             } catch (error) {
-                console.error('PDF export error:', error);
-                // Show detailed error notification
-                showNotification('Export Failed', `Failed to generate PDF: ${error.message}`);
+                console.error('❌ PDF export error:', error);
+                console.error('❌ Error stack:', error.stack || 'No stack trace available');
+                
+                // Show user-friendly error message
+                let errorMsg = 'Failed to generate PDF';
+                if (error.message) {
+                    errorMsg = `Failed to generate PDF: ${error.message}`;
+                }
+                
+                showNotification('Export Failed', errorMsg);
+            } finally {
+                // Always reset the export button
+                const exportBtn = document.getElementById('export-pdf-btn');
+                if (exportBtn) {
+                    exportBtn.disabled = false;
+                    exportBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Export PDF';
+                }
             }
         }
         
@@ -3283,6 +3317,24 @@
             setInterval(updateSensors, 5000);
             
             updateTime();
+            
+            // Add event listener for PDF export button
+            const exportBtn = document.getElementById('export-pdf-btn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', exportAIReportToPDF);
+            } else {
+                console.warn('Export PDF button not found, will retry in 1 second...');
+                // Retry after 1 second in case the button is dynamically created
+                setTimeout(() => {
+                    const retryBtn = document.getElementById('export-pdf-btn');
+                    if (retryBtn) {
+                        retryBtn.addEventListener('click', exportAIReportToPDF);
+                        console.log('Export PDF button event listener added successfully');
+                    } else {
+                        console.error('Export PDF button not found after retry');
+                    }
+                }, 1000);
+            }
         });
     </script>
 </body>

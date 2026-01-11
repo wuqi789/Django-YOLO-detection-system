@@ -799,7 +799,13 @@ def export_ai_pdf(request):
             from datetime import datetime
             
             # 获取POST请求中的数据
-            data = json.loads(request.body)
+            if 'data' in request.POST:
+                # 从表单中获取数据
+                data_str = request.POST.get('data', '')
+                data = json.loads(data_str)
+            else:
+                # 从JSON请求体中获取数据
+                data = json.loads(request.body)
             suggestion = data.get('suggestion', '')
             sensor_data = data.get('sensor_data', {})
             
@@ -809,115 +815,435 @@ def export_ai_pdf(request):
                     'message': 'Missing required data'
                 })
             
-            # 生成HTML模板
-            html_content = f"""
-            <!DOCTYPE html>
-            <html lang="zh-CN">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>AI智能分析报告</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        line-height: 1.6;
-                        color: #333;
-                        padding: 20px;
-                    }
-                    h1 {
-                        color: #2c3e50;
-                        text-align: center;
-                        border-bottom: 2px solid #3498db;
-                        padding-bottom: 10px;
-                    }
-                    h2 {
-                        color: #3498db;
-                        margin-top: 30px;
-                    }
-                    .sensor-container {
-                        display: flex;
-                        flex-wrap: wrap;
-                        gap: 20px;
-                        margin: 20px 0;
-                    }
-                    .sensor-card {
-                        background-color: #f8f9fa;
-                        border: 1px solid #e9ecef;
-                        border-radius: 8px;
-                        padding: 15px;
-                        width: 200px;
-                    }
-                    .sensor-card h3 {
-                        margin-top: 0;
-                        color: #495057;
-                    }
-                    .suggestion {
-                        background-color: #e3f2fd;
-                        border: 1px solid #bbdefb;
-                        border-radius: 8px;
-                        padding: 15px;
-                        margin: 20px 0;
-                    }
-                    .timestamp {
-                        text-align: right;
-                        color: #6c757d;
-                        font-style: italic;
-                        margin-top: 30px;
-                    }
-                </style>
-            </head>
-            <body>
-                <h1>AI智能分析报告</h1>
-                
-                <h2>传感器数据</h2>
-                <div class="sensor-container">
-                    {sensor_html}
-                </div>
-                
-                <h2>AI分析建议</h2>
-                <div class="suggestion">
-                    {suggestion}
-                </div>
-                
-                <div class="timestamp">
-                    生成时间: {current_time}
-                </div>
-            </body>
-            </html>
-            """
+            # 改进的Markdown解析函数，支持更多格式
+            def improved_parse(text):
+                # 替换标题
+                text = text.replace('###', '<h3 style="color: #2c3e50; font-size: 18px; margin-top: 20px; margin-bottom: 15px; font-weight: bold;">')
+                text = text.replace('##', '<h2 style="color: #3498db; font-size: 20px; margin-top: 25px; margin-bottom: 20px; font-weight: bold;">')
+                # 替换粗体
+                text = text.replace('**', '')
+                # 替换列表项
+                text = text.replace('\n- ', '<br><span style="margin-left: 20px; font-weight: bold;">•</span> ')
+                text = text.replace('\n• ', '<br><span style="margin-left: 20px; font-weight: bold;">•</span> ')
+                # 处理换行符
+                text = text.replace('\n', '<br>')
+                return text
             
-            # 生成传感器数据的HTML
-            sensor_html = ''
-            for sensor_name, data in sensor_data.items():
-                sensor_html += f"""
-                <div class="sensor-card">
-                    <h3>{sensor_name}</h3>
-                    <p>温度: {data['temperature']}°C</p>
-                    <p>湿度: {data['humidity']}%</p>
-                </div>
-                """
+            # 解析AI建议
+            parsed_suggestion = improved_parse(suggestion)
             
-            # 填充HTML模板
+            # 为传感器数据添加状态标签
+            def get_sensor_status(temperature, humidity):
+                # 粮仓环境状态判断逻辑
+                if 18 <= temperature <= 22 and 50 <= humidity <= 70:
+                    return "normal", "正常"
+                elif (15 <= temperature < 18 or 22 < temperature <= 25) and (45 <= humidity < 50 or 70 < humidity <= 75):
+                    return "warning", "警告"
+                else:
+                    return "danger", "危险"
+            
+            # 生成PDF文件的当前时间
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            html = html_content.format(
-                sensor_html=sensor_html,
-                suggestion=suggestion,
-                current_time=current_time
-            )
+            
+            # 生成传感器数据HTML
+            sensor_html = ''
+            sensor_index = 0
+            for sensor_name, data_item in sensor_data.items():
+                sensor_index += 1
+                # 获取传感器状态
+                status_class, status_text = get_sensor_status(data_item["temperature"], data_item["humidity"])
+                
+                # 添加传感器位置信息
+                sensor_locations = {
+                    "sensor1": "仓库东侧",
+                    "sensor2": "仓库中央",
+                    "sensor3": "仓库西侧"
+                }
+                location = sensor_locations.get(sensor_name, "未知位置")
+                
+                # 为不同传感器设置不同的渐变背景
+                gradient_styles = [
+                    "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+                    "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+                    "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
+                    "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+                    "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+                    "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)"
+                ]
+                gradient_style = gradient_styles[(sensor_index - 1) % len(gradient_styles)]
+                
+                sensor_html += f'''<div class="sensor-card" style="background: {gradient_style};">
+                    <div class="sensor-header">
+                        <div class="sensor-name">{sensor_name}</div>
+                        <span class="sensor-location">{location}</span>
+                    </div>
+                    <div class="status-tag status-{status_class}">{status_text}</div>
+                    <div class="sensor-data-item">
+                        <span class="sensor-label">温度</span>
+                        <span class="sensor-value">{data_item["temperature"]}°C</span>
+                    </div>
+                    <div class="sensor-data-item">
+                        <span class="sensor-label">湿度</span>
+                        <span class="sensor-value">{data_item["humidity"]}%</span>
+                    </div>
+                    <div class="sensor-data-item">
+                        <span class="sensor-label">检测时间</span>
+                        <span class="sensor-value">{current_time}</span>
+                    </div>
+                </div>'''
+            
+            # 使用更简单的HTML模板，确保weasyprint能够正确处理
+            html = f'''<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>AI智能分析报告</title>
+    <style>
+        /* 全局样式 */
+        * {{ 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }}
+        
+        body {{ 
+            font-family: "Microsoft YaHei", Arial, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            background-color: #f5f7fa; 
+            padding: 20px; 
+        }}
+        
+        /* 报告容器 */
+        .report-container {{ 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background-color: white; 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
+        }}
+        
+        /* 标题样式 */
+        h1 {{ 
+            color: #2c3e50; 
+            text-align: center; 
+            font-size: 24px; 
+            margin-bottom: 20px; 
+            font-weight: bold; 
+        }}
+        
+        h2 {{ 
+            color: #3498db; 
+            font-size: 20px; 
+            margin-top: 30px; 
+            margin-bottom: 15px; 
+            padding-bottom: 8px; 
+            border-bottom: 2px solid #3498db; 
+        }}
+        
+        h3 {{ 
+            color: #2c3e50; 
+            font-size: 16px; 
+            margin-top: 20px; 
+            margin-bottom: 10px; 
+            font-weight: bold; 
+        }}
+        
+        /* 报告头部信息 */
+        .report-header {{ 
+            background: #667eea; 
+            color: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 25px; 
+        }}
+        
+        .header-info {{ 
+            display: block; 
+        }}
+        
+        .info-item {{ 
+            font-size: 14px; 
+            margin: 5px 0; 
+        }}
+        
+        .info-label {{ 
+            font-weight: bold; 
+            margin-right: 8px; 
+        }}
+        
+        /* 传感器数据样式 */
+        .sensor-grid {{ 
+            display: block; 
+            margin: 25px 0; 
+        }}
+        
+        .sensor-card {{ 
+            color: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 15px; 
+        }}
+        
+        .sensor-header {{ 
+            display: block; 
+            margin-bottom: 15px; 
+        }}
+        
+        .sensor-name {{ 
+            font-size: 18px; 
+            font-weight: bold; 
+        }}
+        
+        .sensor-location {{ 
+            font-size: 12px; 
+            opacity: 0.9; 
+            background: rgba(255, 255, 255, 0.2); 
+            padding: 4px 10px; 
+            border-radius: 12px; 
+        }}
+        
+        .sensor-data-item {{ 
+            display: flex; 
+            justify-content: space-between; 
+            margin: 10px 0; 
+            font-size: 14px; 
+        }}
+        
+        .sensor-label {{ 
+            opacity: 0.9; 
+        }}
+        
+        .sensor-value {{ 
+            font-weight: bold; 
+            font-size: 16px; 
+        }}
+        
+        /* AI分析建议样式 */
+        .suggestion-section {{ 
+            background: #e8f4f8; 
+            padding: 25px; 
+            margin: 25px 0; 
+            border-radius: 8px; 
+            border-left: 4px solid #3498db; 
+        }}
+        
+        .suggestion-title {{ 
+            font-size: 16px; 
+            font-weight: bold; 
+            margin-bottom: 15px; 
+            color: #2c3e50; 
+        }}
+        
+        .suggestion-content {{ 
+            line-height: 1.8; 
+            font-size: 14px; 
+            color: #555; 
+        }}
+        
+        /* 系统概览样式 */
+        .system-overview {{ 
+            background: #fff3cd; 
+            padding: 20px; 
+            margin: 25px 0; 
+            border-radius: 8px; 
+            border: 1px solid #ffeeba; 
+        }}
+        
+        .overview-grid {{ 
+            display: block; 
+            margin-top: 15px; 
+        }}
+        
+        .overview-item {{ 
+            text-align: center; 
+            background: white; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin: 10px 0; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+        }}
+        
+        .overview-value {{ 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: #856404; 
+        }}
+        
+        .overview-label {{ 
+            font-size: 14px; 
+            color: #856404; 
+            margin-top: 5px; 
+        }}
+        
+        /* 页脚样式 */
+        .report-footer {{ 
+            margin-top: 30px; 
+            padding: 20px; 
+            background: #f5f7fa; 
+            border-radius: 8px; 
+            text-align: center; 
+            color: #666; 
+            font-size: 14px; 
+        }}
+        
+        .timestamp {{ 
+            font-style: italic; 
+            margin-top: 10px; 
+            font-size: 13px; 
+        }}
+        
+        /* 状态标签样式 */
+        .status-tag {{ 
+            display: inline-block; 
+            padding: 6px 12px; 
+            border-radius: 15px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            margin-bottom: 10px; 
+        }}
+        
+        .status-normal {{ 
+            background-color: #d4edda; 
+            color: #155724; 
+        }}
+        
+        .status-warning {{ 
+            background-color: #fff3cd; 
+            color: #856404; 
+        }}
+        
+        .status-danger {{ 
+            background-color: #f8d7da; 
+            color: #721c24; 
+        }}
+        
+        /* 数据统计样式 */
+        .stats-section {{ 
+            background: white; 
+            padding: 20px; 
+            margin: 25px 0; 
+            border-radius: 8px; 
+        }}
+        
+        .stats-grid {{ 
+            display: block; 
+            margin-top: 15px; 
+        }}
+        
+        .stat-card {{ 
+            background: #667eea; 
+            color: white; 
+            padding: 15px; 
+            border-radius: 8px; 
+            text-align: center; 
+            margin: 10px 0; 
+        }}
+        
+        .stat-value {{ 
+            font-size: 28px; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+        }}
+        
+        .stat-label {{ 
+            font-size: 14px; 
+            opacity: 0.9; 
+        }}
+        
+        /* 列表样式 */
+        ul, ol {{ 
+            margin-left: 20px; 
+            margin-bottom: 15px; 
+        }}
+        
+        li {{ 
+            margin-bottom: 8px; 
+        }}
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <!-- 报告标题 -->
+        <h1>AI智能粮仓分析报告</h1>
+        
+        <!-- 报告头部信息 -->
+        <div class="report-header">
+            <div class="header-info">
+                <div class="info-item">
+                    <span class="info-label">报告类型:</span>
+                    <span>AI智能分析</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">生成时间:</span>
+                    <span>{current_time}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">传感器数量:</span>
+                    <span>{len(sensor_data)}个</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">报告编号:</span>
+                    <span>REPORT-{current_time.replace('-', '').replace(':', '').replace(' ', '')[:14]}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 传感器数据 -->
+        <h2>传感器实时数据</h2>
+        <div class="sensor-grid">
+            {sensor_html}
+        </div>
+        
+        <!-- AI分析建议 -->
+        <h2>AI智能分析与建议</h2>
+        <div class="suggestion-section">
+            <div class="suggestion-content">
+                {parsed_suggestion}
+            </div>
+        </div>
+        
+        <!-- 粮仓环境管理建议 -->
+        <h2>粮仓环境管理建议</h2>
+        <div class="system-overview">
+            <ul>
+                <li>保持粮仓温度在18-22°C之间，湿度在50-70%之间</li>
+                <li>定期检查传感器设备，确保数据采集准确性</li>
+                <li>根据季节变化调整通风策略，维持稳定环境</li>
+                <li>建立完善的环境监控档案，便于历史数据分析</li>
+                <li>结合AI建议及时调整环境控制措施，预防霉变风险</li>
+            </ul>
+        </div>
+        
+        <!-- 报告页脚 -->
+        <div class="report-footer">
+            <p>© 2026 AI智能粮仓管理系统 | 保留所有权利</p>
+            <p class="timestamp">报告生成时间: {current_time}</p>
+        </div>
+    </div>
+</body>
+</html>'''
             
             # 使用weasyprint生成PDF
             pdf = HTML(string=html).write_pdf()
             
             # 返回PDF响应
-            response = HttpResponse(pdf, content_type='application/pdf')
+            response = HttpResponse(content_type='application/pdf')
             response['Content-Disposition'] = f'attachment; filename="AI_Report_{datetime.now().strftime("%Y-%m-%d")}.pdf"'
+            response.write(pdf)
             
             return response
             
         except Exception as e:
+            # 详细记录错误信息
+            import traceback
+            error_trace = traceback.format_exc()
+            print(f"PDF生成错误详情: {error_trace}")
             return JsonResponse({
                 'status': 'error',
-                'message': f'Failed to generate PDF: {str(e)}'
+                'message': f'Failed to generate PDF: {str(e)}',
+                'error_details': error_trace
             })
     return JsonResponse({
         'status': 'error',
