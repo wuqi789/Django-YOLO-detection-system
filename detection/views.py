@@ -199,7 +199,8 @@ def process_video(request):
             logger.info(f"Base directory: {base_dir}")
             logger.info(f"Temp directory: {temp_dir}")
             logger.info(f"Media directory: {media_dir}")
-            
+
+
             # Create directories if they don't exist
             os.makedirs(temp_dir, exist_ok=True)
             os.makedirs(media_dir, exist_ok=True)
