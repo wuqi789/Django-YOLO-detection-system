@@ -12,7 +12,6 @@ client = OpenAI(
 def get_ai_suggestion(sensor_data):
     """
     获取AI生成的粮仓管理建议
-    
     Args:
         sensor_data: 传感器数据，格式为：
             {
