@@ -156,7 +156,6 @@ def get_stats(request):
 
 from django.views.decorators.csrf import csrf_exempt
 
-
 # Global progress storage (in-memory, for development only)
 processing_progress = {}
 
