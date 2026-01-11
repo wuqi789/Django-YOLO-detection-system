@@ -28,7 +28,8 @@ def get_ai_suggestion(sensor_data):
         # 验证传感器数据格式
         if not isinstance(sensor_data, dict):
             raise ValueError("传感器数据必须是字典格式")
-        
+
+
         # 准备用户消息内容
         user_content = f"""现在的1号传感器的温湿度为{sensor_data['sensor1']['temperature']}°C，{sensor_data['sensor1']['humidity']}%；
 现在的2号传感器的温湿度为{sensor_data['sensor2']['temperature']}°C，{sensor_data['sensor2']['humidity']}%；
