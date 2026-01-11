@@ -8,7 +8,6 @@ client = OpenAI(
     base_url="https://openrouter.ai/api/v1",  # OpenRouter固定的API地址
     api_key=OPENROUTER_API_KEY                # 核心：OpenRouter的API Key
 )
-
 def get_ai_suggestion(sensor_data):
     """
     获取AI生成的粮仓管理建议
