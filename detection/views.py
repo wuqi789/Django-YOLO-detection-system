@@ -163,10 +163,8 @@ processing_progress = {}
 def process_video(request):
     if request.method == 'POST':
         import uuid
-
         import shutil
         import logging
-        
         # Configure logging
         logging.basicConfig(level=logging.DEBUG)
         logger = logging.getLogger('video_processing')
