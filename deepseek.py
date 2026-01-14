@@ -1,6 +1,5 @@
 from openai import OpenAI
 import os
-
 OPENROUTER_API_KEY = "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"  # 替换为真实的OpenRouter API Key
 
 # 初始化OpenAI客户端
@@ -92,7 +91,6 @@ if __name__ == "__main__":
         "sensor2": {"temperature": 19.2, "humidity": 68},
         "sensor3": {"temperature": 17.8, "humidity": 63}
     }
-    
     # 获取建议
     suggestion = get_ai_suggestion(test_data)
     print("AI建议：\n", suggestion)
