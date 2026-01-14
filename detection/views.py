@@ -143,6 +143,7 @@ def get_sensors(request):
 
 def get_stats(request):
     # Generate random stats data
+
     stats = {
         'total_detections': random.randint(300, 500),
         'online_devices': random.randint(3, 5),
