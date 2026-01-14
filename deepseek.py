@@ -63,7 +63,6 @@ def get_ai_suggestion(sensor_data):
             temperature=0.5,  # 降低随机性，确保建议更可靠
             max_tokens=1500     # 限制生成的最大token数
         )
-        
         # 返回模型响应结果
         return completion.choices[0].message.content
     
