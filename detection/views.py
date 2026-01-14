@@ -185,7 +185,8 @@ def process_video(request):
             
             video_file = request.FILES['video']
             logger.info(f"Received video file: {video_file.name}, size: {video_file.size} bytes")
-            
+
+
             # Generate unique filename for the uploaded video
             video_uuid = str(uuid.uuid4())
             logger.info(f"Generated video UUID: {video_uuid}")
