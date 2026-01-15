@@ -71,7 +71,6 @@ def get_model_params(model_path):
             'version': 'unknown',
             'task': 'detect'
         }
-
 # Get the detector instance
 detector = get_detector()
 
