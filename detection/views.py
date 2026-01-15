@@ -46,7 +46,6 @@ def scan_models():
     
     return models
 
-
 # Helper function to get model parameters
 def get_model_params(model_path):
     """Extract parameters from a YOLOv8 model"""
