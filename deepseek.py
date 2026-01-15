@@ -58,6 +58,7 @@ def get_ai_suggestion(sensor_data):
                     "content": user_content
                 }
             ],
+
             extra_headers={},
             extra_body={},
             temperature=0.5,  # 降低随机性，确保建议更可靠
