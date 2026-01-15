@@ -78,7 +78,8 @@ def get_ai_suggestion(sensor_data):
     # 捕获参数错误
     except ValueError as e:
         return f"参数错误：{str(e)}"
-    
+
+
     # 捕获网络/连接错误
     except Exception as e:
         return f"获取建议失败：{str(e)}"
