@@ -9,7 +9,6 @@ class YOLODetector:
         # 检查模型路径是否存在
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"模型文件不存在！请检查路径：{model_path}")
-
         self.model = YOLO(model_path)
         self.class_names = self.model.names
         self.conf_threshold = 0.5
