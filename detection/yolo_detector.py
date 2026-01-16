@@ -44,7 +44,7 @@ class YOLODetector:
             conf=self.conf_threshold,
             device=self.device
         )
-        
+
         # 使用result.plot()生成标注后的图片
         detected_frame = results[0].plot()
         
