@@ -8,6 +8,7 @@ from .ultralytics import YOLO
 import time
 from weasyprint import HTML
 
+
 # Global variables
 models_cache = {}
 current_model = None
