@@ -1204,7 +1204,8 @@
             detectionInterval: null,
             currentModel: null,
             modelsList: [],
-            currentVideoDuration: 0
+            currentVideoDuration: 0,
+            lastHighTempAlert: 0
         };
         
         // Format file size to human readable format
@@ -2594,64 +2595,117 @@
             state.sensorMode = mode;
         }
         
+        // Sensor data update with performance optimizations
+        let updateSensorsPending = false;
+        let sensorAbortController = null;
+        
         async function updateSensors() {
+            // Prevent multiple simultaneous requests
+            if (updateSensorsPending) {
+                return;
+            }
+            
+            updateSensorsPending = true;
+            
             try {
-                const response = await fetch('/get_sensors/');
+                // Cancel previous request if still pending
+                if (sensorAbortController) {
+                    sensorAbortController.abort();
+                }
+                
+                sensorAbortController = new AbortController();
+                
+                const response = await fetch('/get_sensors/', {
+                    signal: sensorAbortController.signal,
+                    cache: 'no-cache'
+                });
                 const data = await response.json();
                 
                 if (data.status === 'success') {
-                    const sensorData = data.data;
-                    state.temperature = sensorData.temperature;
-                    state.humidity = sensorData.humidity;
-                    
-                    document.getElementById('tempValue').textContent = state.temperature.toFixed(1);
-                    document.getElementById('humidValue').textContent = Math.round(state.humidity);
-                    document.getElementById('gaugeTemp').textContent = state.temperature.toFixed(1);
-                    document.getElementById('gaugeHumid').textContent = Math.round(state.humidity);
-                    
-                    document.getElementById('tempBar').style.width = `${(state.temperature - 15) / 25 * 100}%`;
-                    document.getElementById('humidBar').style.width = `${state.humidity}%`;
-                    
-                    // Check alerts
-                    if (state.temperature > 30) {
-                        addAlert('warning', 'High Temperature', `Current temperature: ${state.temperature.toFixed(1)}°C`);
-                    }
+                    updateSensorData(data.data);
                 }
             } catch (error) {
-                console.error('Sensor data error:', error);
-                // Fallback to simulated data if API fails
-                let tempDelta = 0, humidDelta = 0;
-                
-                switch (state.sensorMode) {
-                    case 'normal':
-                        tempDelta = (Math.random() - 0.5) * 0.5;
-                        humidDelta = (Math.random() - 0.5) * 2;
-                        break;
-                    case 'hot':
-                        tempDelta = Math.random() * 0.3;
-                        break;
-                    case 'humid':
-                        humidDelta = Math.random() * 1;
-                        break;
-                    case 'random':
-                        if (Math.random() > 0.9) {
-                            tempDelta = (Math.random() - 0.5) * 5;
-                            humidDelta = (Math.random() - 0.5) * 10;
-                        }
-                        break;
+                if (error.name !== 'AbortError') {
+                    console.error('Sensor data error:', error);
+                    // Fallback to simulated data if API fails
+                    generateSimulatedSensorData();
                 }
-                
-                state.temperature = Math.max(15, Math.min(40, state.temperature + tempDelta));
-                state.humidity = Math.max(20, Math.min(95, state.humidity + humidDelta));
-                
-                document.getElementById('tempValue').textContent = state.temperature.toFixed(1);
-                document.getElementById('humidValue').textContent = Math.round(state.humidity);
-                document.getElementById('gaugeTemp').textContent = state.temperature.toFixed(1);
-                document.getElementById('gaugeHumid').textContent = Math.round(state.humidity);
-                
-                document.getElementById('tempBar').style.width = `${(state.temperature - 15) / 25 * 100}%`;
-                document.getElementById('humidBar').style.width = `${state.humidity}%`;
+            } finally {
+                updateSensorsPending = false;
             }
+        }
+        
+        // Update DOM elements with sensor data
+        function updateSensorData(sensorData) {
+            state.temperature = sensorData.temperature;
+            state.humidity = sensorData.humidity;
+            
+            // Optimize DOM updates by batching them
+            const updates = [
+                { id: 'tempValue', value: state.temperature.toFixed(1) },
+                { id: 'humidValue', value: Math.round(state.humidity) },
+                { id: 'gaugeTemp', value: state.temperature.toFixed(1) },
+                { id: 'gaugeHumid', value: Math.round(state.humidity) }
+            ];
+            
+            // Update text content first
+            updates.forEach(update => {
+                const element = document.getElementById(update.id);
+                if (element && element.textContent !== update.value) {
+                    element.textContent = update.value;
+                }
+            });
+            
+            // Update styles
+            const tempBar = document.getElementById('tempBar');
+            const tempWidth = `${(state.temperature - 15) / 25 * 100}%`;
+            if (tempBar && tempBar.style.width !== tempWidth) {
+                tempBar.style.width = tempWidth;
+            }
+            
+            const humidBar = document.getElementById('humidBar');
+            const humidWidth = `${state.humidity}%`;
+            if (humidBar && humidBar.style.width !== humidWidth) {
+                humidBar.style.width = humidWidth;
+            }
+            
+            // Check alerts (throttled to prevent too many alerts)
+            if (state.temperature > 30 && Date.now() - state.lastHighTempAlert > 30000) {
+                addAlert('warning', 'High Temperature', `Current temperature: ${state.temperature.toFixed(1)}°C`);
+                state.lastHighTempAlert = Date.now();
+            }
+        }
+        
+        // Generate simulated sensor data with optimized calculations
+        function generateSimulatedSensorData() {
+            let tempDelta = 0, humidDelta = 0;
+            
+            // Simplified mode-based delta calculation
+            switch (state.sensorMode) {
+                case 'normal':
+                    tempDelta = (Math.random() - 0.5) * 0.5;
+                    humidDelta = (Math.random() - 0.5) * 2;
+                    break;
+                case 'hot':
+                    tempDelta = Math.random() * 0.3;
+                    break;
+                case 'humid':
+                    humidDelta = Math.random() * 1;
+                    break;
+                case 'random':
+                    if (Math.random() > 0.9) {
+                        tempDelta = (Math.random() - 0.5) * 5;
+                        humidDelta = (Math.random() - 0.5) * 10;
+                    }
+                    break;
+            }
+            
+            // Update state with bounds checking
+            state.temperature = Math.max(15, Math.min(40, state.temperature + tempDelta));
+            state.humidity = Math.max(20, Math.min(95, state.humidity + humidDelta));
+            
+            // Use the same update function as real data
+            updateSensorData(state);
         }
         
         // Time Update
@@ -3314,9 +3368,10 @@
             initAlerts();
             
             setInterval(updateTime, 1000);
-            setInterval(updateSensors, 5000);
+            setInterval(updateSensors, 500);
             
             updateTime();
+            updateSensors();
             
             // Add event listener for PDF export button
             const exportBtn = document.getElementById('export-pdf-btn');
