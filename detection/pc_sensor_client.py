@@ -3,7 +3,7 @@ import time
 import json
 
 # ==================== 需修改的配置项 ====================
-JETSON_IP = "192.168.31.120"  # 替换为你的Jetson真实IP
+JETSON_IP = "192.168.0.110"  # 替换为你的Jetson真实IP
 JETSON_PORT = 5000  # 必须和Jetson端的port一致
 # =======================================================
 
@@ -55,6 +55,7 @@ def get_sensor_data_continuously():
                 # 打印格式化数据
                 print(
                     f"时间：{data['timestamp']} | 温度：{data['temperature']}℃ | 湿度：{data['humidity']}% | 状态：{data['status']}")
+                # 格式为:时间：2026-01-18 19:38:32 | 温度：['21.80', '19.60', '19.70']℃ | 湿度：['29.00', '46.50', '46.60']% | 状态：normal
             else:
                 print(f"❌ 获取数据失败，状态码：{response.status_code}")
 
