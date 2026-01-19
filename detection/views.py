@@ -3,6 +3,7 @@ from django.http import JsonResponse
 import os
 import random
 import cv2
+import requests
 from .yolo_detector import get_detector, YOLODetector
 from .ultralytics import YOLO
 import time
@@ -132,12 +133,46 @@ def detect(request):
     return JsonResponse({'status': 'error', 'message': 'Method not allowed'})
 
 def get_sensors(request):
-    # Generate random sensor data
-    sensor_data = {
-        'temperature': round(random.uniform(15.0, 30.0), 1),
-        'humidity': random.randint(20, 80)
-    }
-    return JsonResponse({'status': 'success', 'data': sensor_data})
+    try:
+        # Call Jetson sensor API
+        jetson_url = "http://192.168.0.110:5000/sensor"
+        response = requests.get(jetson_url, timeout=2)
+        jetson_data = response.json()
+        
+        # Directly use the sensor data without averaging
+        # Ensure we have at least 3 values for each sensor type
+        temperature = jetson_data['temperature']
+        humidity = jetson_data['humidity']
+        
+        # Make sure we have exactly 3 values
+        while len(temperature) < 3:
+            temperature.append(temperature[-1] if temperature else "24.5")
+        while len(humidity) < 3:
+            humidity.append(humidity[-1] if humidity else "65")
+        
+        # Take only the first 3 values if we have more
+        temperature = temperature[:3]
+        humidity = humidity[:3]
+        
+        # Format response with all sensor data
+        sensor_data = {
+            'temperature': temperature,
+            'humidity': humidity,
+            'timestamp': jetson_data.get('timestamp', ''),
+            'status': jetson_data.get('status', 'normal')
+        }
+        return JsonResponse({'status': 'success', 'data': sensor_data})
+    except Exception as e:
+        # Fallback to random data if Jetson API fails
+        print(f"Failed to get data from Jetson: {str(e)}")
+        # Generate random values for each sensor
+        sensor_data = {
+            'temperature': [f"{round(random.uniform(15.0, 30.0), 2)}", f"{round(random.uniform(15.0, 30.0), 2)}", f"{round(random.uniform(15.0, 30.0), 2)}"],
+            'humidity': [f"{round(random.uniform(20.0, 80.0), 2)}", f"{round(random.uniform(20.0, 80.0), 2)}", f"{round(random.uniform(20.0, 80.0), 2)}"],
+            'timestamp': time.strftime("%Y-%m-%d %H:%M:%S"),
+            'status': 'warning'
+        }
+        return JsonResponse({'status': 'success', 'data': sensor_data})
 
 def get_stats(request):
     # Generate random stats data
@@ -753,7 +788,39 @@ def get_ai_analysis(request):
     """
     if request.method == 'GET':
         try:
-            # 生成模拟传感器数据（实际应用中应从真实传感器获取）
+            # Get sensor data from Jetson API
+            jetson_url = "http://192.168.0.110:5000/sensor"
+            response = requests.get(jetson_url, timeout=2)
+            jetson_data = response.json()
+            
+            # Format sensor data for AI analysis
+            sensor_data = {
+                "sensor1": {
+                    "temperature": round(float(jetson_data['temperature'][0]), 1),
+                    "humidity": round(float(jetson_data['humidity'][0]))
+                },
+                "sensor2": {
+                    "temperature": round(float(jetson_data['temperature'][1]), 1),
+                    "humidity": round(float(jetson_data['humidity'][1]))
+                },
+                "sensor3": {
+                    "temperature": round(float(jetson_data['temperature'][2]), 1),
+                    "humidity": round(float(jetson_data['humidity'][2]))
+                }
+            }
+            
+            # 调用AI建议生成函数
+            suggestion = get_ai_suggestion(sensor_data)
+            
+            # 返回JSON响应
+            return JsonResponse({
+                'status': 'success',
+                'suggestion': suggestion,
+                'sensor_data': sensor_data
+            })
+        except Exception as e:
+            print(f"Failed to get data from Jetson: {str(e)}")
+            # Fallback to random data if Jetson API fails
             sensor_data = {
                 "sensor1": {
                     "temperature": round(random.uniform(15.0, 25.0), 1),
@@ -768,20 +835,11 @@ def get_ai_analysis(request):
                     "humidity": random.randint(50, 80)
                 }
             }
-            
-            # 调用AI建议生成函数
             suggestion = get_ai_suggestion(sensor_data)
-            
-            # 返回JSON响应
             return JsonResponse({
                 'status': 'success',
                 'suggestion': suggestion,
                 'sensor_data': sensor_data
-            })
-        except Exception as e:
-            return JsonResponse({
-                'status': 'error',
-                'message': f'Failed to get AI analysis: {str(e)}'
             })
     return JsonResponse({
         'status': 'error',

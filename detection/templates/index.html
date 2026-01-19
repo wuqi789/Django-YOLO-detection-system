@@ -471,14 +471,6 @@
                                 <label class="text-xs text-gray-500 mb-1 block">Confidence Threshold: <span id="confValue">0.5</span></label>
                                 <input type="range" min="0.3" max="0.9" step="0.05" value="0.5" class="w-full" id="confidenceSlider" oninput="updateConfidence(this.value)">
                             </div>
-                            <div>
-                                <label class="text-xs text-gray-500 mb-1 block">Detection Frequency</label>
-                                <select class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm" id="detectionFreq">
-                                    <option value="realtime">Real-time</option>
-                                    <option value="2s">Every 2 seconds</option>
-                                    <option value="5s">Every 5 seconds</option>
-                                </select>
-                            </div>
                         </div>
                     </div>
                     
@@ -507,22 +499,58 @@
                         </div>
                     </div>
                     
-                    <!-- Environment Sensors -->
+                    <!-- Individual Sensors -->
                     <div class="glass-card rounded-2xl p-4">
-                        <h3 class="text-sm font-medium text-gray-400 mb-4">Environmental Sensors</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="text-center p-3 rounded-xl bg-white/5">
-                                <div class="text-3xl font-bold text-blue-400" id="tempValue">15.5</div>
-                                <div class="text-xs text-gray-500 mt-1">Temperature °C</div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-sm font-medium text-gray-400">Individual Sensors</h3>
+                            <div class="flex items-center gap-3">
+                                <span id="sensorStatus" class="px-2 py-1 text-xs rounded-full bg-green-500/20 text-green-400">normal</span>
+                                <span id="sensorTimestamp" class="text-xs text-gray-400">--:--:--</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4">
+                            <!-- Sensor 1 -->
+                            <div class="text-center p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
+                                <div class="text-xs text-gray-500 mb-1">Sensor 1</div>
+                                <div class="text-xl font-bold text-blue-400 mb-1" id="sensor1Temp">15.50</div>
+                                <div class="text-xs text-gray-400 mb-2">Temperature °C</div>
+                                <div class="text-xl font-bold text-green-400 mb-1" id="sensor1Humid">21.00</div>
+                                <div class="text-xs text-gray-400">Humidity %</div>
+                                <div class="mt-3 h-1 bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-blue-500 transition-all" style="width: 60%" id="sensor1TempBar"></div>
+                                </div>
                                 <div class="mt-2 h-1 bg-gray-700 rounded-full overflow-hidden">
-                                    <div class="h-full bg-blue-500 transition-all" style="width: 60%" id="tempBar"></div>
+                                    <div class="h-full bg-green-500 transition-all" style="width: 65%" id="sensor1HumidBar"></div>
                                 </div>
                             </div>
-                            <div class="text-center p-3 rounded-xl bg-white/5">
-                                <div class="text-3xl font-bold text-green-400" id="humidValue">21</div>
-                                <div class="text-xs text-gray-500 mt-1">Humidity %</div>
+                            
+                            <!-- Sensor 2 -->
+                            <div class="text-center p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
+                                <div class="text-xs text-gray-500 mb-1">Sensor 2</div>
+                                <div class="text-xl font-bold text-blue-400 mb-1" id="sensor2Temp">16.20</div>
+                                <div class="text-xs text-gray-400 mb-2">Temperature °C</div>
+                                <div class="text-xl font-bold text-green-400 mb-1" id="sensor2Humid">23.00</div>
+                                <div class="text-xs text-gray-400">Humidity %</div>
+                                <div class="mt-3 h-1 bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-blue-500 transition-all" style="width: 62%" id="sensor2TempBar"></div>
+                                </div>
                                 <div class="mt-2 h-1 bg-gray-700 rounded-full overflow-hidden">
-                                    <div class="h-full bg-green-500 transition-all" style="width: 65%" id="humidBar"></div>
+                                    <div class="h-full bg-green-500 transition-all" style="width: 68%" id="sensor2HumidBar"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sensor 3 -->
+                            <div class="text-center p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
+                                <div class="text-xs text-gray-500 mb-1">Sensor 3</div>
+                                <div class="text-xl font-bold text-blue-400 mb-1" id="sensor3Temp">15.80</div>
+                                <div class="text-xs text-gray-400 mb-2">Temperature °C</div>
+                                <div class="text-xl font-bold text-green-400 mb-1" id="sensor3Humid">22.00</div>
+                                <div class="text-xs text-gray-400">Humidity %</div>
+                                <div class="mt-3 h-1 bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-blue-500 transition-all" style="width: 61%" id="sensor3TempBar"></div>
+                                </div>
+                                <div class="mt-2 h-1 bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-green-500 transition-all" style="width: 66%" id="sensor3HumidBar"></div>
                                 </div>
                             </div>
                         </div>
@@ -1199,13 +1227,18 @@
             startTime: Date.now(),
             alerts: [],
             sensorMode: 'normal',
-            temperature: 24.5,
-            humidity: 65,
+            temperature: [24.5, 24.5, 24.5],
+            humidity: [65, 65, 65],
+            sensorTimestamp: null,
+            sensorStatus: 'normal',
+            sensorConnectionStatus: 'connected',
             detectionInterval: null,
             currentModel: null,
             modelsList: [],
             currentVideoDuration: 0,
-            lastHighTempAlert: 0
+            lastHighTempAlert: 0,
+            lastSensorError: null,
+            sensorErrorCount: 0
         };
         
         // Format file size to human readable format
@@ -2619,14 +2652,38 @@
                     signal: sensorAbortController.signal,
                     cache: 'no-cache'
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
                 
                 if (data.status === 'success') {
                     updateSensorData(data.data);
+                    // Reset error count on successful data fetch
+                    state.sensorErrorCount = 0;
+                    state.lastSensorError = null;
+                    state.sensorConnectionStatus = 'connected';
+                    state.sensorStatus = 'normal';
+                } else {
+                    throw new Error(`API error: ${data.message || 'Unknown error'}`);
                 }
             } catch (error) {
                 if (error.name !== 'AbortError') {
                     console.error('Sensor data error:', error);
+                    
+                    // Increment error count
+                    state.sensorErrorCount++;
+                    state.lastSensorError = error.message;
+                    state.sensorConnectionStatus = 'error';
+                    state.sensorStatus = 'error';
+                    
+                    // Show notification for persistent errors
+                    if (state.sensorErrorCount === 3) {
+                        showNotification('Sensor Connection Issue', 'Failed to get sensor data. Using simulated data instead.');
+                    }
+                    
                     // Fallback to simulated data if API fails
                     generateSimulatedSensorData();
                 }
@@ -2637,16 +2694,49 @@
         
         // Update DOM elements with sensor data
         function updateSensorData(sensorData) {
-            state.temperature = sensorData.temperature;
-            state.humidity = sensorData.humidity;
+            // Update global state with timestamp and status if available
+            if (sensorData.timestamp) {
+                state.sensorTimestamp = sensorData.timestamp;
+            }
+            
+            if (sensorData.status) {
+                state.sensorStatus = sensorData.status;
+            }
+            
+            // Check if we have array data (from Jetson) or single values
+            const isArrayData = Array.isArray(sensorData.temperature) && Array.isArray(sensorData.humidity);
+            
+            // Calculate average values for display
+            let tempArray, humidArray;
+            
+            if (isArrayData) {
+                // Convert string array to number array (handle new format)
+                tempArray = sensorData.temperature.map(temp => parseFloat(temp));
+                humidArray = sensorData.humidity.map(humid => parseFloat(humid));
+            } else {
+                // Handle old format with single values
+                const tempValue = parseFloat(sensorData.temperature);
+                const humidValue = parseFloat(sensorData.humidity);
+                tempArray = [tempValue, tempValue, tempValue];
+                humidArray = [humidValue, humidValue, humidValue];
+            }
+            
+            // Update global state with sensor values (no averaging)
+            state.temperature = tempArray;
+            state.humidity = humidArray;
+            
+            // Update sensor connection status
+            state.sensorConnectionStatus = sensorData.status === 'normal' ? 'connected' : 'warning';
             
             // Optimize DOM updates by batching them
-            const updates = [
-                { id: 'tempValue', value: state.temperature.toFixed(1) },
-                { id: 'humidValue', value: Math.round(state.humidity) },
-                { id: 'gaugeTemp', value: state.temperature.toFixed(1) },
-                { id: 'gaugeHumid', value: Math.round(state.humidity) }
-            ];
+            const updates = [];
+            
+            // Update individual sensor values
+            for (let i = 0; i < 3; i++) {
+                const sensorIndex = i + 1;
+                updates.push({ id: `sensor${sensorIndex}Temp`, value: tempArray[i].toFixed(2) });
+                updates.push({ id: `sensor${sensorIndex}Humid`, value: humidArray[i].toFixed(2) });
+            }
             
             // Update text content first
             updates.forEach(update => {
@@ -2656,56 +2746,71 @@
                 }
             });
             
-            // Update styles
-            const tempBar = document.getElementById('tempBar');
-            const tempWidth = `${(state.temperature - 15) / 25 * 100}%`;
-            if (tempBar && tempBar.style.width !== tempWidth) {
-                tempBar.style.width = tempWidth;
+            // Update individual sensor bars
+            for (let i = 0; i < 3; i++) {
+                const sensorIndex = i + 1;
+                const sensorTempBar = document.getElementById(`sensor${sensorIndex}TempBar`);
+                const sensorTempWidth = `${(tempArray[i] - 15) / 25 * 100}%`;
+                if (sensorTempBar && sensorTempBar.style.width !== sensorTempWidth) {
+                    sensorTempBar.style.width = sensorTempWidth;
+                }
+                
+                const sensorHumidBar = document.getElementById(`sensor${sensorIndex}HumidBar`);
+                const sensorHumidWidth = `${humidArray[i]}%`;
+                if (sensorHumidBar && sensorHumidBar.style.width !== sensorHumidWidth) {
+                    sensorHumidBar.style.width = sensorHumidWidth;
+                }
             }
             
-            const humidBar = document.getElementById('humidBar');
-            const humidWidth = `${state.humidity}%`;
-            if (humidBar && humidBar.style.width !== humidWidth) {
-                humidBar.style.width = humidWidth;
+            // Update sensor status display if element exists
+            const sensorStatusElement = document.getElementById('sensorStatus');
+            if (sensorStatusElement) {
+                sensorStatusElement.textContent = state.sensorStatus || 'normal';
+                sensorStatusElement.className = `px-2 py-1 text-xs rounded-full ${state.sensorConnectionStatus === 'connected' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`;
+            }
+            
+            // Update timestamp display if element exists
+            const timestampElement = document.getElementById('sensorTimestamp');
+            if (timestampElement) {
+                timestampElement.textContent = state.sensorTimestamp || '--:--:--';
             }
             
             // Check alerts (throttled to prevent too many alerts)
-            if (state.temperature > 30 && Date.now() - state.lastHighTempAlert > 30000) {
-                addAlert('warning', 'High Temperature', `Current temperature: ${state.temperature.toFixed(1)}°C`);
+            const anyHighTemp = tempArray.some(temp => temp > 30);
+            if (anyHighTemp && Date.now() - state.lastHighTempAlert > 30000) {
+                // Find the highest temperature sensor
+                const maxTemp = Math.max(...tempArray);
+                const sensorIndex = tempArray.indexOf(maxTemp) + 1;
+                addAlert('warning', 'High Temperature', `Sensor ${sensorIndex} temperature: ${maxTemp.toFixed(1)}°C`);
                 state.lastHighTempAlert = Date.now();
             }
         }
         
         // Generate simulated sensor data with optimized calculations
         function generateSimulatedSensorData() {
-            let tempDelta = 0, humidDelta = 0;
+            // Generate random values for each sensor (no base value)
+            const temperature = [
+                Math.max(15, Math.min(40, Math.random() * 25 + 15)).toFixed(2),
+                Math.max(15, Math.min(40, Math.random() * 25 + 15)).toFixed(2),
+                Math.max(15, Math.min(40, Math.random() * 25 + 15)).toFixed(2)
+            ];
             
-            // Simplified mode-based delta calculation
-            switch (state.sensorMode) {
-                case 'normal':
-                    tempDelta = (Math.random() - 0.5) * 0.5;
-                    humidDelta = (Math.random() - 0.5) * 2;
-                    break;
-                case 'hot':
-                    tempDelta = Math.random() * 0.3;
-                    break;
-                case 'humid':
-                    humidDelta = Math.random() * 1;
-                    break;
-                case 'random':
-                    if (Math.random() > 0.9) {
-                        tempDelta = (Math.random() - 0.5) * 5;
-                        humidDelta = (Math.random() - 0.5) * 10;
-                    }
-                    break;
-            }
+            const humidity = [
+                Math.max(20, Math.min(95, Math.random() * 75 + 20)).toFixed(2),
+                Math.max(20, Math.min(95, Math.random() * 75 + 20)).toFixed(2),
+                Math.max(20, Math.min(95, Math.random() * 75 + 20)).toFixed(2)
+            ];
             
-            // Update state with bounds checking
-            state.temperature = Math.max(15, Math.min(40, state.temperature + tempDelta));
-            state.humidity = Math.max(20, Math.min(95, state.humidity + humidDelta));
+            // Create simulated sensor data in Jetson format
+            const simulatedData = {
+                temperature: temperature,
+                humidity: humidity,
+                timestamp: new Date().toLocaleString(),
+                status: 'normal'
+            };
             
             // Use the same update function as real data
-            updateSensorData(state);
+            updateSensorData(simulatedData);
         }
         
         // Time Update
