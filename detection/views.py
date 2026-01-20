@@ -120,7 +120,7 @@ def detect(request):
             respirator_count = random.randint(0, 3)
             violation_count = random.randint(0, 2)
             detections = []
-        
+
         detections_data = {
             'helmet': helmet_count,
             'person': person_count,
