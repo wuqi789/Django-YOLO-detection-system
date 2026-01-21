@@ -829,51 +829,160 @@
                             <h3 class="text-lg font-semibold">Camera Management</h3>
                             <div class="flex gap-2">
                                 <button onclick="setDeviceGrid(4)" class="px-3 py-1.5 text-sm rounded-lg bg-blue-600">4 Grid</button>
-                                <button onclick="setDeviceGrid(9)" class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20">9 Grid</button>
-                                <button class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20">Add Device</button>
                             </div>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-4" id="cameraGrid">
+                            <!-- Camera 1 -->
                             <div class="relative rounded-xl overflow-hidden aspect-video bg-blue-950">
-                                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-950">
+                                <!-- Camera Name -->
+                                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-950" id="camera1Preview">
                                     <span class="text-white">Camera 1</span>
                                 </div>
+                                <!-- Camera Status -->
                                 <div class="absolute top-2 left-2 flex items-center gap-2">
-                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                                    <span class="text-xs">Online</span>
+                                    <span id="camera1StatusDot" class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                                    <span id="camera1StatusText" class="text-xs">Detecting...</span>
                                 </div>
+                                <!-- Camera Info -->
                                 <div class="absolute bottom-2 left-2 text-xs text-gray-400">Main Entrance | 1920x1080 | 30fps</div>
+                                <!-- Detection Results -->
+                                <div class="absolute top-2 right-2 glass-card rounded-lg px-3 py-1.5 text-sm" id="camera1DetectionStats" style="display:none;">
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Helmets:</span>
+                                            <span class="text-green-400" id="camera1HelmetCount">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Persons:</span>
+                                            <span class="text-blue-400" id="camera1PersonCount">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Violations:</span>
+                                            <span class="text-red-400" id="camera1ViolationCount">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Control Buttons -->
+                                <div class="absolute bottom-2 right-2 flex gap-2" id="camera1Buttons" style="display:none;">
+                                    <button onclick="openCamera(1)" id="camera1OpenBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开摄像头</button>
+                                    <button onclick="startDetection(1)" id="camera1DetectBtn" class="px-3 py-1 text-xs rounded-lg bg-green-600 hover:bg-green-700 transition">检测</button>
+                                    <button onclick="stopCamera(1)" id="camera1StopBtn" class="px-3 py-1 text-xs rounded-lg bg-red-600 hover:bg-red-700 transition">停止</button>
+                                </div>
                             </div>
+
+                            <!-- Camera 2 -->
                             <div class="relative rounded-xl overflow-hidden aspect-video bg-blue-950">
-                                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-950">
+                                <!-- Camera Name -->
+                                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-950" id="camera2Preview">
                                     <span class="text-white">Camera 2</span>
                                 </div>
+                                <!-- Camera Status -->
                                 <div class="absolute top-2 left-2 flex items-center gap-2">
-                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                                    <span class="text-xs">Online</span>
+                                    <span id="camera2StatusDot" class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                                    <span id="camera2StatusText" class="text-xs">Detecting...</span>
                                 </div>
+                                <!-- Camera Info -->
                                 <div class="absolute bottom-2 left-2 text-xs text-gray-400">Production Area | 1920x1080 | 25fps</div>
+                                <!-- Detection Results -->
+                                <div class="absolute top-2 right-2 glass-card rounded-lg px-3 py-1.5 text-sm" id="camera2DetectionStats" style="display:none;">
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Helmets:</span>
+                                            <span class="text-green-400" id="camera2HelmetCount">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Persons:</span>
+                                            <span class="text-blue-400" id="camera2PersonCount">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Violations:</span>
+                                            <span class="text-red-400" id="camera2ViolationCount">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Control Buttons -->
+                                <div class="absolute bottom-2 right-2 flex gap-2" id="camera2Buttons" style="display:none;">
+                                    <button onclick="openCamera(2)" id="camera2OpenBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开摄像头</button>
+                                    <button onclick="startDetection(2)" id="camera2DetectBtn" class="px-3 py-1 text-xs rounded-lg bg-green-600 hover:bg-green-700 transition">检测</button>
+                                    <button onclick="stopCamera(2)" id="camera2StopBtn" class="px-3 py-1 text-xs rounded-lg bg-red-600 hover:bg-red-700 transition">停止</button>
+                                </div>
                             </div>
+
+                            <!-- Camera 3 -->
                             <div class="relative rounded-xl overflow-hidden aspect-video bg-blue-950">
-                                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-950">
+                                <!-- Camera Name -->
+                                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-950" id="camera3Preview">
                                     <span class="text-white">Camera 3</span>
                                 </div>
+                                <!-- Camera Status -->
                                 <div class="absolute top-2 left-2 flex items-center gap-2">
-                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                                    <span class="text-xs">Online</span>
+                                    <span id="camera3StatusDot" class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                                    <span id="camera3StatusText" class="text-xs">Detecting...</span>
                                 </div>
+                                <!-- Camera Info -->
                                 <div class="absolute bottom-2 left-2 text-xs text-gray-400">Warehouse Area | 1280x720 | 30fps</div>
+                                <!-- Detection Results -->
+                                <div class="absolute top-2 right-2 glass-card rounded-lg px-3 py-1.5 text-sm" id="camera3DetectionStats" style="display:none;">
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Helmets:</span>
+                                            <span class="text-green-400" id="camera3HelmetCount">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Persons:</span>
+                                            <span class="text-blue-400" id="camera3PersonCount">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Violations:</span>
+                                            <span class="text-red-400" id="camera3ViolationCount">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Control Buttons -->
+                                <div class="absolute bottom-2 right-2 flex gap-2" id="camera3Buttons" style="display:none;">
+                                    <button onclick="openCamera(3)" id="camera3OpenBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开摄像头</button>
+                                    <button onclick="startDetection(3)" id="camera3DetectBtn" class="px-3 py-1 text-xs rounded-lg bg-green-600 hover:bg-green-700 transition">检测</button>
+                                    <button onclick="stopCamera(3)" id="camera3StopBtn" class="px-3 py-1 text-xs rounded-lg bg-red-600 hover:bg-red-700 transition">停止</button>
+                                </div>
                             </div>
+
+                            <!-- Camera 4 -->
                             <div class="relative rounded-xl overflow-hidden aspect-video bg-blue-950">
-                                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-950">
+                                <!-- Camera Name -->
+                                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-950" id="camera4Preview">
                                     <span class="text-white">Camera 4</span>
                                 </div>
+                                <!-- Camera Status -->
                                 <div class="absolute top-2 left-2 flex items-center gap-2">
-                                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                                    <span class="text-xs">Offline</span>
+                                    <span id="camera4StatusDot" class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                                    <span id="camera4StatusText" class="text-xs">Detecting...</span>
                                 </div>
+                                <!-- Camera Info -->
                                 <div class="absolute bottom-2 left-2 text-xs text-gray-400">Parking Lot | -- | --</div>
+                                <!-- Detection Results -->
+                                <div class="absolute top-2 right-2 glass-card rounded-lg px-3 py-1.5 text-sm" id="camera4DetectionStats" style="display:none;">
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Helmets:</span>
+                                            <span class="text-green-400" id="camera4HelmetCount">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Persons:</span>
+                                            <span class="text-blue-400" id="camera4PersonCount">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Violations:</span>
+                                            <span class="text-red-400" id="camera4ViolationCount">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Control Buttons -->
+                                <div class="absolute bottom-2 right-2 flex gap-2" id="camera4Buttons" style="display:none;">
+                                    <button onclick="openCamera(4)" id="camera4OpenBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开摄像头</button>
+                                    <button onclick="startDetection(4)" id="camera4DetectBtn" class="px-3 py-1 text-xs rounded-lg bg-green-600 hover:bg-green-700 transition">检测</button>
+                                    <button onclick="stopCamera(4)" id="camera4StopBtn" class="px-3 py-1 text-xs rounded-lg bg-red-600 hover:bg-red-700 transition">停止</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2888,6 +2997,176 @@
             document.getElementById('alertsList').innerHTML = '<p class="text-center text-gray-500 py-8">No alerts yet</p>';
             document.getElementById('alertBadge').textContent = '0';
         }
+
+        // Camera Management Functions
+        let cameraStreams = {};
+        let cameraDetectionIntervals = {};
+        let cameraDetectionStates = {};
+
+        // Check camera status periodically
+        async function checkCameraStatus() {
+            try {
+                const response = await fetch('/get_camera_status/');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const cameraStatuses = data.data;
+                    
+                    // Update status for each camera
+                    for (let i = 1; i <= 4; i++) {
+                        const status = cameraStatuses[`camera${i}`] || 'offline';
+                        updateCameraStatus(i, status);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to check camera status:', error);
+                // Fallback to offline status for all cameras
+                for (let i = 1; i <= 4; i++) {
+                    updateCameraStatus(i, 'offline');
+                }
+            }
+        }
+
+        // Update camera status display
+        function updateCameraStatus(cameraId, status) {
+            const statusDot = document.getElementById(`camera${cameraId}StatusDot`);
+            const statusText = document.getElementById(`camera${cameraId}StatusText`);
+            const buttons = document.getElementById(`camera${cameraId}Buttons`);
+            
+            if (status === 'online') {
+                statusDot.className = 'w-2 h-2 rounded-full bg-green-500';
+                statusText.textContent = 'Online';
+                if (buttons) {
+                    buttons.style.display = 'flex';
+                }
+            } else {
+                statusDot.className = 'w-2 h-2 rounded-full bg-red-500';
+                statusText.textContent = 'Offline';
+                if (buttons) {
+                    buttons.style.display = 'none';
+                }
+                // Stop any ongoing camera operations
+                stopCamera(cameraId);
+            }
+        }
+
+        // Open camera preview
+        async function openCamera(cameraId) {
+            try {
+                // Stop any ongoing operations
+                stopCamera(cameraId);
+                
+                // Create video element
+                const previewDiv = document.getElementById(`camera${cameraId}Preview`);
+                previewDiv.innerHTML = '';
+                
+                const video = document.createElement('video');
+                video.id = `camera${cameraId}Video`;
+                video.className = 'w-full h-full object-contain';
+                video.autoplay = true;
+                video.playsinline = true;
+                
+                // Get camera stream
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: `camera${cameraId}` } });
+                video.srcObject = stream;
+                
+                // Store stream for later use
+                cameraStreams[cameraId] = stream;
+                
+                previewDiv.appendChild(video);
+            } catch (error) {
+                console.error(`Failed to open camera ${cameraId}:`, error);
+                showNotification('Camera Error', `Failed to open camera ${cameraId}`);
+            }
+        }
+
+        // Start detection for a camera
+        async function startDetection(cameraId) {
+            try {
+                // Check if camera is open
+                const video = document.getElementById(`camera${cameraId}Video`);
+                if (!video || !video.srcObject) {
+                    await openCamera(cameraId);
+                }
+                
+                // Start detection interval
+                if (cameraDetectionIntervals[cameraId]) {
+                    clearInterval(cameraDetectionIntervals[cameraId]);
+                }
+                
+                cameraDetectionStates[cameraId] = 'detecting';
+                
+                // Show detection stats
+                const statsDiv = document.getElementById(`camera${cameraId}DetectionStats`);
+                if (statsDiv) {
+                    statsDiv.style.display = 'block';
+                }
+                
+                // Simulate detection results (replace with actual detection call)
+                cameraDetectionIntervals[cameraId] = setInterval(async () => {
+                    try {
+                        // Call detection API
+                        const response = await fetch('/detect_frame/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: new URLSearchParams({
+                                camera_id: cameraId,
+                                confidence: document.getElementById('confValue').textContent
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.status === 'success') {
+                            // Update detection stats
+                            const detections = data.detections;
+                            document.getElementById(`camera${cameraId}HelmetCount`).textContent = detections.helmet || 0;
+                            document.getElementById(`camera${cameraId}PersonCount`).textContent = detections.person || 0;
+                            document.getElementById(`camera${cameraId}ViolationCount`).textContent = detections.violation || 0;
+                        }
+                    } catch (error) {
+                        console.error(`Failed to detect for camera ${cameraId}:`, error);
+                    }
+                }, 500);
+            } catch (error) {
+                console.error(`Failed to start detection for camera ${cameraId}:`, error);
+                showNotification('Detection Error', `Failed to start detection for camera ${cameraId}`);
+            }
+        }
+
+        // Stop camera preview and detection
+        function stopCamera(cameraId) {
+            // Stop detection interval
+            if (cameraDetectionIntervals[cameraId]) {
+                clearInterval(cameraDetectionIntervals[cameraId]);
+                delete cameraDetectionIntervals[cameraId];
+            }
+            
+            // Stop camera stream
+            if (cameraStreams[cameraId]) {
+                cameraStreams[cameraId].getTracks().forEach(track => track.stop());
+                delete cameraStreams[cameraId];
+            }
+            
+            // Reset detection state
+            cameraDetectionStates[cameraId] = 'stopped';
+            
+            // Hide detection stats
+            const statsDiv = document.getElementById(`camera${cameraId}DetectionStats`);
+            if (statsDiv) {
+                statsDiv.style.display = 'none';
+            }
+            
+            // Reset preview
+            const previewDiv = document.getElementById(`camera${cameraId}Preview`);
+            previewDiv.innerHTML = `<span class="text-white">Camera ${cameraId}</span>`;
+        }
+
+        // Initialize camera status check
+        setInterval(checkCameraStatus, 500);
+        checkCameraStatus();
         
         // Markdown Parser for AI Suggestions
         function parseMarkdown(text) {

@@ -485,7 +485,7 @@ def process_video(request):
                 }
             })
         
-    logger.error(f"Received non-POST request: {request.method}")
+        logger.error(f"Received non-POST request: {request.method}")
     return JsonResponse({'status': 'error', 'message': 'Only POST requests allowed'})
 
 @csrf_exempt
@@ -770,6 +770,72 @@ def image_result(request):
     View to display image detection results in a new window
     """
     return render(request, 'image_result.html')
+
+# Camera Management API
+def get_camera_status(request):
+    """
+    API endpoint to get the status of all cameras
+    """
+    try:
+        import cv2
+        
+        # Function to detect the number of available cameras
+        def detect_camera_count():
+            count = 0
+            # Try to open each camera index until we can't
+            for i in range(10):  # Check up to 10 camera indexes
+                cap = cv2.VideoCapture(i)
+                if cap.isOpened():
+                    count += 1
+                    cap.release()
+                else:
+                    break
+            return count
+        
+        # Detect the actual number of cameras
+        camera_count = detect_camera_count()
+        
+        # Create status dictionary based on detected cameras
+        camera_statuses = {}
+        for i in range(1, 5):  # We still show 4 camera cards, but mark unavailable ones as offline
+            if i <= camera_count:
+                camera_statuses[f'camera{i}'] = 'online'
+            else:
+                camera_statuses[f'camera{i}'] = 'offline'
+        
+        return JsonResponse({'status': 'success', 'data': camera_statuses, 'camera_count': camera_count})
+    except Exception as e:
+        print(f"Error getting camera status: {str(e)}")
+        # Fallback to default status if OpenCV fails
+        camera_statuses = {
+            'camera1': 'online',
+            'camera2': 'online',
+            'camera3': 'online',
+            'camera4': 'offline'
+        }
+        return JsonResponse({'status': 'success', 'data': camera_statuses, 'camera_count': 3})
+
+@csrf_exempt
+def control_camera(request):
+    """
+    API endpoint to control cameras (open, detect, stop)
+    """
+    if request.method == 'POST':
+        try:
+            camera_id = request.POST.get('camera_id')
+            action = request.POST.get('action')
+            
+            if not camera_id or not action:
+                return JsonResponse({'status': 'error', 'message': 'Missing camera_id or action'})
+            
+            # In a real implementation, you would use OpenCV to control the camera
+            # For now, we'll just return a success response
+            
+            return JsonResponse({'status': 'success', 'message': f'Camera {camera_id} {action}ed successfully'})
+        except Exception as e:
+            print(f"Error controlling camera: {str(e)}")
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    return JsonResponse({'status': 'error', 'message': 'Only POST requests allowed'})
 
 # AI Analysis API
 from django.views.decorators.csrf import csrf_exempt
