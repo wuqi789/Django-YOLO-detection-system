@@ -777,8 +777,6 @@ def get_camera_status(request):
     API endpoint to get the status of all cameras
     """
     try:
-
-
         import cv2
         # Function to detect the number of available cameras
         def detect_camera_count():
