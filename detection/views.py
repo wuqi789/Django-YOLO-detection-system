@@ -772,47 +772,47 @@ def image_result(request):
     return render(request, 'image_result.html')
 
 # Camera Management API
-def get_camera_status(request):
-    """
-    API endpoint to get the status of all cameras
-    """
-    try:
-        import cv2
-        # Function to detect the number of available cameras
-        def detect_camera_count():
-            count = 0
-            # Try to open each camera index until we can't
-            for i in range(10):  # Check up to 10 camera indexes
-                cap = cv2.VideoCapture(i)
-                if cap.isOpened():
-                    count += 1
-                    cap.release()
-                else:
-                    break
-            return count
-        
-        # Detect the actual number of cameras
-        camera_count = detect_camera_count()
-        
-        # Create status dictionary based on detected cameras
-        camera_statuses = {}
-        for i in range(1, 5):  # We still show 4 camera cards, but mark unavailable ones as offline
-            if i <= camera_count:
-                camera_statuses[f'camera{i}'] = 'online'
-            else:
-                camera_statuses[f'camera{i}'] = 'offline'
-        
-        return JsonResponse({'status': 'success', 'data': camera_statuses, 'camera_count': camera_count})
-    except Exception as e:
-        print(f"Error getting camera status: {str(e)}")
-        # Fallback to default status if OpenCV fails
-        camera_statuses = {
-            'camera1': 'online',
-            'camera2': 'online',
-            'camera3': 'online',
-            'camera4': 'offline'
-        }
-        return JsonResponse({'status': 'success', 'data': camera_statuses, 'camera_count': 3})
+# def get_camera_status(request):
+#     """
+#     API endpoint to get the status of all cameras
+#     """
+#     try:
+#         import cv2
+#         # Function to detect the number of available cameras
+#         def detect_camera_count():
+#             count = 0
+#             # Try to open each camera index until we can't
+#             for i in range(10):  # Check up to 10 camera indexes
+#                 cap = cv2.VideoCapture(i)
+#                 if cap.isOpened():
+#                     count += 1
+#                     cap.release()
+#                 else:
+#                     break
+#             return count
+#
+#         # Detect the actual number of cameras
+#         camera_count = detect_camera_count()
+#
+#         # Create status dictionary based on detected cameras
+#         camera_statuses = {}
+#         for i in range(1, 5):  # We still show 4 camera cards, but mark unavailable ones as offline
+#             if i <= camera_count:
+#                 camera_statuses[f'camera{i}'] = 'online'
+#             else:
+#                 camera_statuses[f'camera{i}'] = 'offline'
+#
+#         return JsonResponse({'status': 'success', 'data': camera_statuses, 'camera_count': camera_count})
+#     except Exception as e:
+#         print(f"Error getting camera status: {str(e)}")
+#         # Fallback to default status if OpenCV fails
+#         camera_statuses = {
+#             'camera1': 'online',
+#             'camera2': 'online',
+#             'camera3': 'online',
+#             'camera4': 'offline'
+#         }
+#         return JsonResponse({'status': 'success', 'data': camera_statuses, 'camera_count': 3})
 
 @csrf_exempt
 def control_camera(request):

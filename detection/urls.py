@@ -12,7 +12,7 @@ urlpatterns = [
     path('process_video/', views.process_video, name='process_video'),
     path('process_progress/', views.process_progress, name='process_progress'),
     # Camera management API endpoints
-    path('get_camera_status/', views.get_camera_status, name='get_camera_status'),
+    # path('get_camera_status/', views.get_camera_status, name='get_camera_status'),
     path('control_camera/', views.control_camera, name='control_camera'),
     # Model management API endpoints
     path('get_models/', views.get_models, name='get_models'),
