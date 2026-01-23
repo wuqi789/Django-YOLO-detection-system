@@ -416,6 +416,7 @@
                                     <option value="camera3">Camera 3 - Warehouse Area</option>
                                     <option value="local">Local Video File</option>
                                     <option value="image">Local Image</option>
+                                    <option value="jetson">Jetson Orin Nano</option>
                                 </select>
                                 <input type="file" accept="video/*" id="localVideoInput" style="display: none;" onchange="handleLocalVideoSelect(this)" />
                                 <input type="file" accept="image/*" multiple id="localImageInput" style="display: none;" onchange="handleLocalImageSelect(this)" />
@@ -846,9 +847,28 @@
                                 </div>
                                 <!-- Camera Info -->
                                 <div class="absolute bottom-2 left-2 text-xs text-gray-400">Main Entrance | 1920x1080 | 30fps</div>
+                                <!-- Detection Results -->
+                                <div class="absolute top-2 right-2 glass-card rounded-lg px-3 py-1.5 text-sm" id="camera1DetectionStats" style="display:none;">
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Helmets:</span>
+                                            <span class="text-green-400" id="camera1HelmetCount">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Persons:</span>
+                                            <span class="text-blue-400" id="camera1PersonCount">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Violations:</span>
+                                            <span class="text-red-400" id="camera1ViolationCount">0</span>
+                                        </div>
+                                    </div>
+                                </div>
                                 <!-- Control Buttons -->
                                 <div class="absolute bottom-2 right-2 flex gap-2" id="camera1Buttons" style="display:none;">
-                                    <button onclick="toggleCameraDetection(1)" id="camera1ToggleBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开</button>
+                                    <button onclick="openCamera(1)" id="camera1OpenBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开摄像头</button>
+                                    <button onclick="startCameraDetection(1)" id="camera1DetectBtn" class="px-3 py-1 text-xs rounded-lg bg-green-600 hover:bg-green-700 transition">检测</button>
+                                    <button onclick="stopCamera(1)" id="camera1StopBtn" class="px-3 py-1 text-xs rounded-lg bg-red-600 hover:bg-red-700 transition">停止</button>
                                 </div>
                             </div>
 
@@ -865,9 +885,28 @@
                                 </div>
                                 <!-- Camera Info -->
                                 <div class="absolute bottom-2 left-2 text-xs text-gray-400">Production Area | 1920x1080 | 25fps</div>
+                                <!-- Detection Results -->
+                                <div class="absolute top-2 right-2 glass-card rounded-lg px-3 py-1.5 text-sm" id="camera2DetectionStats" style="display:none;">
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Helmets:</span>
+                                            <span class="text-green-400" id="camera2HelmetCount">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Persons:</span>
+                                            <span class="text-blue-400" id="camera2PersonCount">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Violations:</span>
+                                            <span class="text-red-400" id="camera2ViolationCount">0</span>
+                                        </div>
+                                    </div>
+                                </div>
                                 <!-- Control Buttons -->
                                 <div class="absolute bottom-2 right-2 flex gap-2" id="camera2Buttons" style="display:none;">
-                                    <button onclick="toggleCameraDetection(2)" id="camera2ToggleBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开</button>
+                                    <button onclick="openCamera(2)" id="camera2OpenBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开摄像头</button>
+                                    <button onclick="startCameraDetection(2)" id="camera2DetectBtn" class="px-3 py-1 text-xs rounded-lg bg-green-600 hover:bg-green-700 transition">检测</button>
+                                    <button onclick="stopCamera(2)" id="camera2StopBtn" class="px-3 py-1 text-xs rounded-lg bg-red-600 hover:bg-red-700 transition">停止</button>
                                 </div>
                             </div>
 
@@ -884,9 +923,28 @@
                                 </div>
                                 <!-- Camera Info -->
                                 <div class="absolute bottom-2 left-2 text-xs text-gray-400">Warehouse Area | 1280x720 | 30fps</div>
+                                <!-- Detection Results -->
+                                <div class="absolute top-2 right-2 glass-card rounded-lg px-3 py-1.5 text-sm" id="camera3DetectionStats" style="display:none;">
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Helmets:</span>
+                                            <span class="text-green-400" id="camera3HelmetCount">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Persons:</span>
+                                            <span class="text-blue-400" id="camera3PersonCount">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Violations:</span>
+                                            <span class="text-red-400" id="camera3ViolationCount">0</span>
+                                        </div>
+                                    </div>
+                                </div>
                                 <!-- Control Buttons -->
                                 <div class="absolute bottom-2 right-2 flex gap-2" id="camera3Buttons" style="display:none;">
-                                    <button onclick="toggleCameraDetection(3)" id="camera3ToggleBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开</button>
+                                    <button onclick="openCamera(3)" id="camera3OpenBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开摄像头</button>
+                                    <button onclick="startCameraDetection(3)" id="camera3DetectBtn" class="px-3 py-1 text-xs rounded-lg bg-green-600 hover:bg-green-700 transition">检测</button>
+                                    <button onclick="stopCamera(3)" id="camera3StopBtn" class="px-3 py-1 text-xs rounded-lg bg-red-600 hover:bg-red-700 transition">停止</button>
                                 </div>
                             </div>
 
@@ -903,9 +961,28 @@
                                 </div>
                                 <!-- Camera Info -->
                                 <div class="absolute bottom-2 left-2 text-xs text-gray-400">Parking Lot | -- | --</div>
+                                <!-- Detection Results -->
+                                <div class="absolute top-2 right-2 glass-card rounded-lg px-3 py-1.5 text-sm" id="camera4DetectionStats" style="display:none;">
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Helmets:</span>
+                                            <span class="text-green-400" id="camera4HelmetCount">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Persons:</span>
+                                            <span class="text-blue-400" id="camera4PersonCount">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Violations:</span>
+                                            <span class="text-red-400" id="camera4ViolationCount">0</span>
+                                        </div>
+                                    </div>
+                                </div>
                                 <!-- Control Buttons -->
                                 <div class="absolute bottom-2 right-2 flex gap-2" id="camera4Buttons" style="display:none;">
-                                    <button onclick="toggleCameraDetection(4)" id="camera4ToggleBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开</button>
+                                    <button onclick="openCamera(4)" id="camera4OpenBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开摄像头</button>
+                                    <button onclick="startCameraDetection(4)" id="camera4DetectBtn" class="px-3 py-1 text-xs rounded-lg bg-green-600 hover:bg-green-700 transition">检测</button>
+                                    <button onclick="stopCamera(4)" id="camera4StopBtn" class="px-3 py-1 text-xs rounded-lg bg-red-600 hover:bg-red-700 transition">停止</button>
                                 </div>
                             </div>
                         </div>
@@ -1266,6 +1343,8 @@
             sensorStatus: 'normal',
             sensorConnectionStatus: 'connected',
             detectionInterval: null,
+            jetsonFrameInterval: null,
+            previousJetsonImageUrl: null,
             currentModel: null,
             modelsList: [],
             currentVideoDuration: 0,
@@ -1472,6 +1551,8 @@
         
         document.getElementById('videoSource').addEventListener('change', function() {
             const videoPlayer = document.getElementById('videoPlayer');
+            const startBtn = document.getElementById('startBtn');
+            const startBtnText = startBtn.querySelector('span') || startBtn;
             
             // Stop any ongoing frame processing
             if (frameProcessingId) {
@@ -1521,6 +1602,17 @@
             uploadImageBtn.classList.add('hidden');
             uploadVideoBtn.classList.add('hidden');
             
+            // Reset start button text to default
+            if (startBtn.querySelector('svg')) {
+                // If button has an icon, update the text after the icon
+                startBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                </svg>
+                Start Detection`;
+            } else {
+                startBtn.textContent = 'Start Detection';
+            }
+            
             if (this.value === 'image') {
                 // Show upload image button when Local Image is selected
                 uploadImageBtn.classList.remove('hidden');
@@ -1546,6 +1638,19 @@
                     videoPlayer.play();
                 }
                 // Update detection time estimate for default video
+                updateDetectionTimeEstimate();
+            } else if (this.value === 'jetson') {
+                // Change start button text to "Open" for Jetson Orin Nano
+                if (startBtn.querySelector('svg')) {
+                    // If button has an icon, update the text after the icon
+                    startBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                    </svg>
+                    Open`;
+                } else {
+                    startBtn.textContent = 'Open';
+                }
+                // Update detection time estimate for Jetson
                 updateDetectionTimeEstimate();
             }
         });
@@ -2324,6 +2429,13 @@
                 return;
             }
             
+            // Check if it's Jetson Orin Nano processing
+            if (videoSource === 'jetson') {
+                // Start Jetson Nano video stream
+                startJetsonStream();
+                return;
+            }
+            
             // Check if we need to initialize camera
             if (videoSource === 'camera1' && !videoPlayer.srcObject) {
                 // Initialize camera only when start detection is clicked
@@ -2351,6 +2463,99 @@
             
             // Draw initial detection boxes
             drawDetectionBoxes();
+        }
+        
+        // Function to handle Jetson Nano video stream
+        function startJetsonStream() {
+            const videoContainer = document.getElementById('videoContainer');
+            const videoPlayer = document.getElementById('videoPlayer');
+            
+            // Hide original video player
+            videoPlayer.style.opacity = '0';
+            
+            // Create or get the Jetson image element
+            let jetsonImage = document.getElementById('jetsonImage');
+            if (!jetsonImage) {
+                jetsonImage = document.createElement('img');
+                jetsonImage.id = 'jetsonImage';
+                jetsonImage.className = 'w-full h-full object-contain';
+                jetsonImage.style.position = 'absolute';
+                jetsonImage.style.top = '0';
+                jetsonImage.style.left = '0';
+                jetsonImage.style.zIndex = '10';
+                videoContainer.appendChild(jetsonImage);
+            }
+            
+            // Show the Jetson image element
+            jetsonImage.style.display = 'block';
+            
+            // Start the Jetson Nano video stream on the backend
+            fetch('/start_jetson_stream/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCSRFToken()
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('Jetson Nano video stream started successfully');
+                    // Start fetching Jetson Nano frames every 100ms
+                    if (!state.jetsonFrameInterval) {
+                        state.jetsonFrameInterval = setInterval(fetchJetsonFrame, 100);
+                    }
+                } else {
+                    console.error('Failed to start Jetson Nano video stream:', data.message);
+                    alert('Failed to start Jetson Nano video stream: ' + data.message);
+                    stopDetection();
+                }
+            })
+            .catch(error => {
+                console.error('Error starting Jetson Nano video stream:', error);
+                alert('Error starting Jetson Nano video stream: ' + error.message);
+                stopDetection();
+            });
+        }
+        
+        // Function to fetch the latest frame from Jetson Nano
+        function fetchJetsonFrame() {
+            const jetsonImage = document.getElementById('jetsonImage');
+            if (!jetsonImage || !state.isDetecting) {
+                return;
+            }
+            
+            // Fetch the latest frame from the backend
+            fetch('/get_jetson_frame/')
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                } else {
+                    throw new Error('Failed to fetch Jetson Nano frame');
+                }
+            })
+            .then(blob => {
+                // Create a URL for the blob and set it as the image source
+                const imageUrl = URL.createObjectURL(blob);
+                jetsonImage.src = imageUrl;
+                
+                // Release the previous URL to free up memory
+                if (state.previousJetsonImageUrl) {
+                    URL.revokeObjectURL(state.previousJetsonImageUrl);
+                }
+                state.previousJetsonImageUrl = imageUrl;
+            })
+            .catch(error => {
+                console.error('Error fetching Jetson Nano frame:', error);
+            });
+        }
+        
+        // Helper function to get CSRF token for Django requests
+        function getCSRFToken() {
+            const cookieValue = document.cookie
+                .split('; ') 
+                .find(row => row.startsWith('csrftoken=')) 
+                ?.split('=')[1];
+            return cookieValue || '';
         }
         
         // Add AbortController support for fetch requests
@@ -2402,6 +2607,44 @@
                 state.detectionInterval = null;
             }
             
+            // Handle Jetson Nano stream cleanup
+            if (state.jetsonFrameInterval) {
+                // Clear the Jetson frame interval
+                clearInterval(state.jetsonFrameInterval);
+                state.jetsonFrameInterval = null;
+                
+                // Call the backend API to stop the Jetson Nano stream
+                fetch('/stop_jetson_stream/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCSRFToken()
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        console.log('Jetson Nano video stream stopped successfully');
+                    } else {
+                        console.error('Failed to stop Jetson Nano video stream:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error stopping Jetson Nano video stream:', error);
+                });
+                
+                // Hide or remove the Jetson image element
+                const jetsonImage = document.getElementById('jetsonImage');
+                if (jetsonImage) {
+                    jetsonImage.style.display = 'none';
+                }
+                
+                // Release the previous image URL to free up memory
+                if (state.previousJetsonImageUrl) {
+                    URL.revokeObjectURL(state.previousJetsonImageUrl);
+                    state.previousJetsonImageUrl = null;
+                }
+            }
+            
             // Clear all detection boxes immediately
             const container = document.getElementById('detectionBoxes');
             container.innerHTML = '';
@@ -2420,6 +2663,9 @@
                 // Remove detected image
                 detectedImage.remove();
             }
+            
+            // Restore video player opacity
+            videoPlayer.style.opacity = '1';
             
             // Abort any pending fetch requests
             if (abortController) {
@@ -2864,92 +3110,35 @@
             panel.classList.toggle('hidden');
         }
         
-        // Enhanced notification function with type support and auto-dismissal
-        function showNotification(title, message, type = 'info') {
-            // Define notification styles based on type
-            const typeStyles = {
-                success: { bg: 'bg-green-500/10', text: 'text-green-400', border: 'border-green-500/30' },
-                error: { bg: 'bg-red-500/10', text: 'text-red-400', border: 'border-red-500/30' },
-                warning: { bg: 'bg-orange-500/10', text: 'text-orange-400', border: 'border-orange-500/30' },
-                info: { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/30' }
-            };
-            
-            const styles = typeStyles[type] || typeStyles.info;
-            
-            // Browser notification with icon based on type
+        function showNotification(title, message) {
+            // Browser notification
             if (Notification.permission === 'granted') {
-                new Notification(title, {
-                    body: message,
-                    icon: type === 'error' ? '/static/icons/error.png' : 
-                          type === 'warning' ? '/static/icons/warning.png' :
-                          type === 'success' ? '/static/icons/success.png' :
-                          '/static/icons/info.png'
-                });
+                new Notification(title, { body: message });
             }
             
             // In-app notification
             const list = document.getElementById('notificationList');
-            if (list) {
-                const notification = document.createElement('div');
-                notification.className = `p-3 rounded-xl ${styles.bg} ${styles.border} animate-fade-in`;
-                notification.innerHTML = `
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <p class="font-medium text-sm ${styles.text}">${title}</p>
-                            <p class="text-xs text-gray-400 mt-1">${message}</p>
-                            <p class="text-xs text-gray-500 mt-2">Just now</p>
-                        </div>
-                        <button onclick="this.parentElement.parentElement.remove()" 
-                                class="text-gray-400 hover:text-white text-xs">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-                `;
-                list.insertBefore(notification, list.firstChild);
-                
-                // Auto-dismiss notification after 5 seconds
-                setTimeout(() => {
-                    if (notification.parentElement) {
-                        notification.remove();
-                    }
-                }, 5000);
-            }
+            const notification = document.createElement('div');
+            notification.className = 'p-3 rounded-xl bg-white/5 animate-fade-in';
+            notification.innerHTML = `
+                <p class="font-medium text-sm">${title}</p>
+                <p class="text-xs text-gray-400 mt-1">${message}</p>
+                <p class="text-xs text-gray-500 mt-2">Just now</p>
+            `;
+            list.insertBefore(notification, list.firstChild);
         }
         
-        // Global error handler for uncaught exceptions
-        window.addEventListener('error', function(event) {
-            console.error('Global error caught:', event.error);
-            
-            // Show error notification with detailed information
-            showNotification('System Error', `An unexpected error occurred: ${event.error.message}`, 'error');
-            
-            // Add to alerts list
-            addAlert('critical', 'System Error', `An unexpected error occurred: ${event.error.message}`);
-            
-            // Prevent default error handling
-            event.preventDefault();
-        });
-        
-        // Enhanced alert function with detailed error information
-        function addAlert(level, title, message, details = '') {
+        // Alerts
+        function addAlert(level, title, message) {
             const alertsList = document.getElementById('alertsList');
-            if (!alertsList) return;
-            
             const config = {
                 critical: { bg: 'bg-red-500/10', border: 'border-red-500/30', dot: 'bg-red-500' },
                 warning: { bg: 'bg-orange-500/10', border: 'border-orange-500/30', dot: 'bg-orange-500' },
-                info: { bg: 'bg-blue-500/10', border: 'border-blue-500/30', dot: 'bg-blue-500' },
-                success: { bg: 'bg-green-500/10', border: 'border-green-500/30', dot: 'bg-green-500' }
+                info: { bg: 'bg-blue-500/10', border: 'border-blue-500/30', dot: 'bg-blue-500' }
             };
             
             const alert = document.createElement('div');
             alert.className = `alert-item p-4 rounded-xl ${config[level].bg} border ${config[level].border}`;
-            
-            // Include details if provided
-            const detailsHTML = details ? `<p class="text-xs text-gray-500 mt-2">${details}</p>` : '';
-            
             alert.innerHTML = `
                 <div class="flex items-start gap-3">
                     <span class="w-3 h-3 rounded-full ${config[level].dot} mt-1 flex-shrink-0"></span>
@@ -2959,14 +3148,6 @@
                             <span class="text-xs text-gray-500">Just now</span>
                         </div>
                         <p class="text-sm text-gray-400 mt-1">${message}</p>
-                        ${detailsHTML}
-                        <div class="flex gap-2 mt-3">
-                            <button onclick="this.parentElement.parentElement.remove()" 
-                                    class="px-3 py-1 text-xs rounded bg-white/10 hover:bg-white/20 transition">Dismiss</button>
-                            ${level === 'critical' || level === 'warning' ? 
-                                `<button onclick="attemptRecovery()" 
-                                        class="px-3 py-1 text-xs rounded bg-blue-600/50 hover:bg-blue-600/70 transition">Attempt Recovery</button>` : ''}
-                        </div>
                     </div>
                 </div>
             `;
@@ -2974,39 +3155,8 @@
             
             // Update badge
             const badge = document.getElementById('alertBadge');
-            if (badge) {
-                badge.textContent = parseInt(badge.textContent) || 0 + 1;
-            }
+            badge.textContent = parseInt(badge.textContent) + 1;
         }
-        
-        // Auto-recovery mechanism for critical errors
-        function attemptRecovery() {
-            showNotification('Recovery Attempt', 'Attempting to recover from error...', 'warning');
-            
-            try {
-                // Stop all ongoing camera operations
-                for (let i = 1; i <= 4; i++) {
-                    stopCamera(i);
-                }
-                
-                // Reset global state
-                cameraStreams = {};
-                cameraDetectionIntervals = {};
-                cameraDetectionStates = {};
-                
-                // Reload models
-                loadModels();
-                
-                // Show success notification
-                showNotification('Recovery Success', 'System has been recovered. Please try again.', 'success');
-                
-            } catch (error) {
-                console.error('Recovery failed:', error);
-                showNotification('Recovery Failed', 'Failed to recover. Please refresh the page.', 'error');
-            }
-        }
-        
-
         
         function testAlert() {
             addAlert('warning', 'Test Alert', 'This is a test alert message');
@@ -3023,203 +3173,50 @@
         let cameraDetectionIntervals = {};
         let cameraDetectionStates = {};
 
-        // Local Camera Variables
-        let localCameraStream = null;
-        let hasLocalCamera = false;
-        let detectedCameras = [];
-        
         // Check camera status periodically
         async function checkCameraStatus() {
             try {
-                // Check if we're on the device management page
-                const activeTab = document.querySelector('.tab-active');
-                const isDeviceManagementPage = activeTab && activeTab.dataset.tab === 'devices';
+                const response = await fetch('/get_camera_status/');
+                const data = await response.json();
                 
-                // Only check camera status if we're on the device management page to save resources
-                if (!isDeviceManagementPage) {
-                    return;
-                }
-                
-                // Detect local cameras
-                await detectLocalCameras();
-                
-                try {
-                    const response = await fetch('/get_camera_status/');
-                    const data = await response.json();
+                if (data.status === 'success') {
+                    const cameraStatuses = data.data;
                     
-                    if (data.status === 'success') {
-                        const cameraStatuses = data.data;
-                        
-                        // Update status for each camera
-                        for (let i = 1; i <= 4; i++) {
-                            let status = cameraStatuses[`camera${i}`] || 'offline';
-                            
-                            // If local camera is active, override with local status
-                            if (cameraStreams[i] || cameraDetectionIntervals[i]) {
-                                status = 'detecting';
-                            }
-                            
-                            updateCameraStatus(i, status);
-                        }
-                    }
-                } catch (error) {
-                    console.error('Failed to fetch remote camera status:', error);
-                    
-                    // Fallback to local camera status
+                    // Update status for each camera
                     for (let i = 1; i <= 4; i++) {
-                        // Check if camera is locally active
-                        const isLocallyActive = cameraStreams[i] || cameraDetectionIntervals[i];
-                        const status = isLocallyActive ? 'detecting' : (i <= detectedCameras.length ? 'online' : 'offline');
+                        const status = cameraStatuses[`camera${i}`] || 'offline';
                         updateCameraStatus(i, status);
                     }
                 }
-                
-                // Show control buttons for cameras with local support
-                updateControlButtonsVisibility();
-                
             } catch (error) {
-                console.error('Camera status check error:', error);
-            }
-        }
-        
-        // Detect local cameras
-        async function detectLocalCameras() {
-            try {
-                // Check if browser supports media devices
-                if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
-                    console.log('Browser does not support camera detection');
-                    hasLocalCamera = false;
-                    detectedCameras = [];
-                    return;
-                }
-                
-                // Get available media devices
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const videoDevices = devices.filter(device => device.kind === 'videoinput');
-                
-                detectedCameras = videoDevices;
-                hasLocalCamera = videoDevices.length > 0;
-                
-                console.log(`${videoDevices.length} local camera(s) detected`);
-                
-            } catch (error) {
-                console.error('Error detecting local cameras:', error);
-                hasLocalCamera = false;
-                detectedCameras = [];
-                
-                // Show user-friendly error message
-                if (error.name === 'NotAllowedError') {
-                    showNotification('Camera Detection Error', 'Unable to detect cameras: Permission denied. Please grant camera permissions.');
-                } else {
-                    showNotification('Camera Detection Error', `Unable to detect cameras: ${error.message}`);
-                }
-            }
-        }
-        
-        // Update control buttons visibility based on camera status
-        function updateControlButtonsVisibility() {
-            for (let i = 1; i <= 4; i++) {
-                const buttonsDiv = document.getElementById(`camera${i}Buttons`);
-                if (buttonsDiv) {
-                    // Show buttons for all cameras that have local support or are active
-                    const hasCameraSupport = i <= detectedCameras.length || cameraStreams[i] || cameraDetectionIntervals[i];
-                    buttonsDiv.style.display = hasCameraSupport ? 'flex' : 'none';
+                console.error('Failed to check camera status:', error);
+                // Fallback to offline status for all cameras
+                for (let i = 1; i <= 4; i++) {
+                    updateCameraStatus(i, 'offline');
                 }
             }
         }
 
-        // Update camera buttons state based on detection status
-        function updateCameraButtonsState(cameraId, isDetecting) {
-            const toggleBtn = document.getElementById(`camera${cameraId}ToggleBtn`);
-            
-            if (toggleBtn) {
-                if (isDetecting) {
-                    toggleBtn.textContent = '关闭';
-                    toggleBtn.className = 'px-3 py-1 text-xs rounded-lg bg-red-600 hover:bg-red-700 transition';
-                } else {
-                    toggleBtn.textContent = '打开';
-                    toggleBtn.className = 'px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition';
-                }
-            }
-        }
-
-        // Update camera status display with enhanced synchronization
+        // Update camera status display
         function updateCameraStatus(cameraId, status) {
             const statusDot = document.getElementById(`camera${cameraId}StatusDot`);
             const statusText = document.getElementById(`camera${cameraId}StatusText`);
             const buttons = document.getElementById(`camera${cameraId}Buttons`);
-            const previewDiv = document.getElementById(`camera${cameraId}Preview`);
             
-            // Get current detection state
-            const detectionState = cameraDetectionStates[cameraId];
-            
-            // If camera is detecting, override with detecting status
-            if (detectionState === 'detecting') {
-                status = 'detecting';
-            }
-            
-            // Update status dot based on current status
-            if (status === 'online' || status === 'detecting') {
-                statusDot.className = status === 'detecting' ? 
-                    'w-2 h-2 rounded-full bg-green-500 animate-pulse' : 
-                    'w-2 h-2 rounded-full bg-green-500';
+            if (status === 'online') {
+                statusDot.className = 'w-2 h-2 rounded-full bg-green-500';
+                statusText.textContent = 'Online';
+                if (buttons) {
+                    buttons.style.display = 'flex';
+                }
             } else {
                 statusDot.className = 'w-2 h-2 rounded-full bg-red-500';
-            }
-            
-            // Update status text based on current status
-            statusText.textContent = status === 'detecting' ? 'Detecting...' : status;
-            
-            // Update buttons visibility based on status
-            if (buttons) {
-                buttons.style.display = (status === 'online' || status === 'detecting') ? 'flex' : 'none';
-            }
-            
-            // If camera is offline and no local stream, ensure preview is reset
-            if (status === 'offline' && !cameraStreams[cameraId]) {
-                // Only reset preview if it doesn't contain a video element
-                const hasVideoElement = previewDiv && previewDiv.querySelector('video');
-                if (previewDiv && !hasVideoElement) {
-                    previewDiv.innerHTML = `<span class="text-white">Camera ${cameraId}</span>`;
+                statusText.textContent = 'Offline';
+                if (buttons) {
+                    buttons.style.display = 'none';
                 }
-            }
-            
-            // If camera is offline, stop any ongoing operations
-            if (status === 'offline' && !cameraDetectionStates[cameraId] === 'detecting') {
+                // Stop any ongoing camera operations
                 stopCamera(cameraId);
-            }
-            
-            // Update device list status in device management page
-            updateDeviceListStatus(cameraId, status);
-        }
-        
-        // Update device list status in device management page
-        function updateDeviceListStatus(cameraId, status) {
-            // Find the corresponding device in the device list
-            const deviceList = document.getElementById('deviceList');
-            if (!deviceList) return;
-            
-            // Get all device items
-            const deviceItems = deviceList.querySelectorAll('.space-y-3 > div');
-            
-            // Find the camera device item
-            const cameraDeviceItem = Array.from(deviceItems).find(item => {
-                const deviceName = item.querySelector('.font-medium').textContent;
-                return deviceName === `CAM-00${cameraId}`;
-            });
-            
-            if (cameraDeviceItem) {
-                // Update status badge
-                const statusBadge = cameraDeviceItem.querySelector('.rounded');
-                if (statusBadge) {
-                    if (status === 'online' || status === 'detecting') {
-                        statusBadge.className = 'px-2 py-1 text-xs rounded bg-green-500/20 text-green-400';
-                        statusBadge.textContent = 'Online';
-                    } else {
-                        statusBadge.className = 'px-2 py-1 text-xs rounded bg-red-500/20 text-red-400';
-                        statusBadge.textContent = 'Offline';
-                    }
-                }
             }
         }
 
@@ -3231,12 +3228,7 @@
                 
                 // Create video element
                 const previewDiv = document.getElementById(`camera${cameraId}Preview`);
-                previewDiv.innerHTML = '<div class="flex items-center justify-center"><span class="text-white animate-pulse">Initializing...</span></div>';
-                
-                // Check if browser supports media devices
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    throw new Error('Your browser does not support camera access. Please update your browser.');
-                }
+                previewDiv.innerHTML = '';
                 
                 const video = document.createElement('video');
                 video.id = `camera${cameraId}Video`;
@@ -3244,166 +3236,27 @@
                 video.autoplay = true;
                 video.playsinline = true;
                 
-                // Get camera stream with device compatibility
-                const stream = await getCompatibleCameraStream(cameraId);
+                // Get camera stream
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: `camera${cameraId}` } });
                 video.srcObject = stream;
                 
                 // Store stream for later use
                 cameraStreams[cameraId] = stream;
                 
-                // Remove loading message and append video
-                previewDiv.innerHTML = '';
                 previewDiv.appendChild(video);
-                
-                // Update camera status
-                updateCameraStatus(cameraId, 'online');
-                
-                // Show notification for successful camera open
-                showNotification('Camera Status', `Camera ${cameraId} opened successfully`);
             } catch (error) {
                 console.error(`Failed to open camera ${cameraId}:`, error);
-                
-                // Display user-friendly error message
-                let userErrorMessage = 'Failed to open camera';
-                let userErrorDetails = error.message;
-                
-                // Custom error messages for different error types
-                if (error.name === 'NotAllowedError') {
-                    userErrorMessage = 'Camera Access Denied';
-                    userErrorDetails = 'Please grant camera permissions in your browser settings.';
-                } else if (error.name === 'NotFoundError') {
-                    userErrorMessage = 'Camera Not Found';
-                    userErrorDetails = `Camera ${cameraId} not found. Please check if the camera is connected.`;
-                } else if (error.name === 'OverconstrainedError') {
-                    userErrorMessage = 'Camera Constraints Not Met';
-                    userErrorDetails = 'The camera cannot meet the required settings. Please try a different camera.';
-                } else if (error.name === 'NotReadableError') {
-                    userErrorMessage = 'Camera In Use';
-                    userErrorDetails = `Camera ${cameraId} is currently in use by another application.`;
-                } else if (error.name === 'SecurityError') {
-                    userErrorMessage = 'Security Restriction';
-                    userErrorDetails = 'Camera access is blocked by browser security settings.';
-                }
-                
-                // Reset preview with error message
-                const previewDiv = document.getElementById(`camera${cameraId}Preview`);
-                previewDiv.innerHTML = `<div class="text-center p-4">
-                    <span class="text-red-400 font-medium">${userErrorMessage}</span><br>
-                    <span class="text-xs text-gray-400 mt-1">${userErrorDetails}</span>
-                </div>`;
-                
-                // Update camera status
-                updateCameraStatus(cameraId, 'offline');
-                
-                // Show detailed error notification
-                showNotification('Camera Error', `${userErrorMessage}: ${userErrorDetails}`);
+                showNotification('Camera Error', `Failed to open camera ${cameraId}`);
             }
-        }
-        
-        // Get compatible camera stream based on device capabilities
-        async function getCompatibleCameraStream(cameraId) {
-            try {
-                // Get available media devices
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const videoDevices = devices.filter(device => device.kind === 'videoinput');
-                
-                // Find the specific camera device if cameraId is provided as a number
-                let deviceId = `camera${cameraId}`;
-                const targetDevice = videoDevices.find(device => device.deviceId === deviceId || device.label.includes(`Camera ${cameraId}`));
-                
-                if (targetDevice) {
-                    deviceId = targetDevice.deviceId;
-                }
-                
-                // Detect device capabilities and set appropriate constraints
-                const constraints = await getCameraConstraints(targetDevice);
-                
-                // Get the camera stream with appropriate constraints
-                return await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        ...constraints,
-                        deviceId: deviceId
-                    },
-                    audio: false
-                });
-            } catch (error) {
-                console.error('Error getting compatible camera stream:', error);
-                
-                // Fallback to basic constraints if advanced detection fails
-                if (error.name === 'NotFoundError') {
-                    throw new Error(`Camera ${cameraId} not found`);
-                } else if (error.name === 'NotAllowedError') {
-                    throw new Error('Camera access denied. Please check permissions.');
-                } else if (error.name === 'OverconstrainedError') {
-                    // Try with minimal constraints
-                    return await navigator.mediaDevices.getUserMedia({
-                        video: {
-                            deviceId: `camera${cameraId}`
-                        },
-                        audio: false
-                    });
-                } else {
-                    throw new Error(`Failed to access camera: ${error.message}`);
-                }
-            }
-        }
-        
-        // Get appropriate camera constraints based on device capabilities
-        async function getCameraConstraints(device) {
-            // Default constraints for compatibility
-            let constraints = {
-                width: { ideal: 640, max: 1280 },
-                height: { ideal: 480, max: 720 },
-                frameRate: { ideal: 15, max: 30 }
-            };
-            
-            // Check if device is mobile or desktop for better optimization
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            if (isMobile) {
-                // Lower resolution and frame rate for mobile devices
-                constraints = {
-                    width: { ideal: 320, max: 640 },
-                    height: { ideal: 240, max: 480 },
-                    frameRate: { ideal: 10, max: 15 }
-                };
-            }
-            
-            // Check browser capabilities
-            const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-            const hasEnumerateDevices = !!(navigator.mediaDevices && navigator.mediaDevices.enumerateDevices);
-            
-            if (!hasGetUserMedia) {
-                throw new Error('Your browser does not support camera access');
-            }
-            
-            return constraints;
         }
 
         // Start detection for a camera
         async function startCameraDetection(cameraId) {
             try {
-                // Check if detection is already running
-                if (cameraDetectionStates[cameraId] === 'detecting') {
-                    showNotification('Detection Status', `Detection for camera ${cameraId} is already running`);
-                    return;
-                }
-                
-                // Update buttons state to indicate detection is starting
-                updateCameraButtonsState(cameraId, true);
-                
                 // Check if camera is open
-                let video = document.getElementById(`camera${cameraId}Video`);
+                const video = document.getElementById(`camera${cameraId}Video`);
                 if (!video || !video.srcObject) {
-                    // Open camera with status feedback
                     await openCamera(cameraId);
-                    // Re-get video element after opening camera
-                    video = document.getElementById(`camera${cameraId}Video`);
-                }
-                
-                // Check if video is still not available after opening camera
-                if (!video || !video.srcObject) {
-                    throw new Error('Camera video stream not available');
                 }
                 
                 // Start detection interval
@@ -3411,22 +3264,15 @@
                     clearInterval(cameraDetectionIntervals[cameraId]);
                 }
                 
-                // Update detection state
                 cameraDetectionStates[cameraId] = 'detecting';
                 
-                // Show control buttons
-                const buttonsDiv = document.getElementById(`camera${cameraId}Buttons`);
-                if (buttonsDiv) {
-                    buttonsDiv.style.display = 'flex';
+                // Show detection stats
+                const statsDiv = document.getElementById(`camera${cameraId}DetectionStats`);
+                if (statsDiv) {
+                    statsDiv.style.display = 'block';
                 }
                 
-                // Update camera status
-                updateCameraStatus(cameraId, 'detecting');
-                
-                // Update buttons state again after opening camera
-                updateCameraButtonsState(cameraId, true);
-                
-                // Start detection loop
+                // Simulate detection results (replace with actual detection call)
                 cameraDetectionIntervals[cameraId] = setInterval(async () => {
                     try {
                         // Call detection API
@@ -3436,90 +3282,56 @@
                                 'Content-Type': 'application/x-www-form-urlencoded'
                             },
                             body: new URLSearchParams({
-                                camera_id: cameraId
+                                camera_id: cameraId,
+                                confidence: document.getElementById('confValue').textContent
                             })
                         });
                         
-                        await response.json(); // We don't need to update stats anymore
+                        const data = await response.json();
+                        
+                        if (data.status === 'success') {
+                            // Update detection stats
+                            const detections = data.detections;
+                            document.getElementById(`camera${cameraId}HelmetCount`).textContent = detections.helmet || 0;
+                            document.getElementById(`camera${cameraId}PersonCount`).textContent = detections.person || 0;
+                            document.getElementById(`camera${cameraId}ViolationCount`).textContent = detections.violation || 0;
+                        }
                     } catch (error) {
-                        console.error(`Camera ${cameraId} detection error:`, error);
+                        console.error(`Failed to detect for camera ${cameraId}:`, error);
                     }
-                }, 1000); // Increased interval to reduce server load and improve compatibility
-                
-                // Show success notification
-                showNotification('Detection Status', `Started detection for camera ${cameraId}`);
+                }, 500);
             } catch (error) {
                 console.error(`Failed to start detection for camera ${cameraId}:`, error);
-                
-                // Reset detection state and buttons
-                cameraDetectionStates[cameraId] = 'stopped';
-                updateCameraButtonsState(cameraId, false);
-                updateCameraStatus(cameraId, 'error');
-                
-                // Show detailed error notification with appropriate error message
-                let errorMessage = error.message;
-                if (error.name === 'NotAllowedError') {
-                    errorMessage = 'Camera access denied. Please grant camera permissions.';
-                } else if (error.name === 'NotFoundError') {
-                    errorMessage = `Camera ${cameraId} not found. Please check if the camera is connected.`;
-                } else if (error.name === 'OverconstrainedError') {
-                    errorMessage = `Camera ${cameraId} constraints not satisfied. Please try a different camera.`;
-                } else if (error.name === 'NotReadableError') {
-                    errorMessage = `Camera ${cameraId} is in use by another application.`;
-                } else if (error.name === 'SecurityError') {
-                    errorMessage = 'Camera access blocked by browser security settings.';
-                }
-                
-                showNotification('Detection Error', `Failed to start detection for camera ${cameraId}: ${errorMessage}`);
+                showNotification('Detection Error', `Failed to start detection for camera ${cameraId}`);
             }
         }
 
         // Stop camera preview and detection
         function stopCamera(cameraId) {
-            try {
-                // Stop detection interval
-                if (cameraDetectionIntervals[cameraId]) {
-                    clearInterval(cameraDetectionIntervals[cameraId]);
-                    delete cameraDetectionIntervals[cameraId];
-                }
-                
-                // Stop camera stream
-                if (cameraStreams[cameraId]) {
-                    cameraStreams[cameraId].getTracks().forEach(track => track.stop());
-                    delete cameraStreams[cameraId];
-                }
-                
-                // Reset detection state
-                cameraDetectionStates[cameraId] = 'stopped';
-                
-                // Update buttons state
-                updateCameraButtonsState(cameraId, false);
-                
-                // Reset preview
-                const previewDiv = document.getElementById(`camera${cameraId}Preview`);
-                if (previewDiv) {
-                    previewDiv.innerHTML = `<span class="text-white">Camera ${cameraId}</span>`;
-                }
-                
-                // Update camera status
-                updateCameraStatus(cameraId, 'offline');
-                
-                // Show notification for camera stop
-                showNotification('Camera Status', `Camera ${cameraId} stopped`);
-            } catch (error) {
-                console.error(`Failed to stop camera ${cameraId}:`, error);
-                showNotification('Camera Error', `Failed to stop camera ${cameraId}: ${error.message}`);
+            // Stop detection interval
+            if (cameraDetectionIntervals[cameraId]) {
+                clearInterval(cameraDetectionIntervals[cameraId]);
+                delete cameraDetectionIntervals[cameraId];
             }
-        }
-        
-        // Toggle camera detection (start/stop)
-        async function toggleCameraDetection(cameraId) {
-            const isDetecting = cameraDetectionStates[cameraId] === 'detecting';
-            if (isDetecting) {
-                stopCamera(cameraId);
-            } else {
-                await startCameraDetection(cameraId);
+            
+            // Stop camera stream
+            if (cameraStreams[cameraId]) {
+                cameraStreams[cameraId].getTracks().forEach(track => track.stop());
+                delete cameraStreams[cameraId];
             }
+            
+            // Reset detection state
+            cameraDetectionStates[cameraId] = 'stopped';
+            
+            // Hide detection stats
+            const statsDiv = document.getElementById(`camera${cameraId}DetectionStats`);
+            if (statsDiv) {
+                statsDiv.style.display = 'none';
+            }
+            
+            // Reset preview
+            const previewDiv = document.getElementById(`camera${cameraId}Preview`);
+            previewDiv.innerHTML = `<span class="text-white">Camera ${cameraId}</span>`;
         }
 
         // Initialize camera status check

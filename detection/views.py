@@ -8,6 +8,42 @@ from .yolo_detector import get_detector, YOLODetector
 from .ultralytics import YOLO
 import time
 from weasyprint import HTML
+import numpy as np
+import threading
+
+# Jetson Nano configuration
+JETSON_IP = "192.168.0.110"
+JETSON_VIDEO_URL = f"http://{JETSON_IP}:5000/video_feed"
+
+# Global variable to store the latest frame from Jetson Nano
+latest_jetson_frame = None
+jetson_capture_thread = None
+jetson_thread_running = False
+
+# Function to continuously capture frames from Jetson Nano
+def capture_jetson_frames():
+    global latest_jetson_frame, jetson_thread_running
+    
+    cap = cv2.VideoCapture(JETSON_VIDEO_URL)
+    if not cap.isOpened():
+        print(f"❌ 无法连接到Jetson Nano视频流: {JETSON_VIDEO_URL}")
+        jetson_thread_running = False
+        return
+    
+    print(f"✅ 已连接到Jetson Nano视频流: {JETSON_VIDEO_URL}")
+    jetson_thread_running = True
+    
+    while jetson_thread_running:
+        ret, frame = cap.read()
+        if ret:
+            # Update the latest frame
+            latest_jetson_frame = frame
+        else:
+            # If we can't read a frame, wait a bit before trying again
+            time.sleep(0.1)
+    
+    cap.release()
+    print("❌ Jetson Nano视频流捕获已停止")
 
 # Global variables
 models_cache = {}
@@ -772,47 +808,47 @@ def image_result(request):
     return render(request, 'image_result.html')
 
 # Camera Management API
-# def get_camera_status(request):
-#     """
-#     API endpoint to get the status of all cameras
-#     """
-#     try:
-#         import cv2
-#         # Function to detect the number of available cameras
-#         def detect_camera_count():
-#             count = 0
-#             # Try to open each camera index until we can't
-#             for i in range(10):  # Check up to 10 camera indexes
-#                 cap = cv2.VideoCapture(i)
-#                 if cap.isOpened():
-#                     count += 1
-#                     cap.release()
-#                 else:
-#                     break
-#             return count
-#
-#         # Detect the actual number of cameras
-#         camera_count = detect_camera_count()
-#
-#         # Create status dictionary based on detected cameras
-#         camera_statuses = {}
-#         for i in range(1, 5):  # We still show 4 camera cards, but mark unavailable ones as offline
-#             if i <= camera_count:
-#                 camera_statuses[f'camera{i}'] = 'online'
-#             else:
-#                 camera_statuses[f'camera{i}'] = 'offline'
-#
-#         return JsonResponse({'status': 'success', 'data': camera_statuses, 'camera_count': camera_count})
-#     except Exception as e:
-#         print(f"Error getting camera status: {str(e)}")
-#         # Fallback to default status if OpenCV fails
-#         camera_statuses = {
-#             'camera1': 'online',
-#             'camera2': 'online',
-#             'camera3': 'online',
-#             'camera4': 'offline'
-#         }
-#         return JsonResponse({'status': 'success', 'data': camera_statuses, 'camera_count': 3})
+def get_camera_status(request):
+    """
+    API endpoint to get the status of all cameras
+    """
+    try:
+        import cv2
+        # Function to detect the number of available cameras
+        def detect_camera_count():
+            count = 0
+            # Try to open each camera index until we can't
+            for i in range(10):  # Check up to 10 camera indexes
+                cap = cv2.VideoCapture(i)
+                if cap.isOpened():
+                    count += 1
+                    cap.release()
+                else:
+                    break
+            return count
+        
+        # Detect the actual number of cameras
+        camera_count = detect_camera_count()
+        
+        # Create status dictionary based on detected cameras
+        camera_statuses = {}
+        for i in range(1, 5):  # We still show 4 camera cards, but mark unavailable ones as offline
+            if i <= camera_count:
+                camera_statuses[f'camera{i}'] = 'online'
+            else:
+                camera_statuses[f'camera{i}'] = 'offline'
+        
+        return JsonResponse({'status': 'success', 'data': camera_statuses, 'camera_count': camera_count})
+    except Exception as e:
+        print(f"Error getting camera status: {str(e)}")
+        # Fallback to default status if OpenCV fails
+        camera_statuses = {
+            'camera1': 'online',
+            'camera2': 'online',
+            'camera3': 'online',
+            'camera4': 'offline'
+        }
+        return JsonResponse({'status': 'success', 'data': camera_statuses, 'camera_count': 3})
 
 @csrf_exempt
 def control_camera(request):
@@ -905,6 +941,114 @@ def get_ai_analysis(request):
                 'status': 'success',
                 'suggestion': suggestion,
                 'sensor_data': sensor_data
+            })
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Method not allowed'
+    })
+
+@csrf_exempt
+def start_jetson_stream(request):
+    """
+    API endpoint to start the Jetson Nano video stream capture
+    """
+    global jetson_capture_thread, jetson_thread_running
+    
+    if request.method == 'POST':
+        try:
+            # If the thread is already running, return success
+            if jetson_thread_running:
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Jetson Nano video stream is already running'
+                })
+            
+            # Start a new thread to capture frames from Jetson Nano
+            jetson_capture_thread = threading.Thread(target=capture_jetson_frames, daemon=True)
+            jetson_capture_thread.start()
+            
+            # Wait a short time to allow the thread to initialize
+            time.sleep(1)
+            
+            if jetson_thread_running:
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Jetson Nano video stream started successfully'
+                })
+            else:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Failed to start Jetson Nano video stream'
+                })
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Error starting Jetson Nano video stream: {str(e)}'
+            })
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Method not allowed'
+    })
+
+@csrf_exempt
+def stop_jetson_stream(request):
+    """
+    API endpoint to stop the Jetson Nano video stream capture
+    """
+    global jetson_thread_running
+    
+    if request.method == 'POST':
+        try:
+            jetson_thread_running = False
+            
+            # Wait for the thread to terminate if it's running
+            if jetson_capture_thread and jetson_capture_thread.is_alive():
+                jetson_capture_thread.join(timeout=2)
+            
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Jetson Nano video stream stopped successfully'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Error stopping Jetson Nano video stream: {str(e)}'
+            })
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Method not allowed'
+    })
+
+@csrf_exempt
+def get_jetson_frame(request):
+    """
+    API endpoint to get the latest frame from Jetson Nano
+    """
+    global latest_jetson_frame
+    
+    if request.method == 'GET':
+        try:
+            if latest_jetson_frame is None:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'No frame available from Jetson Nano'
+                })
+            
+            # Encode the frame as JPEG
+            ret, buffer = cv2.imencode('.jpg', latest_jetson_frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
+            if not ret:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Failed to encode frame'
+                })
+            
+            # Convert to bytes and return as HttpResponse with content type image/jpeg
+            frame_bytes = buffer.tobytes()
+            return HttpResponse(frame_bytes, content_type='image/jpeg')
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Error getting Jetson Nano frame: {str(e)}'
             })
     return JsonResponse({
         'status': 'error',

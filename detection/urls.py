@@ -12,7 +12,7 @@ urlpatterns = [
     path('process_video/', views.process_video, name='process_video'),
     path('process_progress/', views.process_progress, name='process_progress'),
     # Camera management API endpoints
-    # path('get_camera_status/', views.get_camera_status, name='get_camera_status'),
+    path('get_camera_status/', views.get_camera_status, name='get_camera_status'),
     path('control_camera/', views.control_camera, name='control_camera'),
     # Model management API endpoints
     path('get_models/', views.get_models, name='get_models'),
@@ -22,4 +22,8 @@ urlpatterns = [
     # AI Analysis API endpoint
     path('get_ai_analysis/', views.get_ai_analysis, name='get_ai_analysis'),
     path('export_ai_pdf/', views.export_ai_pdf, name='export_ai_pdf'),
+    # Jetson Nano API endpoints
+    path('start_jetson_stream/', views.start_jetson_stream, name='start_jetson_stream'),
+    path('stop_jetson_stream/', views.stop_jetson_stream, name='stop_jetson_stream'),
+    path('get_jetson_frame/', views.get_jetson_frame, name='get_jetson_frame'),
 ] 
