@@ -823,8 +823,7 @@ def get_camera_status(request):
                 if cap.isOpened():
                     count += 1
                     cap.release()
-                else:
-                    break
+                # Continue checking all indexes, don't break on first failure
             return count
         
         # Detect the actual number of cameras
