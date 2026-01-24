@@ -303,7 +303,7 @@
                     <span class="text-lg font-semibold text-blue-400" id="quickDetectionCount">356</span>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-300">Violations</span>
+                    <span class="text-sm text-gray-300">All</span>
                     <span class="text-lg font-semibold text-orange-400" id="quickViolationCount">5</span>
                 </div>
                 <div class="flex justify-between items-center">
@@ -387,7 +387,7 @@
                                         <span class="text-purple-400" id="respiratorCount">0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-400">Violations:</span>
+                                        <span class="text-gray-400">All:</span>
                                         <span class="text-red-400" id="violationCount">0</span>
                                     </div>
                                 </div>
@@ -847,28 +847,10 @@
                                 </div>
                                 <!-- Camera Info -->
                                 <div class="absolute bottom-2 left-2 text-xs text-gray-400">Main Entrance | 1920x1080 | 30fps</div>
-                                <!-- Detection Results -->
-                                <div class="absolute top-2 right-2 glass-card rounded-lg px-3 py-1.5 text-sm" id="camera1DetectionStats" style="display:none;">
-                                    <div class="space-y-1">
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-400">Helmets:</span>
-                                            <span class="text-green-400" id="camera1HelmetCount">0</span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-400">Persons:</span>
-                                            <span class="text-blue-400" id="camera1PersonCount">0</span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-400">Violations:</span>
-                                            <span class="text-red-400" id="camera1ViolationCount">0</span>
-                                        </div>
-                                    </div>
-                                </div>
+
                                 <!-- Control Buttons -->
                                 <div class="absolute bottom-2 right-2 flex gap-2" id="camera1Buttons" style="display:none;">
-                                    <button onclick="openCamera(1)" id="camera1OpenBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开摄像头</button>
-                                    <button onclick="startCameraDetection(1)" id="camera1DetectBtn" class="px-3 py-1 text-xs rounded-lg bg-green-600 hover:bg-green-700 transition">检测</button>
-                                    <button onclick="stopCamera(1)" id="camera1StopBtn" class="px-3 py-1 text-xs rounded-lg bg-red-600 hover:bg-red-700 transition">停止</button>
+                                    <button onclick="toggleCamera(1)" id="camera1ToggleBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开</button>
                                 </div>
                             </div>
 
@@ -885,28 +867,10 @@
                                 </div>
                                 <!-- Camera Info -->
                                 <div class="absolute bottom-2 left-2 text-xs text-gray-400">Production Area | 1920x1080 | 25fps</div>
-                                <!-- Detection Results -->
-                                <div class="absolute top-2 right-2 glass-card rounded-lg px-3 py-1.5 text-sm" id="camera2DetectionStats" style="display:none;">
-                                    <div class="space-y-1">
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-400">Helmets:</span>
-                                            <span class="text-green-400" id="camera2HelmetCount">0</span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-400">Persons:</span>
-                                            <span class="text-blue-400" id="camera2PersonCount">0</span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-400">Violations:</span>
-                                            <span class="text-red-400" id="camera2ViolationCount">0</span>
-                                        </div>
-                                    </div>
-                                </div>
+
                                 <!-- Control Buttons -->
                                 <div class="absolute bottom-2 right-2 flex gap-2" id="camera2Buttons" style="display:none;">
-                                    <button onclick="openCamera(2)" id="camera2OpenBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开摄像头</button>
-                                    <button onclick="startCameraDetection(2)" id="camera2DetectBtn" class="px-3 py-1 text-xs rounded-lg bg-green-600 hover:bg-green-700 transition">检测</button>
-                                    <button onclick="stopCamera(2)" id="camera2StopBtn" class="px-3 py-1 text-xs rounded-lg bg-red-600 hover:bg-red-700 transition">停止</button>
+                                    <button onclick="toggleCamera(2)" id="camera2ToggleBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开</button>
                                 </div>
                             </div>
 
@@ -923,28 +887,10 @@
                                 </div>
                                 <!-- Camera Info -->
                                 <div class="absolute bottom-2 left-2 text-xs text-gray-400">Warehouse Area | 1280x720 | 30fps</div>
-                                <!-- Detection Results -->
-                                <div class="absolute top-2 right-2 glass-card rounded-lg px-3 py-1.5 text-sm" id="camera3DetectionStats" style="display:none;">
-                                    <div class="space-y-1">
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-400">Helmets:</span>
-                                            <span class="text-green-400" id="camera3HelmetCount">0</span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-400">Persons:</span>
-                                            <span class="text-blue-400" id="camera3PersonCount">0</span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-400">Violations:</span>
-                                            <span class="text-red-400" id="camera3ViolationCount">0</span>
-                                        </div>
-                                    </div>
-                                </div>
+
                                 <!-- Control Buttons -->
                                 <div class="absolute bottom-2 right-2 flex gap-2" id="camera3Buttons" style="display:none;">
-                                    <button onclick="openCamera(3)" id="camera3OpenBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开摄像头</button>
-                                    <button onclick="startCameraDetection(3)" id="camera3DetectBtn" class="px-3 py-1 text-xs rounded-lg bg-green-600 hover:bg-green-700 transition">检测</button>
-                                    <button onclick="stopCamera(3)" id="camera3StopBtn" class="px-3 py-1 text-xs rounded-lg bg-red-600 hover:bg-red-700 transition">停止</button>
+                                    <button onclick="toggleCamera(3)" id="camera3ToggleBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开</button>
                                 </div>
                             </div>
 
@@ -961,28 +907,10 @@
                                 </div>
                                 <!-- Camera Info -->
                                 <div class="absolute bottom-2 left-2 text-xs text-gray-400">Parking Lot | -- | --</div>
-                                <!-- Detection Results -->
-                                <div class="absolute top-2 right-2 glass-card rounded-lg px-3 py-1.5 text-sm" id="camera4DetectionStats" style="display:none;">
-                                    <div class="space-y-1">
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-400">Helmets:</span>
-                                            <span class="text-green-400" id="camera4HelmetCount">0</span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-400">Persons:</span>
-                                            <span class="text-blue-400" id="camera4PersonCount">0</span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-400">Violations:</span>
-                                            <span class="text-red-400" id="camera4ViolationCount">0</span>
-                                        </div>
-                                    </div>
-                                </div>
+
                                 <!-- Control Buttons -->
                                 <div class="absolute bottom-2 right-2 flex gap-2" id="camera4Buttons" style="display:none;">
-                                    <button onclick="openCamera(4)" id="camera4OpenBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开摄像头</button>
-                                    <button onclick="startCameraDetection(4)" id="camera4DetectBtn" class="px-3 py-1 text-xs rounded-lg bg-green-600 hover:bg-green-700 transition">检测</button>
-                                    <button onclick="stopCamera(4)" id="camera4StopBtn" class="px-3 py-1 text-xs rounded-lg bg-red-600 hover:bg-red-700 transition">停止</button>
+                                    <button onclick="toggleCamera(4)" id="camera4ToggleBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开</button>
                                 </div>
                             </div>
                         </div>
@@ -2318,7 +2246,7 @@
                             <div class="text-lg font-semibold text-purple-400">${processedImage.detections.respirator}</div>
                         </div>
                         <div class="text-center p-2 rounded-lg bg-white/5">
-                            <div class="text-sm text-gray-400">Violations</div>
+                            <div class="text-sm text-gray-400">All</div>
                             <div class="text-lg font-semibold text-red-400">${processedImage.detections.violation}</div>
                         </div>
                     </div>
@@ -3168,10 +3096,11 @@
             document.getElementById('alertBadge').textContent = '0';
         }
 
-        // Camera Management Functions
+        // Camera Management API
         let cameraStreams = {};
         let cameraDetectionIntervals = {};
         let cameraDetectionStates = {};
+        let cameraStates = {}; // Track camera states: 'running' or 'stopped'
 
         // Check camera status periodically
         async function checkCameraStatus() {
@@ -3217,11 +3146,36 @@
                 }
                 // Stop any ongoing camera operations
                 stopCamera(cameraId);
+                // Update button text
+                const toggleBtn = document.getElementById(`camera${cameraId}ToggleBtn`);
+                if (toggleBtn) {
+                    toggleBtn.textContent = '打开';
+                    toggleBtn.className = 'px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition';
+                }
             }
         }
 
-        // Open camera preview
-        async function openCamera(cameraId) {
+        // Toggle camera on/off
+        async function toggleCamera(cameraId) {
+            const toggleBtn = document.getElementById(`camera${cameraId}ToggleBtn`);
+            
+            if (cameraStates[cameraId] === 'running') {
+                // Stop camera
+                await stopCamera(cameraId);
+                toggleBtn.textContent = '打开';
+                toggleBtn.className = 'px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition';
+                cameraStates[cameraId] = 'stopped';
+            } else {
+                // Start camera with detection
+                await startCamera(cameraId);
+                toggleBtn.textContent = '停止';
+                toggleBtn.className = 'px-3 py-1 text-xs rounded-lg bg-red-600 hover:bg-red-700 transition';
+                cameraStates[cameraId] = 'running';
+            }
+        }
+
+        // Start camera with detection
+        async function startCamera(cameraId) {
             try {
                 // Stop any ongoing operations
                 stopCamera(cameraId);
@@ -3237,72 +3191,19 @@
                 video.playsinline = true;
                 
                 // Get camera stream
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: `camera${cameraId}` } });
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 video.srcObject = stream;
                 
                 // Store stream for later use
                 cameraStreams[cameraId] = stream;
                 
                 previewDiv.appendChild(video);
-            } catch (error) {
-                console.error(`Failed to open camera ${cameraId}:`, error);
-                showNotification('Camera Error', `Failed to open camera ${cameraId}`);
-            }
-        }
-
-        // Start detection for a camera
-        async function startCameraDetection(cameraId) {
-            try {
-                // Check if camera is open
-                const video = document.getElementById(`camera${cameraId}Video`);
-                if (!video || !video.srcObject) {
-                    await openCamera(cameraId);
-                }
                 
                 // Start detection interval
-                if (cameraDetectionIntervals[cameraId]) {
-                    clearInterval(cameraDetectionIntervals[cameraId]);
-                }
-                
                 cameraDetectionStates[cameraId] = 'detecting';
-                
-                // Show detection stats
-                const statsDiv = document.getElementById(`camera${cameraId}DetectionStats`);
-                if (statsDiv) {
-                    statsDiv.style.display = 'block';
-                }
-                
-                // Simulate detection results (replace with actual detection call)
-                cameraDetectionIntervals[cameraId] = setInterval(async () => {
-                    try {
-                        // Call detection API
-                        const response = await fetch('/detect_frame/', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            },
-                            body: new URLSearchParams({
-                                camera_id: cameraId,
-                                confidence: document.getElementById('confValue').textContent
-                            })
-                        });
-                        
-                        const data = await response.json();
-                        
-                        if (data.status === 'success') {
-                            // Update detection stats
-                            const detections = data.detections;
-                            document.getElementById(`camera${cameraId}HelmetCount`).textContent = detections.helmet || 0;
-                            document.getElementById(`camera${cameraId}PersonCount`).textContent = detections.person || 0;
-                            document.getElementById(`camera${cameraId}ViolationCount`).textContent = detections.violation || 0;
-                        }
-                    } catch (error) {
-                        console.error(`Failed to detect for camera ${cameraId}:`, error);
-                    }
-                }, 500);
             } catch (error) {
-                console.error(`Failed to start detection for camera ${cameraId}:`, error);
-                showNotification('Detection Error', `Failed to start detection for camera ${cameraId}`);
+                console.error(`Failed to start camera ${cameraId}:`, error);
+                showNotification('Camera Error', `Failed to start camera ${cameraId}`);
             }
         }
 
@@ -3322,12 +3223,6 @@
             
             // Reset detection state
             cameraDetectionStates[cameraId] = 'stopped';
-            
-            // Hide detection stats
-            const statsDiv = document.getElementById(`camera${cameraId}DetectionStats`);
-            if (statsDiv) {
-                statsDiv.style.display = 'none';
-            }
             
             // Reset preview
             const previewDiv = document.getElementById(`camera${cameraId}Preview`);

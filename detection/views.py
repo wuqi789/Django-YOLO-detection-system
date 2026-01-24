@@ -765,7 +765,7 @@ def detect_image(request):
             helmet_count = sum(1 for d in detections if d['class_name'] == 'helmet')
             person_count = sum(1 for d in detections if d['class_name'] == 'person')
             respirator_count = sum(1 for d in detections if d['class_name'] == 'ventilator')  # Map ventilator to respirator for frontend compatibility
-            violation_count = sum(1 for d in detections if d['class_name'] not in ['helmet', 'person', 'ventilator'])
+            violation_count = helmet_count + person_count + respirator_count  # Sum of all detections
             
             # Filter detections to focus on person, helmet, and ventilator
             filtered_detections = [d for d in detections if d['class_name'] in ['person', 'helmet', 'ventilator']]
