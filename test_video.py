@@ -2,7 +2,7 @@ import cv2
 import requests
 import numpy as np
 
-JETSON_IP = "192.168.0.110"
+JETSON_IP = "192.168.0.111"
 VIDEO_URL = f"http://{JETSON_IP}:5000/video_feed"
 
 # 读取视频流

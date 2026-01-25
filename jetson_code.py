@@ -40,7 +40,7 @@ openai_api_key = "sk-a05fafcbfd6c43cdb9644035bf7b2987"
 # 微信配置
 APPID = 'wx7564a41e542f83e9'
 APPSECRET = '571989cddf2f9332e1952863aae2ef87'
-openids = ["ojARd6nUw4tePDe1X80DWLY_oBv4", "ojARd6kPEAHuc0dy43CS6XWO7Qv8"]
+openids = ["ojARd6nUw4tePDe1X80DWLY_oBv4"]
 
 # 摄像头配置（Jetson适配）
 CAMERA_TYPE = "USB"  # 可选：CSI / USB

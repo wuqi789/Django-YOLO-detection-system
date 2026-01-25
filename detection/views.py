@@ -12,7 +12,7 @@ import numpy as np
 import threading
 
 # Jetson Nano configuration
-JETSON_IP = "192.168.0.110"
+JETSON_IP = "192.168.0.111"
 JETSON_VIDEO_URL = f"http://{JETSON_IP}:5000/video_feed"
 
 # Global variable to store the latest frame from Jetson Nano
