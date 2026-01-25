@@ -10,9 +10,65 @@ import time
 from weasyprint import HTML
 import numpy as np
 import threading
+import json
+import logging
+import re
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+# Configuration file path
+CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'config.json')
+
+# Load configuration from file
+def load_config():
+    """Load configuration from config.json file"""
+    default_config = {
+        'jetson_ip': '192.168.0.111',
+        'batch_size': 1
+    }
+    
+    if not os.path.exists(CONFIG_FILE):
+        # Create default config file if it doesn't exist
+        with open(CONFIG_FILE, 'w') as f:
+            json.dump(default_config, f, indent=4)
+        logger.info(f"Created default config file at {CONFIG_FILE}")
+        return default_config
+    
+    try:
+        with open(CONFIG_FILE, 'r') as f:
+            config = json.load(f)
+        # Merge with default config to ensure all keys exist
+        merged_config = {**default_config, **config}
+        return merged_config
+    except Exception as e:
+        logger.error(f"Failed to load config file: {e}")
+        return default_config
+
+# Save configuration to file
+def save_config(config):
+    """Save configuration to config.json file"""
+    try:
+        with open(CONFIG_FILE, 'w') as f:
+            json.dump(config, f, indent=4)
+        logger.info(f"Saved config to {CONFIG_FILE}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to save config file: {e}")
+        return False
+
+# Validate IP address
+def is_valid_ip(ip):
+    """Validate IP address format"""
+    pattern = r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+    return re.match(pattern, ip) is not None
+
+# Load initial configuration
+config = load_config()
 
 # Jetson Nano configuration
-JETSON_IP = "192.168.0.111"
+JETSON_IP = config['jetson_ip']
 JETSON_VIDEO_URL = f"http://{JETSON_IP}:5000/video_feed"
 
 # Global variable to store the latest frame from Jetson Nano
@@ -1048,6 +1104,54 @@ def get_jetson_frame(request):
             return JsonResponse({
                 'status': 'error',
                 'message': f'Error getting Jetson Nano frame: {str(e)}'
+            })
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Method not allowed'
+    })
+
+@csrf_exempt
+def save_settings(request):
+    """
+    API endpoint to save system settings
+    """
+    if request.method == 'POST':
+        try:
+            # Get settings data from request
+            jetson_ip = request.POST.get('jetson_ip', '')
+            
+            # Validate IP address
+            if not is_valid_ip(jetson_ip):
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Invalid IP address format'
+                })
+            
+            # Update global config
+            global config, JETSON_IP, JETSON_VIDEO_URL
+            config['jetson_ip'] = jetson_ip
+            
+            # Save to file
+            if save_config(config):
+                # Update global variables
+                JETSON_IP = jetson_ip
+                JETSON_VIDEO_URL = f"http://{JETSON_IP}:5000/video_feed"
+                
+                logger.info(f"Updated Jetson IP to {jetson_ip}")
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Settings saved successfully'
+                })
+            else:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Failed to save settings'
+                })
+        except Exception as e:
+            logger.error(f"Error saving settings: {e}")
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Error saving settings: {str(e)}'
             })
     return JsonResponse({
         'status': 'error',

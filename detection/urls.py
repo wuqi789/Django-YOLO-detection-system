@@ -26,4 +26,6 @@ urlpatterns = [
     path('start_jetson_stream/', views.start_jetson_stream, name='start_jetson_stream'),
     path('stop_jetson_stream/', views.stop_jetson_stream, name='stop_jetson_stream'),
     path('get_jetson_frame/', views.get_jetson_frame, name='get_jetson_frame'),
+    # Settings API endpoint
+    path('save_settings/', views.save_settings, name='save_settings'),
 ] 
