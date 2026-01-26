@@ -14,14 +14,20 @@ class YOLODetector:
         self.conf_threshold = 0.5
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Use GPU if available, otherwise CPU
         
+        print(f"✅ YOLODetector initialized with confidence threshold: {self.conf_threshold}")
+        print(f"✅ Using device: {self.device}")
+        
         # 可选：强制将模型加载到GPU
         if torch.cuda.is_available():
             self.model = self.model.cuda()
         
     def set_conf_threshold(self, threshold):
+        old_threshold = self.conf_threshold
         self.conf_threshold = threshold
+        print(f"🔧 Confidence threshold changed from {old_threshold} to {self.conf_threshold}")
     
     def detect(self, image_path):
+        print(f"🔍 Running detection with confidence threshold: {self.conf_threshold}")
         results = self.model(
             source=image_path,
             conf=self.conf_threshold,
@@ -30,6 +36,7 @@ class YOLODetector:
         return self._process_results(results)
     
     def detect_frame(self, frame):
+        print(f"📹 Running frame detection with confidence threshold: {self.conf_threshold}")
         results = self.model(
             frame,
             conf=self.conf_threshold,
@@ -39,6 +46,7 @@ class YOLODetector:
     
     def detect_and_plot(self, frame):
         """检测并直接生成带标注的图片"""
+        print(f"🎨 Running detect_and_plot with confidence threshold: {self.conf_threshold}")
         results = self.model(
             frame,
             conf=self.conf_threshold,

@@ -70,7 +70,7 @@ config = load_config()
 # Jetson Nano configuration
 JETSON_IP = config['jetson_ip']
 JETSON_VIDEO_URL = f"http://{JETSON_IP}:5000/video_feed"
-
+JETSON_SENSOR_URL =f"http://{JETSON_IP}:5000/sensor"
 # Global variable to store the latest frame from Jetson Nano
 latest_jetson_frame = None
 jetson_capture_thread = None
@@ -176,6 +176,13 @@ def detect(request):
         confidence = float(request.POST.get('confidence', 0.5))
         # model_type = request.POST.get('model_type', 'yolov8s')
         
+        # Validate confidence value
+        if confidence < 0.3 or confidence > 0.9:
+            confidence = 0.5  # Default to 0.5 if out of range
+            print(f"⚠️  Invalid confidence value provided, using default: {confidence}")
+        else:
+            print(f"📊 Received confidence parameter: {confidence}")
+        
         # Set confidence threshold
         detector.set_conf_threshold(confidence)
         
@@ -227,8 +234,9 @@ def detect(request):
 def get_sensors(request):
     try:
         # Call Jetson sensor API
-        jetson_url = "http://192.168.0.110:5000/sensor"
-        response = requests.get(jetson_url, timeout=2)
+        # jetson_url = "http://192.168.0.111:5000/sensor"
+
+        response = requests.get(JETSON_SENSOR_URL, timeout=2)
         jetson_data = response.json()
         
         # Directly use the sensor data without averaging
@@ -605,6 +613,13 @@ def detect_frame(request):
         confidence = float(request.POST.get('confidence', 0.5))
         model_type = request.POST.get('model_type', 'yolov8s')
         
+        # Validate confidence value
+        if confidence < 0.3 or confidence > 0.9:
+            confidence = 0.5  # Default to 0.5 if out of range
+            print(f"⚠️  Invalid confidence value provided in detect_frame, using default: {confidence}")
+        else:
+            print(f"📊 Received confidence parameter in detect_frame: {confidence}")
+        
         # Set confidence threshold
         detector.set_conf_threshold(confidence)
         
@@ -774,6 +789,13 @@ def detect_image(request):
         # Get detection parameters
         confidence = float(request.POST.get('confidence', 0.5))
         model_type = request.POST.get('model_type', 'yolov8s')
+        
+        # Validate confidence value
+        if confidence < 0.3 or confidence > 0.9:
+            confidence = 0.5  # Default to 0.5 if out of range
+            print(f"⚠️  Invalid confidence value provided in detect_image, using default: {confidence}")
+        else:
+            print(f"📊 Received confidence parameter in detect_image: {confidence}")
         
         # Set confidence threshold
         detector.set_conf_threshold(confidence)
@@ -945,8 +967,8 @@ def get_ai_analysis(request):
     if request.method == 'GET':
         try:
             # Get sensor data from Jetson API
-            jetson_url = "http://192.168.0.110:5000/sensor"
-            response = requests.get(jetson_url, timeout=2)
+            # jetson_url = "http://192.168.0.110:5000/sensor"
+            response = requests.get(JETSON_SENSOR_URL, timeout=2)
             jetson_data = response.json()
             
             # Format sensor data for AI analysis
@@ -967,7 +989,8 @@ def get_ai_analysis(request):
             
             # 调用AI建议生成函数
             suggestion = get_ai_suggestion(sensor_data)
-            
+            print(suggestion)
+            ai2wxgzh(suggestion)
             # 返回JSON响应
             return JsonResponse({
                 'status': 'success',
@@ -1001,7 +1024,30 @@ def get_ai_analysis(request):
         'status': 'error',
         'message': 'Method not allowed'
     })
+from .wxgzh  import WechatMessageSender
+APPID = 'wx7564a41e542f83e9'
+APPSECRET = '571989cddf2f9332e1952863aae2ef87'
+openids = ["ojARd6nUw4tePDe1X80DWLY_oBv4"]
+global_warning1=0
+def convert_markdown_to_plain_text(markdown_text):
+    """
+    Convert Markdown text to plain text by removing Markdown syntax
+    """
+    import re
+    # Remove ### headers
+    plain_text = re.sub(r'^###\s+', '', markdown_text, flags=re.MULTILINE)
+    # Remove ** bold markers
+    plain_text = re.sub(r'\*\*(.*?)\*\*', r'\1', plain_text)
+    return plain_text
 
+def ai2wxgzh(analysis1):
+    warning_msg = "有人员未按规定佩戴防护措施！\n\n" if global_warning1 == 1 else "无人员未按规定佩戴防护措施！\n\n"
+    # Convert markdown to plain text
+    plain_analysis = convert_markdown_to_plain_text(analysis1)
+    message_content = f"这一个小时内:\n{warning_msg}{plain_analysis}"
+    # Push to WeChat
+    sender = WechatMessageSender(APPID, APPSECRET, openids)
+    sender.send_messages(message_content)
 @csrf_exempt
 def start_jetson_stream(request):
     """
