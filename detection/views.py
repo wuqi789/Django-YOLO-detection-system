@@ -986,7 +986,7 @@ def get_ai_analysis(request):
                     "humidity": round(float(jetson_data['humidity'][2]))
                 }
             }
-            
+
             # 调用AI建议生成函数
             suggestion = get_ai_suggestion(sensor_data)
             print(suggestion)
