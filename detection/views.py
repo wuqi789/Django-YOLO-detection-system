@@ -101,6 +101,7 @@ def capture_jetson_frames():
     cap.release()
     print("❌ Jetson Nano视频流捕获已停止")
 
+
 # Global variables
 models_cache = {}
 current_model = None
