@@ -959,6 +959,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from deepseek import get_ai_suggestion
 
+
 @csrf_exempt
 def get_ai_analysis(request):
     """

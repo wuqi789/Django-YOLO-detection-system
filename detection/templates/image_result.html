@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Detection Results</title>
+    <title>图像检测结果</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -51,65 +51,65 @@
     </style>
 </head>
 <body class="text-white p-6">
-    <!-- Header -->
+    <!-- 头部 -->
     <header class="glass-card rounded-2xl p-6 mb-8 fade-in">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-bold">Image Detection Results</h1>
-                <p class="text-sm text-gray-400 mt-1">Smart Safety Detection Platform</p>
+                <h1 class="text-2xl font-bold">图像检测结果</h1>
+                <p class="text-sm text-gray-400 mt-1">智能安全检测平台</p>
             </div>
             <div class="flex items-center gap-3">
                 <button onclick="downloadAllImages()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                     </svg>
-                    Download All Images
+                    下载所有图片
                 </button>
                 <button onclick="window.close()" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium transition flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
-                    Close Window
+                    关闭窗口
                 </button>
             </div>
         </div>
     </header>
     
-    <!-- Main Content -->
+    <!-- 主要内容 -->
     <main class="max-w-7xl mx-auto">
-        <!-- Image Detection Results -->
+        <!-- 图像检测结果 -->
         <div id="imageResultsContainer" class="space-y-8"></div>
     </main>
     
     <script>
-        // Get detection results from URL parameters
+        // 从URL参数获取检测结果
         const urlParams = new URLSearchParams(window.location.search);
         const detectionResults = JSON.parse(decodeURIComponent(urlParams.get('results')));
         
-        // Function to draw detection boxes on images
+        // 在图像上绘制检测框的函数
         function drawDetectionBoxes(detectionBoxes, containerId) {
             const container = document.getElementById(containerId);
             if (!container) return;
             
             container.innerHTML = '';
             
-            // Get container dimensions
+            // 获取容器尺寸
             const containerRect = container.getBoundingClientRect();
             const containerWidth = containerRect.width;
             const containerHeight = containerRect.height;
             
-            // Get image dimensions
+            // 获取图像尺寸
             const imgElement = container.previousElementSibling;
             const imgWidth = imgElement.naturalWidth;
             const imgHeight = imgElement.naturalHeight;
             
-            // Scaling factors: container size / actual image size
+            // 缩放因子：容器尺寸 / 实际图像尺寸
             const scaleX = containerWidth / imgWidth;
             const scaleY = containerHeight / imgHeight;
             
-            // Draw each detection box
+            // 绘制每个检测框
             detectionBoxes.forEach(det => {
-                // Focus only on person, exclude helmet and ventilator
+                // 只关注人员，排除安全帽和呼吸器
                 if (det.class_name !== 'person') {
                     return;
                 }
@@ -117,29 +117,29 @@
                 const box = document.createElement('div');
                 box.className = 'detection-box rounded';
                 
-                // Get bounding box coordinates
+                // 获取边界框坐标
                 const [x1, y1, x2, y2] = det.bbox;
                 
-                // Calculate scaled coordinates and dimensions
+                // 计算缩放后的坐标和尺寸
                 const scaledX1 = x1 * scaleX;
                 const scaledY1 = y1 * scaleY;
                 const scaledX2 = x2 * scaleX;
                 const scaledY2 = y2 * scaleY;
                 
-                // Set box position and size
+                // 设置框的位置和大小
                 box.style.left = `${scaledX1}px`;
                 box.style.top = `${scaledY1}px`;
                 box.style.width = `${scaledX2 - scaledX1}px`;
                 box.style.height = `${scaledY2 - scaledY1}px`;
                 
-                // Set color based on class
-                let color = '#3A7BFF'; // Blue for person
+                // 根据类别设置颜色
+                let color = '#3A7BFF'; // 人员为蓝色
                 let bgColor = 'rgba(58, 123, 255, 0.1)';
                 
                 box.style.borderColor = color;
                 box.style.backgroundColor = bgColor;
                 
-                // Create label
+                // 创建标签
                 const label = document.createElement('span');
                 label.className = 'absolute -top-6 left-0 text-xs px-2 py-0.5 rounded font-bold';
                 label.style.backgroundColor = color;
@@ -152,123 +152,123 @@
             });
         }
         
-        // Function to show image detection results
+        // 显示图像检测结果的函数
         function showImageResults(processedImages) {
             const resultsContainer = document.getElementById('imageResultsContainer');
             
-            // Create result for each processed image
+            // 为每个处理过的图像创建结果
             processedImages.forEach((processedImage, index) => {
                 const resultItem = document.createElement('div');
                 resultItem.className = 'glass-card rounded-2xl p-8 fade-in';
                 resultItem.style.animationDelay = `${index * 0.2}s`;
                 
                 resultItem.innerHTML = `
-                    <h2 class="text-xl font-semibold mb-6">Detection Result ${index + 1}: ${processedImage.file.name}</h2>
+                    <h2 class="text-xl font-semibold mb-6">检测结果 ${index + 1}: ${processedImage.file.name}</h2>
                     
-                    <!-- Image with Detection Boxes -->
+                    <!-- 带检测框的图像 -->
                     <div class="relative rounded-xl overflow-hidden mb-6 aspect-video bg-gray-800">
                         <img src="${processedImage.image_url}" alt="${processedImage.file.name}" class="w-full h-full object-contain" />
                         <div id="imageDetectionBoxes-${index}" class="absolute inset-0"></div>
                     </div>
                     
-                    <!-- Detection Statistics -->
+                    <!-- 检测统计 -->
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                         <div class="text-center p-4 rounded-xl bg-white/5">
                             <div class="text-3xl font-bold text-green-400">${processedImage.detections.helmet}</div>
-                            <div class="text-sm text-gray-400 mt-1">Helmets</div>
+                            <div class="text-sm text-gray-400 mt-1">安全帽</div>
                         </div>
                         <div class="text-center p-4 rounded-xl bg-white/5">
                             <div class="text-3xl font-bold text-blue-400">${processedImage.detections.person}</div>
-                            <div class="text-sm text-gray-400 mt-1">Persons</div>
+                            <div class="text-sm text-gray-400 mt-1">人员</div>
                         </div>
                         <div class="text-center p-4 rounded-xl bg-white/5">
                             <div class="text-3xl font-bold text-purple-400">${processedImage.detections.respirator}</div>
-                            <div class="text-sm text-gray-400 mt-1">Ventilators</div>
+                            <div class="text-sm text-gray-400 mt-1">呼吸器</div>
                         </div>
                         <div class="text-center p-4 rounded-xl bg-white/5">
                             <div class="text-3xl font-bold text-red-400">${processedImage.detections.violation}</div>
-                            <div class="text-sm text-gray-400 mt-1">All</div>
+                            <div class="text-sm text-gray-400 mt-1">总计</div>
                         </div>
                     </div>
                     
-                    <!-- Save Button -->
+                    <!-- 保存按钮 -->
                     <div class="flex justify-end">
                         <button onclick="saveImage('${processedImage.image_url}', '${processedImage.file.name}')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
                             </svg>
-                            Save Image
+                            保存图像
                         </button>
                     </div>
                 `;
                 
                 resultsContainer.appendChild(resultItem);
                 
-                // Draw detection boxes for this image
+                // 为该图像绘制检测框
                 drawDetectionBoxes(processedImage.detections.boxes, `imageDetectionBoxes-${index}`);
             });
         }
         
-        // Function to save image
+        // 保存图像的函数
         function saveImage(imageUrl, fileName) {
             return fetch(imageUrl)
                 .then(response => response.blob())
                 .then(blob => {
-                    // Create a download link
+                    // 创建下载链接
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
                     
-                    // Set download filename
+                    // 设置下载文件名
                     const baseName = fileName.split('.')[0];
                     const extension = imageUrl.split('.').pop();
                     a.download = `${baseName}_detected.${extension}`;
                     
-                    // Trigger download
+                    // 触发下载
                     document.body.appendChild(a);
                     a.click();
                     
-                    // Clean up
+                    // 清理
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
                 })
                 .catch(error => {
-                    console.error('Failed to save image:', error);
-                    alert('Failed to save image: ' + error.message);
+                    console.error('保存图像失败:', error);
+                    alert('保存图像失败: ' + error.message);
                 });
         }
         
-        // Function to download all images
+        // 下载所有图像的函数
         function downloadAllImages() {
-            // Use the detectionResults variable that's already loaded from URL params
+            // 使用已经从URL参数加载的detectionResults变量
             if (!detectionResults || detectionResults.length === 0) {
-                alert('No images to download');
+                alert('没有图像可下载');
                 return;
             }
             
-            // Show a notification that download is starting
-            alert(`Starting download of ${detectionResults.length} images...`);
+            // 显示下载开始的通知
+            alert(`开始下载 ${detectionResults.length} 张图像...`);
             
-            // Download each image
+            // 下载每张图像
             const downloadPromises = detectionResults.map((result, index) => {
-                // Use original filename if available, otherwise use a generic name
+                // 使用原始文件名（如果可用），否则使用通用名称
                 const fileName = result.file.name || `image_${index + 1}`;
                 return saveImage(result.image_url, fileName);
             });
             
-            // Wait for all downloads to complete
+            // 等待所有下载完成
             Promise.all(downloadPromises)
                 .then(() => {
-                    alert('All images downloaded successfully!');
+                    alert('所有图像下载成功！');
                 })
                 .catch(() => {
-                    alert('Some images failed to download. Please try again.');
+                    alert('部分图像下载失败，请重试。');
                 });
         }
         
-        // Initialize page
+        // 初始化页面
         document.addEventListener('DOMContentLoaded', function() {
-            // Show image detection results
+            // 显示图像检测结果
             showImageResults(detectionResults);
         });
     </script>

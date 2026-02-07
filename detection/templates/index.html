@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Safety Equipment Detection Platform</title>
+    <title>智能安全设备检测平台</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- html2pdf library for PDF export -->
@@ -222,8 +222,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-lg font-semibold">Smart Safety Detection Platform</h1>
-                    <p class="text-xs text-gray-400">Version 1.0</p>
+                    <h1 class="text-lg font-semibold">智能安全检测平台</h1>
+                    <p class="text-xs text-gray-400">版本 1.0</p>
                 </div>
             </div>
         </div>
@@ -231,7 +231,7 @@
         <div class="flex items-center gap-6">
             <div class="flex items-center gap-2 text-sm">
                 <span class="w-2 h-2 rounded-full bg-green-500 pulse-animation"></span>
-                <span class="text-white">System Running</span>
+                <span class="text-white">系统运行中</span>
             </div>
             <div class="flex items-center gap-2 text-sm">
                 <span id="currentTime" class="text-white">--:--:--</span>
@@ -263,26 +263,26 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                 </svg>
-                <span>Monitor Center</span>
+                <span>监控中心</span>
             </button>
 
             <button onclick="switchTab('ai')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition hover:bg-white/5" data-tab="ai">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                 </svg>
-                <span>AI Analysis</span>
+                <span>AI分析</span>
             </button>
             <button onclick="switchTab('devices')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition hover:bg-white/5" data-tab="devices">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                 </svg>
-                <span>Device Management</span>
+                <span>设备管理</span>
             </button>
             <button onclick="switchTab('alerts')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition hover:bg-white/5" data-tab="alerts">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                 </svg>
-                <span>Alert Center</span>
+                <span>警报中心</span>
                 <span class="ml-auto bg-red-500 text-xs px-2 py-0.5 rounded-full" id="sidebarAlertCount">3</span>
             </button>
             <button onclick="switchTab('settings')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition hover:bg-white/5" data-tab="settings">
@@ -290,44 +290,44 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
-                <span>Settings</span>
+                <span>设置</span>
             </button>
         </nav>
         
-        <!-- Quick Stats -->
+        <!-- 快速统计 -->
         <div class="mt-8 p-4 rounded-xl glass-card-light">
-            <h3 class="text-sm font-medium text-gray-400 mb-3">Quick Stats</h3>
+            <h3 class="text-sm font-medium text-gray-400 mb-3">快速统计</h3>
             <div class="space-y-3">
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-300">Today's Detections</span>
+                    <span class="text-sm text-gray-300">今日检测数</span>
                     <span class="text-lg font-semibold text-blue-400" id="quickDetectionCount">356</span>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-300">All</span>
+                    <span class="text-sm text-gray-300">违规数</span>
                     <span class="text-lg font-semibold text-orange-400" id="quickViolationCount">5</span>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-300">Online Devices</span>
+                    <span class="text-sm text-gray-300">在线设备</span>
                     <span class="text-lg font-semibold text-green-400" id="quickDeviceCount">4</span>
                 </div>
             </div>
         </div>
         
-        <!-- System Status -->
+        <!-- 系统状态 -->
         <div class="mt-4 p-4 rounded-xl glass-card-light">
-            <h3 class="text-sm font-medium text-gray-400 mb-3">System Status</h3>
+            <h3 class="text-sm font-medium text-gray-400 mb-3">系统状态</h3>
             <div class="space-y-2">
                 <div class="flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                    <span class="text-xs text-gray-300">Detection Service: Normal</span>
+                    <span class="text-xs text-gray-300">检测服务：正常</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                    <span class="text-xs text-gray-300">AI Service: Normal</span>
+                    <span class="text-xs text-gray-300">AI服务：正常</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
-                    <span class="text-xs text-gray-300">Database: Medium Load</span>
+                    <span class="text-xs text-gray-300">数据库：中等负载</span>
                 </div>
             </div>
         </div>
@@ -342,11 +342,11 @@
                 <div class="col-span-8">
                     <div class="glass-card rounded-2xl p-4">
                         <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-lg font-semibold">Real-time Video Detection</h2>
+                            <h2 class="text-lg font-semibold">实时视频检测</h2>
                             <div class="flex gap-2">
-                                <button onclick="togglePIP()" class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition">PiP</button>
-                                <button onclick="captureFrame()" class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition">Screenshot</button>
-                                <button onclick="toggleRecording()" id="recordBtn" class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition">Record</button>
+                                <button onclick="togglePIP()" class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition">画中画</button>
+                                <button onclick="captureFrame()" class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition">截图</button>
+                                <button onclick="toggleRecording()" id="recordBtn" class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition">录制</button>
                             </div>
                         </div>
                         
@@ -371,38 +371,38 @@
                             
 
                             
-                            <!-- Detection Stats Overlay -->
+                            <!-- 检测统计覆盖层 -->
                             <div class="absolute top-4 left-4 glass-card rounded-xl p-3 text-sm" id="detectionStats" style="display:none;">
                                 <div class="space-y-1">
                                     <div class="flex justify-between gap-8">
-                                        <span class="text-gray-400">Helmets:</span>
+                                        <span class="text-gray-400">安全帽:</span>
                                         <span class="text-green-400" id="helmetCount">0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-400">Persons:</span>
+                                        <span class="text-gray-400">人员:</span>
                                         <span class="text-blue-400" id="personCount">0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-400">Ventilators:</span>
+                                        <span class="text-gray-400">呼吸器:</span>
                                         <span class="text-purple-400" id="respiratorCount">0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-400">All:</span>
+                                        <span class="text-gray-400">违规:</span>
                                         <span class="text-red-400" id="violationCount">0</span>
                                     </div>
                                 </div>
                             </div>
                             
-                            <!-- Detection Stats -->
+                            <!-- 检测统计 -->
                             <div class="absolute top-4 right-4 glass-card rounded-lg px-3 py-1.5 text-sm" id="fpsCounter" style="display:none;">
-                                <span class="text-gray-400">FPS:</span>
+                                <span class="text-gray-400">帧率:</span>
                                 <span class="text-green-400 ml-1" id="fpsValue">30</span>
                             </div>
                             
-                            <!-- Recording Indicator -->
+                            <!-- 录制指示器 -->
                             <div class="absolute bottom-4 left-4 glass-card rounded-lg px-3 py-1.5 text-sm flex items-center gap-2" id="recordingIndicator" style="display:none;">
                                 <span class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></span>
-                                <span>Recording</span>
+                                <span>录制中</span>
                                 <span id="recordingTime">00:00</span>
                             </div>
                         </div>
@@ -411,11 +411,11 @@
                         <div class="flex items-center justify-between mt-4">
                             <div class="flex gap-2">
                                 <select class="bg-blue-900/40 rounded-lg px-3 py-2 text-sm" id="videoSource">
-                                    <option value="camera1">Camera 1 - Main Entrance</option>
-                                    <option value="camera2">Camera 2 - Production Area</option>
-                                    <option value="camera3">Camera 3 - Warehouse Area</option>
-                                    <option value="local">Local Video File</option>
-                                    <option value="image">Local Image</option>
+                                    <option value="camera1">摄像头 1 - 主入口</option>
+                                    <option value="camera2">摄像头 2 - 生产区域</option>
+                                    <option value="camera3">摄像头 3 - 仓库区域</option>
+                                    <option value="local">本地视频文件</option>
+                                    <option value="image">本地图片</option>
                                     <option value="jetson">Jetson Orin Nano</option>
                                 </select>
                                 <input type="file" accept="video/*" id="localVideoInput" style="display: none;" onchange="handleLocalVideoSelect(this)" />
@@ -424,32 +424,32 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
                                     </svg>
-                                    Upload Video
+                                    上传视频
                                 </button>
                                 <button onclick="document.getElementById('localImageInput').click()" id="uploadImageBtn" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-medium transition flex items-center gap-2 hidden">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                                     </svg>
-                                    Upload Images
+                                    上传图片
                                 </button>
-                                <div id="imageCount" class="mt-2 text-sm text-gray-400 hidden">Selected <span id="selectedImageCount">0</span> images</div>
+                                <div id="imageCount" class="mt-2 text-sm text-gray-400 hidden">已选择 <span id="selectedImageCount">0</span> 张图片</div>
                                 <div id="imagePreview" class="mt-4 grid grid-cols-1 gap-4 hidden"></div>
                                 <div id="imageResults" class="mt-4 grid grid-cols-1 gap-4 hidden"></div>
                                 <button onclick="startDetection()" id="startBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
                                     </svg>
-                                    Start Detection
+                                    开始检测
                                 </button>
                                 <button onclick="stopDetection()" id="stopBtn" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition hidden">
-                                    Stop
+                                    停止
                                 </button>
                             </div>
                             <div class="flex items-center gap-4 text-sm">
-                                <span class="text-gray-400">Detection Status:</span>
-                                <span id="detectionStatus" class="text-gray-400">Stopped</span>
+                                <span class="text-gray-400">检测状态:</span>
+                                <span id="detectionStatus" class="text-gray-400">已停止</span>
                                 <span class="text-gray-400">|</span>
-                                <span id="detectionTimeEstimate" class="text-blue-400">Estimated detection time: ~30 seconds</span>
+                                <span id="detectionTimeEstimate" class="text-blue-400">预计检测时间: ~30 秒</span>
                             </div>
                         </div>
                     </div>
@@ -457,19 +457,19 @@
                 
                 <!-- Control Panel -->
                 <div class="col-span-4 space-y-4">
-                    <!-- Model Selector -->
+                    <!-- 模型配置 -->
                     <div class="glass-card rounded-2xl p-4">
-                        <h3 class="text-sm font-medium text-gray-400 mb-4">Model Configuration</h3>
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">模型配置</h3>
                         <div class="space-y-3">
                             <div>
-                                <label class="text-xs text-gray-500 mb-1 block">Detection Model</label>
+                                <label class="text-xs text-gray-500 mb-1 block">检测模型</label>
                                 <select class="w-full bg-blue-900/40 rounded-lg px-3 py-2 text-sm" id="modelSelect" onchange="onModelChange()">
-                                    <!-- Dynamically loaded model list -->
-                                    <option value="loading">Loading...</option>
+                                    <!-- 动态加载模型列表 -->
+                                    <option value="loading">加载中...</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="text-xs text-gray-500 mb-1 block">Confidence Threshold: <span id="confValue">0.5</span></label>
+                                <label class="text-xs text-gray-500 mb-1 block">置信度阈值: <span id="confValue">0.5</span></label>
                                 <input type="range" min="0.3" max="0.9" step="0.05" value="0.5" class="w-full" id="confidenceSlider" oninput="updateConfidence(this.value)">
                             </div>
                         </div>
@@ -477,46 +477,46 @@
                     
 
                     
-                    <!-- Alert Thresholds -->
+                    <!-- 警报阈值 -->
                     <div class="glass-card rounded-2xl p-4">
-                        <h3 class="text-sm font-medium text-gray-400 mb-4">Alert Thresholds</h3>
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">警报阈值</h3>
                         <div class="space-y-3">
                             <div class="flex items-center justify-between">
-                                <span class="text-sm">No Helmet Alert</span>
+                                <span class="text-sm">无安全帽警报</span>
                                 <div class="toggle-switch active" onclick="toggleSwitch(this)" data-alert="helmet"></div>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-sm">Person Intrusion Alert</span>
+                                <span class="text-sm">人员入侵警报</span>
                                 <div class="toggle-switch" onclick="toggleSwitch(this)" data-alert="intrusion"></div>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-sm">Missing Ventilator Alert</span>
+                                <span class="text-sm">无呼吸器警报</span>
                                 <div class="toggle-switch active" onclick="toggleSwitch(this)" data-alert="respirator"></div>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-sm">Temperature Anomaly Alert</span>
+                                <span class="text-sm">温度异常警报</span>
                                 <div class="toggle-switch active" onclick="toggleSwitch(this)" data-alert="temp"></div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Individual Sensors -->
+                    <!-- 独立传感器 -->
                     <div class="glass-card rounded-2xl p-4">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-sm font-medium text-gray-400">Individual Sensors</h3>
+                            <h3 class="text-sm font-medium text-gray-400">独立传感器</h3>
                             <div class="flex items-center gap-3">
-                                <span id="sensorStatus" class="px-2 py-1 text-xs rounded-full bg-green-500/20 text-green-400">normal</span>
+                                <span id="sensorStatus" class="px-2 py-1 text-xs rounded-full bg-green-500/20 text-green-400">正常</span>
                                 <span id="sensorTimestamp" class="text-xs text-gray-400">--:--:--</span>
                             </div>
                         </div>
                         <div class="grid grid-cols-3 gap-4">
-                            <!-- Sensor 1 -->
+                            <!-- 传感器 1 -->
                             <div class="text-center p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
-                                <div class="text-xs text-gray-500 mb-1">Sensor 1</div>
+                                <div class="text-xs text-gray-500 mb-1">传感器 1</div>
                                 <div class="text-xl font-bold text-blue-400 mb-1" id="sensor1Temp">15.50</div>
-                                <div class="text-xs text-gray-400 mb-2">Temperature °C</div>
+                                <div class="text-xs text-gray-400 mb-2">温度 °C</div>
                                 <div class="text-xl font-bold text-green-400 mb-1" id="sensor1Humid">21.00</div>
-                                <div class="text-xs text-gray-400">Humidity %</div>
+                                <div class="text-xs text-gray-400">湿度 %</div>
                                 <div class="mt-3 h-1 bg-gray-700 rounded-full overflow-hidden">
                                     <div class="h-full bg-blue-500 transition-all" style="width: 60%" id="sensor1TempBar"></div>
                                 </div>
@@ -525,13 +525,13 @@
                                 </div>
                             </div>
                             
-                            <!-- Sensor 2 -->
+                            <!-- 传感器 2 -->
                             <div class="text-center p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
-                                <div class="text-xs text-gray-500 mb-1">Sensor 2</div>
+                                <div class="text-xs text-gray-500 mb-1">传感器 2</div>
                                 <div class="text-xl font-bold text-blue-400 mb-1" id="sensor2Temp">16.20</div>
-                                <div class="text-xs text-gray-400 mb-2">Temperature °C</div>
+                                <div class="text-xs text-gray-400 mb-2">温度 °C</div>
                                 <div class="text-xl font-bold text-green-400 mb-1" id="sensor2Humid">23.00</div>
-                                <div class="text-xs text-gray-400">Humidity %</div>
+                                <div class="text-xs text-gray-400">湿度 %</div>
                                 <div class="mt-3 h-1 bg-gray-700 rounded-full overflow-hidden">
                                     <div class="h-full bg-blue-500 transition-all" style="width: 62%" id="sensor2TempBar"></div>
                                 </div>
@@ -540,13 +540,13 @@
                                 </div>
                             </div>
                             
-                            <!-- Sensor 3 -->
+                            <!-- 传感器 3 -->
                             <div class="text-center p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
-                                <div class="text-xs text-gray-500 mb-1">Sensor 3</div>
+                                <div class="text-xs text-gray-500 mb-1">传感器 3</div>
                                 <div class="text-xl font-bold text-blue-400 mb-1" id="sensor3Temp">15.80</div>
-                                <div class="text-xs text-gray-400 mb-2">Temperature °C</div>
+                                <div class="text-xs text-gray-400 mb-2">温度 °C</div>
                                 <div class="text-xl font-bold text-green-400 mb-1" id="sensor3Humid">22.00</div>
-                                <div class="text-xs text-gray-400">Humidity %</div>
+                                <div class="text-xs text-gray-400">湿度 %</div>
                                 <div class="mt-3 h-1 bg-gray-700 rounded-full overflow-hidden">
                                     <div class="h-full bg-blue-500 transition-all" style="width: 61%" id="sensor3TempBar"></div>
                                 </div>
@@ -558,13 +558,13 @@
                     </div>
                 </div>
                 
-                <!-- Statistics Cards -->
+                <!-- 统计卡片 -->
                 <div class="col-span-12">
                     <div class="grid grid-cols-4 gap-4">
                         <div class="stat-card rounded-xl p-4 glow-blue">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-sm text-gray-400">Today's Total Detections</p>
+                                    <p class="text-sm text-gray-400">今日总检测数</p>
                                     <p class="text-3xl font-bold mt-2" id="totalDetections">356</p>
                                 </div>
                                 <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
@@ -577,14 +577,14 @@
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
                                 </svg>
-                                <span>+12.5% vs Yesterday</span>
+                                <span>较昨日 +12.5%</span>
                             </div>
                         </div>
                         
                         <div class="stat-card rounded-xl p-4" style="background: linear-gradient(135deg, rgba(76, 217, 100, 0.1) 0%, rgba(76, 217, 100, 0.05) 100%); border-color: rgba(76, 217, 100, 0.2);">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-sm text-gray-400">Online Devices</p>
+                                    <p class="text-sm text-gray-400">在线设备</p>
                                     <p class="text-3xl font-bold mt-2" id="onlineDevices">4</p>
                                 </div>
                                 <div class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
@@ -594,14 +594,14 @@
                                 </div>
                             </div>
                             <div class="mt-3 text-xs text-gray-400">
-                                <span>Total 5 devices</span>
+                                <span>共 5 台设备</span>
                             </div>
                         </div>
                         
                         <div class="stat-card rounded-xl p-4" style="background: linear-gradient(135deg, rgba(255, 154, 61, 0.1) 0%, rgba(255, 154, 61, 0.05) 100%); border-color: rgba(255, 154, 61, 0.2);">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-sm text-gray-400">Violation Events</p>
+                                    <p class="text-sm text-gray-400">违规事件</p>
                                     <p class="text-3xl font-bold mt-2 text-orange-400" id="violationEvents">5</p>
                                 </div>
                                 <div class="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center">
@@ -614,14 +614,14 @@
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
                                 </svg>
-                                <span>-5.2% vs Yesterday</span>
+                                <span>较昨日 -5.2%</span>
                             </div>
                         </div>
                         
                         <div class="stat-card rounded-xl p-4" style="background: linear-gradient(135deg, rgba(156, 136, 255, 0.1) 0%, rgba(156, 136, 255, 0.05) 100%); border-color: rgba(156, 136, 255, 0.2);">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-sm text-gray-400">System Uptime</p>
+                                    <p class="text-sm text-gray-400">系统运行时间</p>
                                     <p class="text-3xl font-bold mt-2" id="systemUptime">00:00:00</p>
                                 </div>
                                 <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
@@ -631,13 +631,13 @@
                                 </div>
                             </div>
                             <div class="mt-3 text-xs text-gray-400">
-                                <span>Running stably</span>
+                                <span>运行稳定</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Second Row Stats -->
+                <!-- 第二行统计 -->
                 <div class="col-span-12">
                     <div class="grid grid-cols-4 gap-4">
                         <div class="glass-card rounded-xl p-4">
@@ -648,7 +648,7 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="text-xs text-gray-400">Average Detection Speed</p>
+                                    <p class="text-xs text-gray-400">平均检测速度</p>
                                     <p class="text-xl font-bold"><span id="avgFps">30</span> FPS</p>
                                 </div>
                             </div>
@@ -662,7 +662,7 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="text-xs text-gray-400">Model Accuracy</p>
+                                    <p class="text-xs text-gray-400">模型准确率</p>
                                     <p class="text-xl font-bold"><span id="modelAccuracy">94.5</span>%</p>
                                 </div>
                             </div>
@@ -676,8 +676,8 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="text-xs text-gray-400">Sensor Status</p>
-                                    <p class="text-xl font-bold text-green-400">Normal</p>
+                                    <p class="text-xs text-gray-400">传感器状态</p>
+                                    <p class="text-xl font-bold text-green-400">正常</p>
                                 </div>
                             </div>
                         </div>
@@ -690,7 +690,7 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="text-xs text-gray-400">AI Analysis Coverage</p>
+                                    <p class="text-xs text-gray-400">AI分析覆盖率</p>
                                     <p class="text-xl font-bold"><span id="aiCoverage">100</span>%</p>
                                 </div>
                             </div>
@@ -716,15 +716,15 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 class="text-lg font-semibold">AI Intelligent Analysis Report</h3>
-                                    <p class="text-xs text-gray-400">Powered by DeepSeek AI Engine</p>
+                                    <h3 class="text-lg font-semibold">AI智能分析报告</h3>
+                                    <p class="text-xs text-gray-400">由DeepSeek AI引擎提供支持</p>
                                 </div>
                             </div>
                             <button onclick="generateAIReport()" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                 </svg>
-                                Generate Analysis
+                                生成分析
                             </button>
                         </div>
                         
@@ -733,58 +733,58 @@
                                 <svg class="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                                 </svg>
-                                <p>Click the "Generate Analysis" button to start AI intelligent analysis</p>
-                                <p class="text-sm mt-2">Analysis will be automatically generated based on current detection data</p>
+                                <p>点击"生成分析"按钮开始AI智能分析</p>
+                                <p class="text-sm mt-2">分析将根据当前检测数据自动生成</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Analysis History -->
+                <!-- 分析历史 -->
                 <div class="col-span-4 space-y-4">
                     <div class="glass-card rounded-2xl p-4">
-                        <h3 class="text-sm font-medium text-gray-400 mb-4">Analysis History</h3>
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">分析历史</h3>
                         <div class="space-y-3" id="analysisHistory">
                             <div class="p-3 rounded-xl bg-white/5 hover:bg-white/10 cursor-pointer transition">
                                 <div class="flex justify-between items-start">
                                     <div>
                                         <p class="text-sm font-medium">2025-11-15 14:30</p>
-                                        <p class="text-xs text-gray-500 mt-1">Security Status: Good</p>
+                                        <p class="text-xs text-gray-500 mt-1">安全状态: 良好</p>
                                     </div>
-                                    <span class="px-2 py-0.5 text-xs rounded bg-green-500/20 text-green-400">Good</span>
+                                    <span class="px-2 py-0.5 text-xs rounded bg-green-500/20 text-green-400">良好</span>
                                 </div>
                             </div>
                             <div class="p-3 rounded-xl bg-white/5 hover:bg-white/10 cursor-pointer transition">
                                 <div class="flex justify-between items-start">
                                     <div>
                                         <p class="text-sm font-medium">2025-11-15 10:15</p>
-                                        <p class="text-xs text-gray-500 mt-1">Security Status: Excellent</p>
+                                        <p class="text-xs text-gray-500 mt-1">安全状态: 优秀</p>
                                     </div>
-                                    <span class="px-2 py-0.5 text-xs rounded bg-blue-500/20 text-blue-400">Excellent</span>
+                                    <span class="px-2 py-0.5 text-xs rounded bg-blue-500/20 text-blue-400">优秀</span>
                                 </div>
                             </div>
                             <div class="p-3 rounded-xl bg-white/5 hover:bg-white/10 cursor-pointer transition">
                                 <div class="flex justify-between items-start">
                                     <div>
                                         <p class="text-sm font-medium">2025-11-14 16:45</p>
-                                        <p class="text-xs text-gray-500 mt-1">Security Status: Fair</p>
+                                        <p class="text-xs text-gray-500 mt-1">安全状态: 一般</p>
                                     </div>
-                                    <span class="px-2 py-0.5 text-xs rounded bg-yellow-500/20 text-yellow-400">Fair</span>
+                                    <span class="px-2 py-0.5 text-xs rounded bg-yellow-500/20 text-yellow-400">一般</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="glass-card rounded-2xl p-4">
-                        <h3 class="text-sm font-medium text-gray-400 mb-4">Analysis Dimensions</h3>
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">分析维度</h3>
                         <div class="space-y-3 text-sm">
                             <div class="flex items-start gap-3">
                                 <div class="w-6 h-6 rounded bg-blue-500/20 flex items-center justify-center flex-shrink-0">
                                     <span class="text-xs text-blue-400">1</span>
                                 </div>
                                 <div>
-                                    <p class="font-medium">Security Status Assessment</p>
-                                    <p class="text-xs text-gray-500">Comprehensive assessment of current security level</p>
+                                    <p class="font-medium">安全状态评估</p>
+                                    <p class="text-xs text-gray-500">当前安全级别的综合评估</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-3">
@@ -792,8 +792,8 @@
                                     <span class="text-xs text-green-400">2</span>
                                 </div>
                                 <div>
-                                    <p class="font-medium">Violation Pattern Recognition</p>
-                                    <p class="text-xs text-gray-500">Analysis of common violation types</p>
+                                    <p class="font-medium">违规模式识别</p>
+                                    <p class="text-xs text-gray-500">常见违规类型分析</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-3">
@@ -801,8 +801,8 @@
                                     <span class="text-xs text-yellow-400">3</span>
                                 </div>
                                 <div>
-                                    <p class="font-medium">Trend Prediction</p>
-                                    <p class="text-xs text-gray-500">Early warning based on historical data</p>
+                                    <p class="font-medium">趋势预测</p>
+                                    <p class="text-xs text-gray-500">基于历史数据的预警</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-3">
@@ -810,8 +810,8 @@
                                     <span class="text-xs text-purple-400">4</span>
                                 </div>
                                 <div>
-                                    <p class="font-medium">Improvement Suggestions</p>
-                                    <p class="text-xs text-gray-500">Targeted security recommendations</p>
+                                    <p class="font-medium">改进建议</p>
+                                    <p class="text-xs text-gray-500">针对性安全建议</p>
                                 </div>
                             </div>
                         </div>
@@ -820,95 +820,95 @@
             </div>
         </div>
         
-        <!-- Devices Tab -->
+        <!-- 设备管理 -->
         <div id="tab-devices" class="tab-content p-6 hidden">
             <div class="grid grid-cols-12 gap-6">
-                <!-- Camera Management -->
+                <!-- 摄像头管理 -->
                 <div class="col-span-8">
                     <div class="glass-card rounded-2xl p-6">
                         <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-semibold">Camera Management</h3>
+                            <h3 class="text-lg font-semibold">摄像头管理</h3>
                             <div class="flex gap-2">
-                                <button onclick="setDeviceGrid(4)" class="px-3 py-1.5 text-sm rounded-lg bg-blue-600">4 Grid</button>
+                                <button onclick="setDeviceGrid(4)" class="px-3 py-1.5 text-sm rounded-lg bg-blue-600">4 网格</button>
                             </div>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-4" id="cameraGrid">
-                            <!-- Camera 1 -->
+                            <!-- 摄像头 1 -->
                             <div class="relative rounded-xl overflow-hidden aspect-video bg-blue-950">
-                                <!-- Camera Name -->
+                                <!-- 摄像头名称 -->
                                 <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-950" id="camera1Preview">
-                                    <span class="text-white">Camera 1</span>
+                                    <span class="text-white">摄像头 1</span>
                                 </div>
-                                <!-- Camera Status -->
+                                <!-- 摄像头状态 -->
                                 <div class="absolute top-2 left-2 flex items-center gap-2">
                                     <span id="camera1StatusDot" class="w-2 h-2 rounded-full bg-yellow-500"></span>
-                                    <span id="camera1StatusText" class="text-xs">Detecting...</span>
+                                    <span id="camera1StatusText" class="text-xs">检测中...</span>
                                 </div>
-                                <!-- Camera Info -->
-                                <div class="absolute bottom-2 left-2 text-xs text-gray-400">Main Entrance | 1920x1080 | 30fps</div>
+                                <!-- 摄像头信息 -->
+                                <div class="absolute bottom-2 left-2 text-xs text-gray-400">主入口 | 1920x1080 | 30fps</div>
 
-                                <!-- Control Buttons -->
+                                <!-- 控制按钮 -->
                                 <div class="absolute bottom-2 right-2 flex gap-2" id="camera1Buttons" style="display:none;">
                                     <button onclick="toggleCamera(1)" id="camera1ToggleBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开</button>
                                 </div>
                             </div>
 
-                            <!-- Camera 2 -->
+                            <!-- 摄像头 2 -->
                             <div class="relative rounded-xl overflow-hidden aspect-video bg-blue-950">
-                                <!-- Camera Name -->
+                                <!-- 摄像头名称 -->
                                 <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-950" id="camera2Preview">
-                                    <span class="text-white">Camera 2</span>
+                                    <span class="text-white">摄像头 2</span>
                                 </div>
-                                <!-- Camera Status -->
+                                <!-- 摄像头状态 -->
                                 <div class="absolute top-2 left-2 flex items-center gap-2">
                                     <span id="camera2StatusDot" class="w-2 h-2 rounded-full bg-yellow-500"></span>
-                                    <span id="camera2StatusText" class="text-xs">Detecting...</span>
+                                    <span id="camera2StatusText" class="text-xs">检测中...</span>
                                 </div>
-                                <!-- Camera Info -->
-                                <div class="absolute bottom-2 left-2 text-xs text-gray-400">Production Area | 1920x1080 | 25fps</div>
+                                <!-- 摄像头信息 -->
+                                <div class="absolute bottom-2 left-2 text-xs text-gray-400">生产区域 | 1920x1080 | 25fps</div>
 
-                                <!-- Control Buttons -->
+                                <!-- 控制按钮 -->
                                 <div class="absolute bottom-2 right-2 flex gap-2" id="camera2Buttons" style="display:none;">
                                     <button onclick="toggleCamera(2)" id="camera2ToggleBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开</button>
                                 </div>
                             </div>
 
-                            <!-- Camera 3 -->
+                            <!-- 摄像头 3 -->
                             <div class="relative rounded-xl overflow-hidden aspect-video bg-blue-950">
-                                <!-- Camera Name -->
+                                <!-- 摄像头名称 -->
                                 <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-950" id="camera3Preview">
-                                    <span class="text-white">Camera 3</span>
+                                    <span class="text-white">摄像头 3</span>
                                 </div>
-                                <!-- Camera Status -->
+                                <!-- 摄像头状态 -->
                                 <div class="absolute top-2 left-2 flex items-center gap-2">
                                     <span id="camera3StatusDot" class="w-2 h-2 rounded-full bg-yellow-500"></span>
-                                    <span id="camera3StatusText" class="text-xs">Detecting...</span>
+                                    <span id="camera3StatusText" class="text-xs">检测中...</span>
                                 </div>
-                                <!-- Camera Info -->
-                                <div class="absolute bottom-2 left-2 text-xs text-gray-400">Warehouse Area | 1280x720 | 30fps</div>
+                                <!-- 摄像头信息 -->
+                                <div class="absolute bottom-2 left-2 text-xs text-gray-400">仓库区域 | 1280x720 | 30fps</div>
 
-                                <!-- Control Buttons -->
+                                <!-- 控制按钮 -->
                                 <div class="absolute bottom-2 right-2 flex gap-2" id="camera3Buttons" style="display:none;">
                                     <button onclick="toggleCamera(3)" id="camera3ToggleBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开</button>
                                 </div>
                             </div>
 
-                            <!-- Camera 4 -->
+                            <!-- 摄像头 4 -->
                             <div class="relative rounded-xl overflow-hidden aspect-video bg-blue-950">
-                                <!-- Camera Name -->
+                                <!-- 摄像头名称 -->
                                 <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-950" id="camera4Preview">
-                                    <span class="text-white">Camera 4</span>
+                                    <span class="text-white">摄像头 4</span>
                                 </div>
-                                <!-- Camera Status -->
+                                <!-- 摄像头状态 -->
                                 <div class="absolute top-2 left-2 flex items-center gap-2">
                                     <span id="camera4StatusDot" class="w-2 h-2 rounded-full bg-yellow-500"></span>
-                                    <span id="camera4StatusText" class="text-xs">Detecting...</span>
+                                    <span id="camera4StatusText" class="text-xs">检测中...</span>
                                 </div>
-                                <!-- Camera Info -->
-                                <div class="absolute bottom-2 left-2 text-xs text-gray-400">Parking Lot | -- | --</div>
+                                <!-- 摄像头信息 -->
+                                <div class="absolute bottom-2 left-2 text-xs text-gray-400">停车场 | -- | --</div>
 
-                                <!-- Control Buttons -->
+                                <!-- 控制按钮 -->
                                 <div class="absolute bottom-2 right-2 flex gap-2" id="camera4Buttons" style="display:none;">
                                     <button onclick="toggleCamera(4)" id="camera4ToggleBtn" class="px-3 py-1 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 transition">打开</button>
                                 </div>
@@ -917,10 +917,10 @@
                     </div>
                 </div>
                 
-                <!-- Device List & Sensor -->
+                <!-- 设备列表和传感器 -->
                 <div class="col-span-4 space-y-4">
                     <div class="glass-card rounded-2xl p-4">
-                        <h3 class="text-sm font-medium text-gray-400 mb-4">Device List</h3>
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">设备列表</h3>
                         <div class="space-y-3">
                             <div class="flex items-center justify-between p-3 rounded-xl bg-white/5">
                                 <div class="flex items-center gap-3">
@@ -931,10 +931,10 @@
                                     </div>
                                     <div>
                                         <p class="text-sm font-medium">CAM-001</p>
-                                        <p class="text-xs text-gray-500">Main Entrance</p>
+                                        <p class="text-xs text-gray-500">主入口</p>
                                     </div>
                                 </div>
-                                <span class="px-2 py-1 text-xs rounded bg-green-500/20 text-green-400">Online</span>
+                                <span class="px-2 py-1 text-xs rounded bg-green-500/20 text-green-400">在线</span>
                             </div>
                             <div class="flex items-center justify-between p-3 rounded-xl bg-white/5">
                                 <div class="flex items-center gap-3">
@@ -945,10 +945,10 @@
                                     </div>
                                     <div>
                                         <p class="text-sm font-medium">CAM-002</p>
-                                        <p class="text-xs text-gray-500">Production Area</p>
+                                        <p class="text-xs text-gray-500">生产区域</p>
                                     </div>
                                 </div>
-                                <span class="px-2 py-1 text-xs rounded bg-green-500/20 text-green-400">Online</span>
+                                <span class="px-2 py-1 text-xs rounded bg-green-500/20 text-green-400">在线</span>
                             </div>
                             <div class="flex items-center justify-between p-3 rounded-xl bg-white/5">
                                 <div class="flex items-center gap-3">
@@ -959,89 +959,89 @@
                                     </div>
                                     <div>
                                         <p class="text-sm font-medium">SENSOR-001</p>
-                                        <p class="text-xs text-gray-500">Temperature & Humidity Sensor</p>
+                                        <p class="text-xs text-gray-500">温湿度传感器</p>
                                     </div>
                                 </div>
-                                <span class="px-2 py-1 text-xs rounded bg-green-500/20 text-green-400">Normal</span>
+                                <span class="px-2 py-1 text-xs rounded bg-green-500/20 text-green-400">正常</span>
                             </div>
                         </div>
                     </div>
                     
                     <div class="glass-card rounded-2xl p-4">
-                        <h3 class="text-sm font-medium text-gray-400 mb-4">Sensor Simulation Control</h3>
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">传感器模拟控制</h3>
                         <div class="space-y-4">
                             <div>
-                                <label class="text-xs text-gray-500 mb-1 block">Simulation Mode</label>
+                                <label class="text-xs text-gray-500 mb-1 block">模拟模式</label>
                                 <select class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm" id="sensorMode" onchange="setSensorMode(this.value)">
-                                    <option value="normal">Normal Fluctuation</option>
-                                    <option value="hot">High Temperature</option>
-                                    <option value="humid">High Humidity</option>
-                                    <option value="random">Random Anomaly</option>
+                                    <option value="normal">正常波动</option>
+                                    <option value="hot">高温模式</option>
+                                    <option value="humid">高湿模式</option>
+                                    <option value="random">随机异常</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="text-xs text-gray-500 mb-1 block">Data Reporting Frequency</label>
+                                <label class="text-xs text-gray-500 mb-1 block">数据上报频率</label>
                                 <select class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
-                                    <option value="1">Every second</option>
-                                    <option value="5" selected>Every 5 seconds</option>
-                                    <option value="10">Every 10 seconds</option>
+                                    <option value="1">每秒</option>
+                                    <option value="5" selected>每5秒</option>
+                                    <option value="10">每10秒</option>
                                 </select>
                             </div>
-                            <button class="w-full py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition">Export Sensor Data</button>
+                            <button class="w-full py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition">导出传感器数据</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Alerts Tab -->
+        <!-- 警报中心 -->
         <div id="tab-alerts" class="tab-content p-6 hidden">
             <div class="grid grid-cols-12 gap-6">
-                <!-- Real-time Alerts -->
+                <!-- 实时警报 -->
                 <div class="col-span-8">
                     <div class="glass-card rounded-2xl p-6">
                         <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-semibold">Real-time Alerts</h3>
+                            <h3 class="text-lg font-semibold">实时警报</h3>
                             <div class="flex gap-2">
                                 <select class="bg-white/10 rounded-lg px-3 py-2 text-sm">
-                                    <option value="all">All Types</option>
-                                    <option value="safety">Safety Equipment</option>
-                                    <option value="environment">Environmental Anomaly</option>
-                                    <option value="device">Device Status</option>
+                                    <option value="all">所有类型</option>
+                                    <option value="safety">安全设备</option>
+                                    <option value="environment">环境异常</option>
+                                    <option value="device">设备状态</option>
                                 </select>
-                                <button onclick="clearAllAlerts()" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600/30 rounded-lg text-sm transition">Clear All</button>
+                                <button onclick="clearAllAlerts()" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600/30 rounded-lg text-sm transition">清除全部</button>
                             </div>
                         </div>
                         
                         <div class="space-y-3 max-h-96 overflow-y-auto scrollbar-thin" id="alertsList">
-                            <!-- Alerts generated by JS -->
+                            <!-- JS生成的警报 -->
                         </div>
                     </div>
                 </div>
                 
-                <!-- Alert Stats -->
+                <!-- 警报统计 -->
                 <div class="col-span-4 space-y-4">
                     <div class="glass-card rounded-2xl p-4">
-                        <h3 class="text-sm font-medium text-gray-400 mb-4">Alert Statistics</h3>
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">警报统计</h3>
                         <div class="space-y-3">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <span class="w-3 h-3 rounded-full bg-red-500"></span>
-                                    <span class="text-sm">Critical Alerts</span>
+                                    <span class="text-sm">严重警报</span>
                                 </div>
                                 <span class="text-lg font-semibold text-red-400" id="criticalCount">1</span>
                             </div>
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <span class="w-3 h-3 rounded-full bg-orange-500"></span>
-                                    <span class="text-sm">Warnings</span>
+                                    <span class="text-sm">警告</span>
                                 </div>
                                 <span class="text-lg font-semibold text-orange-400" id="warningCount">2</span>
                             </div>
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <span class="w-3 h-3 rounded-full bg-blue-500"></span>
-                                    <span class="text-sm">Information</span>
+                                    <span class="text-sm">信息</span>
                                 </div>
                                 <span class="text-lg font-semibold text-blue-400" id="infoCount">5</span>
                             </div>
@@ -1049,53 +1049,53 @@
                     </div>
                     
                     <div class="glass-card rounded-2xl p-4">
-                        <h3 class="text-sm font-medium text-gray-400 mb-4">Notification Settings</h3>
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">通知设置</h3>
                         <div class="space-y-3">
                             <div class="flex items-center justify-between">
-                                <span class="text-sm">Desktop Notifications</span>
+                                <span class="text-sm">桌面通知</span>
                                 <div class="toggle-switch active" onclick="toggleSwitch(this)" data-setting="desktop"></div>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-sm">Sound Alerts</span>
+                                <span class="text-sm">声音警报</span>
                                 <div class="toggle-switch active" onclick="toggleSwitch(this)" data-setting="sound"></div>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-sm">Email Notifications</span>
+                                <span class="text-sm">邮件通知</span>
                                 <div class="toggle-switch" onclick="toggleSwitch(this)" data-setting="email"></div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="glass-card rounded-2xl p-4">
-                        <h3 class="text-sm font-medium text-gray-400 mb-4">Quick Actions</h3>
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">快速操作</h3>
                         <div class="space-y-2">
-                            <button onclick="testAlert()" class="w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition">Test Alert</button>
-                            <button class="w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition">Export Alert Logs</button>
-                            <button class="w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition">Alert Rules Configuration</button>
+                            <button onclick="testAlert()" class="w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition">测试警报</button>
+                            <button class="w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition">导出警报日志</button>
+                            <button class="w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition">警报规则配置</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Settings Tab -->
+        <!-- 设置 -->
         <div id="tab-settings" class="tab-content p-6 hidden">
             <div class="grid grid-cols-12 gap-6">
                 <div class="col-span-8">
                     <div class="glass-card rounded-2xl p-6">
-                        <h3 class="text-lg font-semibold mb-6">System Settings</h3>
+                        <h3 class="text-lg font-semibold mb-6">系统设置</h3>
                         
                         <div class="space-y-6">
-                            <!-- Detection Settings -->
+                            <!-- 检测设置 -->
                             <div class="border-b border-white/10 pb-6">
-                                <h4 class="text-sm font-medium text-gray-400 mb-4">Detection Settings</h4>
+                                <h4 class="text-sm font-medium text-gray-400 mb-4">检测设置</h4>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label class="text-xs text-gray-500 mb-1 block">Model Path</label>
+                                        <label class="text-xs text-gray-500 mb-1 block">模型路径</label>
                                         <input type="text" value="./detection/static/models/yolov8-best.pt" class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
                                     </div>
                                     <div>
-                                        <label class="text-xs text-gray-500 mb-1 block">Computation Device</label>
+                                        <label class="text-xs text-gray-500 mb-1 block">计算设备</label>
                                         <select class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
                                             <option value="cuda">CUDA (GPU)</option>
                                             <option value="cpu">CPU</option>
@@ -1103,50 +1103,63 @@
                                     </div>
                                     <div>
                                         <label class="text-xs text-gray-500 mb-1 block">Jetson Orin Nano IP</label>
-                                        <input type="text" id="jetsonIp" value="192.168.0.111" class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm" placeholder="Enter Jetson Orin Nano IP address">
+                                        <input type="text" id="jetsonIp" value="192.168.0.111" class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm" placeholder="输入 Jetson Orin Nano IP 地址">
                                     </div>
                                     <div>
-                                        <label class="text-xs text-gray-500 mb-1 block">NMS Threshold</label>
+                                        <label class="text-xs text-gray-500 mb-1 block">NMS 阈值</label>
                                         <input type="number" step="0.05" value="0.45" class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
                                     </div>
                                 </div>
                             </div>
                             
-                            <!-- AI Service Settings -->
+                            <!-- AI 服务设置 -->
                             <div class="border-b border-white/10 pb-6">
-                                <h4 class="text-sm font-medium text-gray-400 mb-4">AI Service Settings</h4>
+                                <h4 class="text-sm font-medium text-gray-400 mb-4">AI 服务设置</h4>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label class="text-xs text-gray-500 mb-1 block">DeepSeek API Key</label>
+                                        <label class="text-xs text-gray-500 mb-1 block">DeepSeek API 密钥</label>
                                         <input type="password" value="sk-xxx..." class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
                                     </div>
                                     <div class="flex items-end">
                                         <div class="flex items-center gap-3">
-                                            <span class="text-sm">Auto Analysis</span>
+                                            <span class="text-sm">自动分析</span>
                                             <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
                                         </div>
                                     </div>
                                     <div>
-                                        <label class="text-xs text-gray-500 mb-1 block">Analysis Delay (seconds)</label>
+                                        <label class="text-xs text-gray-500 mb-1 block">分析延迟 (秒)</label>
                                         <input type="number" value="3" class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 mb-1 block">每隔X分钟自动进行AI分析</label>
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-sm">启用</span>
+                                            <div class="toggle-switch" onclick="toggleAutoAIAnalysis(this)"></div>
+                                            <input type="number" id="autoAnalysisInterval" value="5" min="1" class="w-20 bg-white/10 rounded-lg px-3 py-2 text-sm">
+                                            <span class="text-sm text-gray-500">分钟</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 mb-1 block">AI分析PDF存储路径</label>
+                                        <input type="text" id="pdfStoragePath" value="d:\webtest\Django-YOLO-detection-system-main\detection\media" class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
                                     </div>
                                 </div>
                             </div>
                             
-                            <!-- Data Settings -->
+                            <!-- 数据设置 -->
                             <div class="border-b border-white/10 pb-6">
-                                <h4 class="text-sm font-medium text-gray-400 mb-4">Data Settings</h4>
+                                <h4 class="text-sm font-medium text-gray-400 mb-4">数据设置</h4>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label class="text-xs text-gray-500 mb-1 block">Data Retention Days</label>
+                                        <label class="text-xs text-gray-500 mb-1 block">数据保留天数</label>
                                         <input type="number" value="30" class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
                                     </div>
                                     <div>
-                                        <label class="text-xs text-gray-500 mb-1 block">Alert Retention Days</label>
+                                        <label class="text-xs text-gray-500 mb-1 block">警报保留天数</label>
                                         <input type="number" value="90" class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
                                     </div>
                                     <div>
-                                        <label class="text-xs text-gray-500 mb-1 block">Export Format</label>
+                                        <label class="text-xs text-gray-500 mb-1 block">导出格式</label>
                                         <select class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
                                             <option>CSV</option>
                                             <option>JSON</option>
@@ -1156,27 +1169,27 @@
                                 </div>
                             </div>
                             
-                            <!-- UI Settings -->
+                            <!-- UI 设置 -->
                             <div>
-                                <h4 class="text-sm font-medium text-gray-400 mb-4">UI Settings</h4>
+                                <h4 class="text-sm font-medium text-gray-400 mb-4">界面设置</h4>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label class="text-xs text-gray-500 mb-1 block">Theme</label>
+                                        <label class="text-xs text-gray-500 mb-1 block">主题</label>
                                         <select class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
-                                            <option value="dark">Dark Mode</option>
-                                            <option value="light">Light Mode</option>
-                                            <option value="auto">System Default</option>
+                                            <option value="dark">深色模式</option>
+                                            <option value="light">浅色模式</option>
+                                            <option value="auto">系统默认</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="text-xs text-gray-500 mb-1 block">Language</label>
+                                        <label class="text-xs text-gray-500 mb-1 block">语言</label>
                                         <select class="w-full bg-white/10 rounded-lg px-3 py-2 text-sm">
-                                            <option value="zh-CN">Chinese Simplified</option>
+                                            <option value="zh-CN">简体中文</option>
                                             <option value="en">English</option>
                                         </select>
                                     </div>
                                     <div class="flex items-center gap-3">
-                                        <span class="text-sm">Enable Animations</span>
+                                        <span class="text-sm">启用动画</span>
                                         <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
                                     </div>
                                 </div>
@@ -1184,7 +1197,7 @@
                         </div>
                         
                         <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-white/10">
-                            <button class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition">Reset to Default</button>
+                            <button class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition">恢复默认</button>
                             <button onclick="saveSettings()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition">保存设置</button>
                         </div>
                     </div>
@@ -1192,44 +1205,44 @@
                 
                 <div class="col-span-4 space-y-4">
                     <div class="glass-card rounded-2xl p-4">
-                        <h3 class="text-sm font-medium text-gray-400 mb-4">System Information</h3>
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">系统信息</h3>
                         <div class="space-y-3 text-sm">
                             <div class="flex justify-between">
-                                <span class="text-gray-500">Version</span>
+                                <span class="text-gray-500">版本</span>
                                 <span>v1.0.0</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-gray-500">Build Date</span>
+                                <span class="text-gray-500">构建日期</span>
                                 <span>2025-11-15</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-gray-500">Runtime Environment</span>
-                                <span>Browser</span>
+                                <span class="text-gray-500">运行环境</span>
+                                <span>浏览器</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-gray-500">License</span>
-                                <span class="text-green-400">Activated</span>
+                                <span class="text-gray-500">许可证</span>
+                                <span class="text-green-400">已激活</span>
                             </div>
                         </div>
                     </div>
                     
                     <div class="glass-card rounded-2xl p-4">
-                        <h3 class="text-sm font-medium text-gray-400 mb-4">Keyboard Shortcuts</h3>
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">键盘快捷键</h3>
                         <div class="space-y-2 text-sm">
                             <div class="flex justify-between">
-                                <span class="text-gray-500">Help</span>
+                                <span class="text-gray-500">帮助</span>
                                 <kbd class="px-2 py-1 bg-white/10 rounded text-xs">F1</kbd>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-gray-500">Refresh</span>
+                                <span class="text-gray-500">刷新</span>
                                 <kbd class="px-2 py-1 bg-white/10 rounded text-xs">F5</kbd>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-gray-500">Start/Stop Detection</span>
-                                <kbd class="px-2 py-1 bg-white/10 rounded text-xs">Space</kbd>
+                                <span class="text-gray-500">开始/停止检测</span>
+                                <kbd class="px-2 py-1 bg-white/10 rounded text-xs">空格</kbd>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-gray-500">Screenshot</span>
+                                <span class="text-gray-500">截图</span>
                                 <kbd class="px-2 py-1 bg-white/10 rounded text-xs">S</kbd>
                             </div>
                         </div>
@@ -1239,10 +1252,10 @@
         </div>
     </main>
     
-    <!-- Notification Panel -->
+    <!-- 通知面板 -->
     <div id="notificationPanel" class="fixed top-16 right-4 w-80 glass-card rounded-2xl p-4 z-50 hidden animate-fade-in">
         <div class="flex justify-between items-center mb-4">
-            <h3 class="font-semibold">Notification Center</h3>
+            <h3 class="font-semibold">通知中心</h3>
             <button onclick="toggleNotifications()" class="text-gray-400 hover:text-white">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -1250,7 +1263,7 @@
             </button>
         </div>
         <div class="space-y-3 max-h-96 overflow-y-auto scrollbar-thin" id="notificationList">
-            <!-- Notifications generated by JS -->
+            <!-- JS生成的通知 -->
         </div>
     </div>
 
@@ -1278,7 +1291,12 @@
             currentVideoDuration: 0,
             lastHighTempAlert: 0,
             lastSensorError: null,
-            sensorErrorCount: 0
+            sensorErrorCount: 0,
+            // 自动AI分析相关变量
+            autoAIAnalysisEnabled: false,
+            autoAIAnalysisInterval: 5, // 默认5分钟
+            autoAIAnalysisTimer: null,
+            pdfStoragePath: 'd:\\webtest\\Django-YOLO-detection-system-main\\detection\\media'
         };
         
         // Format file size to human readable format
@@ -1303,7 +1321,7 @@
                     if (data.models.length === 0) {
                         const option = document.createElement('option');
                         option.value = 'none';
-                        option.textContent = 'No model files detected';
+                        option.textContent = '未检测到模型文件';
                         modelSelect.appendChild(option);
                     } else {
                         data.models.forEach(model => {
@@ -1323,12 +1341,12 @@
                 } else {
                     console.error('Failed to load models:', data.message);
                     const modelSelect = document.getElementById('modelSelect');
-                    modelSelect.innerHTML = '<option value="error">Failed to load models</option>';
+                    modelSelect.innerHTML = '<option value="error">加载模型失败</option>';
                 }
             } catch (error) {
                 console.error('Error loading models:', error);
                 const modelSelect = document.getElementById('modelSelect');
-                modelSelect.innerHTML = '<option value="error">Failed to load models</option>';
+                modelSelect.innerHTML = '<option value="error">加载模型失败</option>';
             }
         }
         
@@ -1369,7 +1387,7 @@
             const modelName = modelSelect.value;
             
             if (!modelName || modelName === 'none' || modelName === 'error') {
-                alert('Please select a valid model');
+                alert('请选择有效的模型');
                 return;
             }
             
@@ -1377,7 +1395,7 @@
                 // Show loading state
                 const button = document.querySelector('button[onclick="switchModel()"]');
                 const originalText = button.textContent;
-                button.textContent = 'Switching...';
+                button.textContent = '切换中...';
                 button.disabled = true;
                 
                 const response = await fetch('/switch_model/', {
@@ -1393,18 +1411,18 @@
                 const data = await response.json();
                 
                 if (data.status === 'success') {
-                    alert('Model switched successfully');
+                    alert('模型切换成功');
                     state.currentModel = modelName;
                 } else {
-                    alert('Failed to switch model: ' + data.message);
+                    alert('切换模型失败: ' + data.message);
                 }
             } catch (error) {
                 console.error('Error switching model:', error);
-                alert('Failed to switch model: ' + error.message);
+                alert('切换模型失败: ' + error.message);
             } finally {
                 // Restore button state
                 const button = document.querySelector('button[onclick="switchModel()"]');
-                button.textContent = 'Switch Model';
+                button.textContent = '切换模型';
                 button.disabled = false;
             }
         }
@@ -1422,11 +1440,11 @@
         function initAlerts() {
             const alertsList = document.getElementById('alertsList');
             const alerts = [
-                { level: 'critical', title: 'Safety helmet not detected', location: 'Production Workshop - Area B', time: '2 minutes ago' },
-                { level: 'warning', title: 'Temperature approaching upper limit', location: 'Warehouse Area', time: '5 minutes ago' },
-                { level: 'warning', title: 'Breathing equipment missing', location: 'Chemical Storage Area', time: '12 minutes ago' },
-                { level: 'info', title: 'Device CAM-004 offline', location: 'Parking Lot', time: '30 minutes ago' },
-                { level: 'info', title: 'Detection model updated', location: 'System', time: '1 hour ago' }
+                { level: 'critical', title: '未检测到安全帽', location: '生产车间 - B区', time: '2分钟前' },
+                { level: 'warning', title: '温度接近上限', location: '仓库区域', time: '5分钟前' },
+                { level: 'warning', title: '缺少呼吸设备', location: '化学品存储区', time: '12分钟前' },
+                { level: 'info', title: '设备 CAM-004 离线', location: '停车场', time: '30分钟前' },
+                { level: 'info', title: '检测模型已更新', location: '系统', time: '1小时前' }
             ];
             
             const levelConfig = {
@@ -1446,9 +1464,9 @@
                             </div>
                             <p class="text-sm text-gray-400 mt-1">${alert.location}</p>
                             <div class="flex gap-2 mt-3">
-                                <button class="px-3 py-1 text-xs rounded bg-white/10 hover:bg-white/20 transition">Confirm</button>
-                                <button class="px-3 py-1 text-xs rounded bg-white/10 hover:bg-white/20 transition">Ignore</button>
-                                <button class="px-3 py-1 text-xs rounded bg-green-600/50 hover:bg-green-600/70 transition">Processed</button>
+                                <button class="px-3 py-1 text-xs rounded bg-white/10 hover:bg-white/20 transition">确认</button>
+                                <button class="px-3 py-1 text-xs rounded bg-white/10 hover:bg-white/20 transition">忽略</button>
+                                <button class="px-3 py-1 text-xs rounded bg-green-600/50 hover:bg-green-600/70 transition">已处理</button>
                             </div>
                         </div>
                     </div>
@@ -1467,6 +1485,65 @@
             });
             document.querySelector(`[data-tab="${tabId}"]`).classList.add('tab-active');
             document.querySelector(`[data-tab="${tabId}"]`).classList.remove('hover:bg-white/5');
+        }
+        
+        // 切换自动AI分析功能
+        function toggleAutoAIAnalysis(element) {
+            element.classList.toggle('active');
+            state.autoAIAnalysisEnabled = element.classList.contains('active');
+            
+            if (state.autoAIAnalysisEnabled) {
+                // 获取用户设置的时间间隔
+                const intervalInput = document.getElementById('autoAnalysisInterval');
+                if (intervalInput) {
+                    state.autoAIAnalysisInterval = parseInt(intervalInput.value) || 5;
+                }
+                startAutoAIAnalysis();
+                showNotification('自动AI分析功能已启用', 'info');
+            } else {
+                stopAutoAIAnalysis();
+                showNotification('自动AI分析功能已禁用', 'info');
+            }
+        }
+        
+        // 启动自动AI分析
+        function startAutoAIAnalysis() {
+            // 先停止现有的定时器
+            stopAutoAIAnalysis();
+            
+            // 设置新的定时器
+            const intervalMs = state.autoAIAnalysisInterval * 60 * 1000; // 转换为毫秒
+            state.autoAIAnalysisTimer = setInterval(() => {
+                performAutoAIAnalysis();
+            }, intervalMs);
+            
+            console.log(`自动AI分析已启动，间隔: ${state.autoAIAnalysisInterval}分钟`);
+        }
+        
+        // 停止自动AI分析
+        function stopAutoAIAnalysis() {
+            if (state.autoAIAnalysisTimer) {
+                clearInterval(state.autoAIAnalysisTimer);
+                state.autoAIAnalysisTimer = null;
+                console.log('自动AI分析已停止');
+            }
+        }
+        
+        // 执行自动AI分析
+        function performAutoAIAnalysis() {
+            console.log('执行自动AI分析...');
+            showNotification('开始执行自动AI分析', 'info');
+            
+            // 调用现有的AI分析函数
+            generateAIReport().then(() => {
+                // 分析完成后生成PDF报告
+                return exportAIReportToPDF();
+            }).then(() => {
+                showNotification('自动AI分析完成，已生成PDF报告', 'success');
+            }).catch(err => {
+                console.error('自动AI分析失败:', err);
+                showNotification('自动AI分析失败: ' + err.message, 'error');
+            });
         }
         
         // Video Source Control
@@ -1536,9 +1613,9 @@
                 startBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
                 </svg>
-                Start Detection`;
+                开始检测`;
             } else {
-                startBtn.textContent = 'Start Detection';
+                startBtn.textContent = '开始检测';
             }
             
             if (this.value === 'image') {
@@ -1574,9 +1651,9 @@
                     startBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
                     </svg>
-                    Open`;
+                    打开`;
                 } else {
-                    startBtn.textContent = 'Open';
+                    startBtn.textContent = '打开';
                 }
                 // Update detection time estimate for Jetson
                 updateDetectionTimeEstimate();
@@ -1609,7 +1686,7 @@
                 }
             } catch (error) {
                 console.error('Camera initialization failed:', error);
-                alert('Cannot access camera, please check permission settings');
+                alert('无法访问摄像头，请检查权限设置');
             }
         }
         
@@ -1728,7 +1805,7 @@
                 estimateSeconds = Math.max(1, selectedLocalImages.length);
             }
             
-            timeEstimateElement.textContent = `This detection will take approximately ${estimateSeconds} seconds`;
+            timeEstimateElement.textContent = `预计检测时间: ~${estimateSeconds} 秒`;
         }
 
         // Format time in seconds to mm:ss format
@@ -3812,18 +3889,31 @@
                 
                 console.log('📋 AI report data found:', window.aiReportData);
                 
+                // Get user-specified PDF storage path
+                const pdfStoragePathInput = document.getElementById('pdfStoragePath');
+                if (pdfStoragePathInput) {
+                    state.pdfStoragePath = pdfStoragePathInput.value;
+                }
+                
                 // Show loading notification
                 console.log('🔔 Showing loading notification...');
                 showNotification('Exporting PDF', 'Please wait while we generate your report...');
                 
+                // Prepare PDF data with storage path
+                const pdfData = {
+                    ...window.aiReportData,
+                    storage_path: state.pdfStoragePath
+                };
+                
                 // 使用fetch API发送JSON数据，而不是表单提交，这样可以处理错误响应
                 console.log('📡 Sending request to generate PDF...');
+                console.log('📁 Storage path:', state.pdfStoragePath);
                 const response = await fetch('/export_ai_pdf/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(window.aiReportData)
+                    body: JSON.stringify(pdfData)
                 });
                 
                 if (!response.ok) {
@@ -3845,7 +3935,7 @@
                 
                 // Show success notification immediately
                 console.log('🔔 Showing success notification...');
-                showNotification('Export Successful', 'AI report has been generated and downloaded successfully');
+                showNotification('Export Successful', `AI report has been generated and saved to: ${state.pdfStoragePath}`);
                 
             } catch (error) {
                 console.error('❌ PDF export error:', error);
