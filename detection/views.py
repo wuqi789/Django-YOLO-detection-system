@@ -988,6 +988,7 @@ def get_ai_analysis(request):
                 }
             }
 
+
             # 调用AI建议生成函数
             suggestion = get_ai_suggestion(sensor_data)
             print(suggestion)
