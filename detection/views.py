@@ -927,6 +927,7 @@ def get_camera_status(request):
         }
         return JsonResponse({'status': 'success', 'data': camera_statuses, 'camera_count': 3})
 
+
 @csrf_exempt
 def control_camera(request):
     """
