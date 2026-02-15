@@ -949,7 +949,6 @@ def control_camera(request):
             return JsonResponse({'status': 'error', 'message': str(e)})
     return JsonResponse({'status': 'error', 'message': 'Only POST requests allowed'})
 
-
 # AI Analysis API
 from django.views.decorators.csrf import csrf_exempt
 import random
