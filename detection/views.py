@@ -15,7 +15,6 @@ import logging
 import re
 import uuid
 
-
 VGGT_OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'vggt_output')
 
 # Configure logging
