@@ -13,6 +13,9 @@ import threading
 import json
 import logging
 import re
+import uuid
+
+VGGT_OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'vggt_output')
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -896,7 +899,7 @@ def get_camera_status(request):
         def detect_camera_count():
             count = 0
             # Try to open each camera index until we can't
-            for i in range(10):  # Check up to 10 camera indexes
+            for i in range(1):  # Check up to 10 camera indexes
                 cap = cv2.VideoCapture(i)
                 if cap.isOpened():
                     count += 1
@@ -1022,6 +1025,290 @@ def get_ai_analysis(request):
                 'suggestion': suggestion,
                 'sensor_data': sensor_data
             })
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Method not allowed'
+    })
+
+@csrf_exempt
+def vggt_preload_model(request):
+    """
+    API endpoint to preload VGGT model into memory
+    """
+    from .vggt_processor import load_model
+    
+    if request.method == 'POST':
+        try:
+            logger.info("Preloading VGGT model...")
+            model = load_model()
+            logger.info("VGGT model preloaded successfully")
+            return JsonResponse({
+                'status': 'success',
+                'message': 'VGGT model loaded successfully'
+            })
+        except Exception as e:
+            import traceback
+            error_trace = traceback.format_exc()
+            logger.error(f"Failed to preload VGGT model: {error_trace}")
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Failed to load model: {str(e)}'
+            })
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Method not allowed'
+    })
+
+@csrf_exempt
+def vggt_reconstruct(request):
+    """
+    API endpoint to start 3D reconstruction using VGGT
+    """
+    from .vggt_processor import start_async_reconstruction
+    
+    if request.method == 'POST':
+        try:
+            os.makedirs(VGGT_OUTPUT_DIR, exist_ok=True)
+            
+            task_id = str(uuid.uuid4())
+            
+            video_path = None
+            image_paths = []
+            
+            temp_dir = os.path.join(VGGT_OUTPUT_DIR, 'temp')
+            os.makedirs(temp_dir, exist_ok=True)
+            
+            if 'video' in request.FILES:
+                video_file = request.FILES['video']
+                video_temp_path = os.path.join(temp_dir, f"{task_id}_video{os.path.splitext(video_file.name)[1]}")
+                with open(video_temp_path, 'wb+') as destination:
+                    for chunk in video_file.chunks():
+                        destination.write(chunk)
+                video_path = video_temp_path
+            
+            if 'images' in request.FILES:
+                images_files = request.FILES.getlist('images')
+                for idx, img_file in enumerate(images_files):
+                    img_temp_path = os.path.join(temp_dir, f"{task_id}_img_{idx}{os.path.splitext(img_file.name)[1]}")
+                    with open(img_temp_path, 'wb+') as destination:
+                        for chunk in img_file.chunks():
+                            destination.write(chunk)
+                    image_paths.append(img_temp_path)
+            
+            if not video_path and not image_paths:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'No video or images provided'
+                })
+            
+            conf_thres = float(request.POST.get('conf_thres', 50.0))
+            frame_filter = request.POST.get('frame_filter', 'All')
+            mask_black_bg = request.POST.get('mask_black_bg', 'false').lower() == 'true'
+            mask_white_bg = request.POST.get('mask_white_bg', 'false').lower() == 'true'
+            show_cam = request.POST.get('show_cam', 'true').lower() == 'true'
+            mask_sky = request.POST.get('mask_sky', 'false').lower() == 'true'
+            prediction_mode = request.POST.get('prediction_mode', 'Depthmap and Camera Branch')
+            
+            start_async_reconstruction(
+                task_id=task_id,
+                video_path=video_path,
+                image_paths=image_paths,
+                output_base_dir=VGGT_OUTPUT_DIR,
+                conf_thres=conf_thres,
+                frame_filter=frame_filter,
+                mask_black_bg=mask_black_bg,
+                mask_white_bg=mask_white_bg,
+                show_cam=show_cam,
+                mask_sky=mask_sky,
+                prediction_mode=prediction_mode
+            )
+            
+            return JsonResponse({
+                'status': 'success',
+                'task_id': task_id,
+                'message': '3D reconstruction started'
+            })
+            
+        except Exception as e:
+            import traceback
+            error_trace = traceback.format_exc()
+            logger.error(f"VGGT reconstruction error: {error_trace}")
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e),
+                'error_details': error_trace
+            })
+    
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Method not allowed'
+    })
+
+@csrf_exempt
+def vggt_status(request):
+    """
+    API endpoint to get 3D reconstruction status
+    """
+    from .vggt_processor import get_progress
+    
+    if request.method == 'GET':
+        task_id = request.GET.get('task_id', '')
+        
+        if not task_id:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Missing task_id parameter'
+            })
+        
+        progress_data = get_progress(task_id)
+        
+        response_data = {
+            'status': progress_data['status'],
+            'progress': progress_data['progress'],
+            'message': progress_data['message'],
+            'error': progress_data.get('error')
+        }
+        
+        if progress_data['status'] == 'completed' and progress_data.get('glb_path'):
+            glb_filename = os.path.basename(progress_data['glb_path'])
+            target_dir_name = os.path.basename(progress_data['target_dir'])
+            response_data['glb_url'] = f"/static/vggt_output/{target_dir_name}/{glb_filename}"
+            response_data['target_dir'] = progress_data['target_dir']
+            
+            # 尝试启动Gradio服务
+            try:
+                from .gradio_server import start_gradio_server, is_gradio_running, get_gradio_url
+                if not is_gradio_running():
+                    gradio_url = start_gradio_server(progress_data['target_dir'], progress_data['glb_path'], port=8080)
+                    if gradio_url:
+                        response_data['gradio_url'] = gradio_url
+                        logger.info(f"Gradio server started at {gradio_url}")
+                    else:
+                        logger.warning("Gradio server failed to start, using Three.js fallback")
+                        response_data['use_threejs'] = True
+                else:
+                    response_data['gradio_url'] = get_gradio_url()
+            except Exception as e:
+                logger.error(f"Error starting Gradio server: {e}")
+                response_data['use_threejs'] = True
+        
+        return JsonResponse(response_data)
+    
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Method not allowed'
+    })
+
+@csrf_exempt
+def start_gradio(request):
+    """
+    API endpoint to start Gradio server for 3D visualization
+    """
+    if request.method == 'POST':
+        try:
+            import json
+            data = json.loads(request.body)
+            target_dir = data.get('target_dir', '')
+            glb_path = data.get('glb_path', '')
+            
+            if not target_dir or not glb_path:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Missing target_dir or glb_path'
+                })
+            
+            from .gradio_server import start_gradio_server, is_gradio_running, get_gradio_url
+            
+            if not is_gradio_running():
+                gradio_url = start_gradio_server(target_dir, glb_path, port=8080)
+                if gradio_url:
+                    return JsonResponse({
+                        'status': 'success',
+                        'gradio_url': gradio_url
+                    })
+                else:
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': 'Failed to start Gradio server'
+                    })
+            else:
+                return JsonResponse({
+                    'status': 'success',
+                    'gradio_url': get_gradio_url()
+                })
+                
+        except Exception as e:
+            logger.error(f"Error starting Gradio server: {e}")
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            })
+    
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Method not allowed'
+    })
+
+@csrf_exempt
+def vggt_export(request):
+    """
+    API endpoint to export/update 3D model with new visualization parameters
+    """
+    from .vggt_processor import update_glb_visualization
+    
+    if request.method == 'POST':
+        try:
+            target_dir = request.POST.get('target_dir', '')
+            
+            if not target_dir or not os.path.isdir(target_dir):
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Invalid target directory'
+                })
+            
+            conf_thres = float(request.POST.get('conf_thres', 50.0))
+            frame_filter = request.POST.get('frame_filter', 'All')
+            mask_black_bg = request.POST.get('mask_black_bg', 'false').lower() == 'true'
+            mask_white_bg = request.POST.get('mask_white_bg', 'false').lower() == 'true'
+            show_cam = request.POST.get('show_cam', 'true').lower() == 'true'
+            mask_sky = request.POST.get('mask_sky', 'false').lower() == 'true'
+            prediction_mode = request.POST.get('prediction_mode', 'Depthmap and Camera Branch')
+            
+            glb_path, message = update_glb_visualization(
+                target_dir=target_dir,
+                conf_thres=conf_thres,
+                frame_filter=frame_filter,
+                mask_black_bg=mask_black_bg,
+                mask_white_bg=mask_white_bg,
+                show_cam=show_cam,
+                mask_sky=mask_sky,
+                prediction_mode=prediction_mode
+            )
+            
+            if glb_path:
+                glb_filename = os.path.basename(glb_path)
+                target_dir_name = os.path.basename(target_dir)
+                return JsonResponse({
+                    'status': 'success',
+                    'glb_url': f"/static/vggt_output/{target_dir_name}/{glb_filename}",
+                    'message': message
+                })
+            else:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': message
+                })
+                
+        except Exception as e:
+            import traceback
+            error_trace = traceback.format_exc()
+            logger.error(f"VGGT export error: {error_trace}")
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e),
+                'error_details': error_trace
+            })
+    
     return JsonResponse({
         'status': 'error',
         'message': 'Method not allowed'

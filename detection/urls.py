@@ -28,4 +28,10 @@ urlpatterns = [
     path('get_jetson_frame/', views.get_jetson_frame, name='get_jetson_frame'),
     # Settings API endpoint
     path('save_settings/', views.save_settings, name='save_settings'),
+    # VGGT API endpoints
+    path('vggt_preload_model/', views.vggt_preload_model, name='vggt_preload_model'),
+    path('vggt_reconstruct/', views.vggt_reconstruct, name='vggt_reconstruct'),
+    path('vggt_status/', views.vggt_status, name='vggt_status'),
+    path('vggt_export/', views.vggt_export, name='vggt_export'),
+    path('start_gradio/', views.start_gradio, name='start_gradio'),
 ] 

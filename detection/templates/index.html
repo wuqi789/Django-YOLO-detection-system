@@ -8,6 +8,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- html2pdf library for PDF export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Three.js library for 3D visualization -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+        
+        window.THREE = THREE;
+        window.THREE.OrbitControls = OrbitControls;
+        window.THREE.GLTFLoader = GLTFLoader;
+        window.THREE.DRACOLoader = DRACOLoader;
+        
+        // Dispatch event when Three.js is ready
+        window.dispatchEvent(new Event('three-ready'));
+    </script>
     <style>
         * { font-family: 'Inter', system-ui, sans-serif; }
         
@@ -291,6 +314,13 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
                 <span>设置</span>
+            </button>
+            <button onclick="switchTab('3d')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition hover:bg-white/5" data-tab="3d">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 7v10M7 12h10"/>
+                </svg>
+                <span>3D重建</span>
             </button>
         </nav>
         
@@ -829,7 +859,8 @@
                         <div class="flex justify-between items-center mb-6">
                             <h3 class="text-lg font-semibold">摄像头管理</h3>
                             <div class="flex gap-2">
-                                <button onclick="setDeviceGrid(4)" class="px-3 py-1.5 text-sm rounded-lg bg-blue-600">4 网格</button>
+                                <button onclick="setDeviceGrid(1)" class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition">1 网格</button>
+                                <button onclick="setDeviceGrid(2)" class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition">2 网格</button>
                             </div>
                         </div>
                         
@@ -988,6 +1019,138 @@
                                 </select>
                             </div>
                             <button class="w-full py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition">导出传感器数据</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 3D重建选项卡 -->
+        <div id="tab-3d" class="tab-content p-6 hidden">
+            <div class="grid grid-cols-12 gap-6">
+                <!-- 3D可视化区域 -->
+                <div class="col-span-8">
+                    <div class="glass-card rounded-2xl p-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold">3D重建可视化</h2>
+                            <div class="flex gap-2">
+                                <button onclick="resetCamera()" class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition">重置视角</button>
+                                <button onclick="toggleLighting()" class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition">切换光照</button>
+                                <button onclick="exportGLB()" class="px-3 py-1.5 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition">导出模型</button>
+                            </div>
+                        </div>
+                        
+                        <div class="rounded-xl overflow-hidden bg-black relative" style="height: 500px;" id="threeContainer">
+                            <div class="absolute inset-0 flex items-center justify-center text-gray-500" id="loadingOverlay" style="display: none;">
+                                <div class="text-center">
+                                    <svg class="w-16 h-16 mx-auto mb-4 text-gray-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                    <p id="loadingText">加载3D场景中...</p>
+                                </div>
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center text-gray-500" id="placeholderOverlay">
+                                <div class="text-center">
+                                    <svg class="w-24 h-24 mx-auto mb-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"/>
+                                    </svg>
+                                    <p class="text-gray-500">上传图片或视频开始3D重建</p>
+                                </div>
+                            </div>
+                            <!-- Gradio iframe容器 -->
+            <iframe id="gradioIframe" class="w-full h-full border-0" style="display: none; position: absolute; top: 0; left: 0; z-index: 10;"></iframe>
+                            <!-- 3D文件已生成提示 -->
+                            <div id="modelReadyOverlay" class="absolute inset-0 flex items-center justify-center bg-black/80" style="display: none;">
+                                <div class="text-center">
+                                    <svg class="w-16 h-16 mx-auto mb-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <p class="text-green-400 text-lg font-medium mb-2">3D文件已生成</p>
+                                    <p class="text-gray-400 text-sm">正在加载3D渲染器...</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 进度条 -->
+                        <div class="mt-4 hidden" id="progressContainer">
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="text-gray-400" id="progressText">处理中...</span>
+                                <span class="text-blue-400" id="progressPercent">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" id="progressBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center gap-4 text-sm">
+                                <span class="text-gray-400">模型状态:</span>
+                                <span id="modelStatus" class="text-gray-400">未加载</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm">
+                                <span class="text-gray-400">顶点数:</span>
+                                <span class="text-green-400" id="vertexCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 控制面板 -->
+                <div class="col-span-4 space-y-4">
+                    <!-- 文件上传 -->
+                    <div class="glass-card rounded-2xl p-4">
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">文件上传</h3>
+                        <div class="space-y-3">
+                            <!-- 视频上传 -->
+                            <div class="flex flex-col items-center p-4 border-2 border-dashed border-gray-600 rounded-xl hover:border-blue-500 transition cursor-pointer" onclick="document.getElementById('videoUpload').click()">
+                                <svg class="w-10 h-10 text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                <p class="text-sm text-gray-400">上传视频</p>
+                                <p class="text-xs text-gray-500">支持 mp4, avi, mov</p>
+                                <input type="file" accept="video/*" id="videoUpload" style="display: none;" onchange="handleVideoUpload(this)" />
+                            </div>
+                            
+                            <!-- 图片上传 -->
+                            <div class="flex flex-col items-center p-4 border-2 border-dashed border-gray-600 rounded-xl hover:border-blue-500 transition cursor-pointer" id="dropZone" onclick="document.getElementById('imageUpload').click()">
+                                <svg class="w-10 h-10 text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <p class="text-sm text-gray-400">上传图片</p>
+                                <p class="text-xs text-gray-500">支持多张图片</p>
+                                <input type="file" accept="image/*" multiple id="imageUpload" style="display: none;" onchange="handleImageUpload(this)" />
+                            </div>
+                            
+                            <!-- 已选文件预览 -->
+                            <div id="filePreviewContainer" class="hidden">
+                                <div class="text-xs text-gray-400 mb-2">已选择文件:</div>
+                                <div id="fileList" class="max-h-32 overflow-y-auto text-xs text-gray-500 space-y-1"></div>
+                            </div>
+                            
+                            <!-- 处理状态提示 -->
+                            <div id="processingStatus" class="hidden text-center py-3">
+                                <div class="flex items-center justify-center gap-2 text-blue-400">
+                                    <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                    <span id="processingText">正在处理...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- VGGT状态 -->
+                    <div class="glass-card rounded-2xl p-4">
+                        <h3 class="text-sm font-medium text-gray-400 mb-4">系统状态</h3>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">CUDA</span>
+                                <span class="px-2 py-1 text-xs rounded-full bg-green-600/30 text-green-400" id="cudaStatus">检测中</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">模型</span>
+                                <span class="px-2 py-1 text-xs rounded-full bg-gray-700 text-gray-400" id="modelLoadStatus">未加载</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1475,6 +1638,59 @@
         }
         
         // Tab Switching
+        let threeJSInitialized = false;
+        let vggtModelPreloaded = false;
+        let vggtModelLoading = false;
+        
+        function getCSRFToken() {
+            const match = document.cookie.match(/csrftoken=([^;]+)/);
+            return match ? match[1] : '';
+        }
+        
+        function preloadVGGTModel() {
+            if (vggtModelPreloaded || vggtModelLoading) return;
+            
+            vggtModelLoading = true;
+            const modelStatus = document.getElementById('modelStatus');
+            if (modelStatus) {
+                modelStatus.textContent = '模型加载中...';
+                modelStatus.className = 'text-yellow-400';
+            }
+            
+            fetch('/vggt_preload_model/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCSRFToken()
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                vggtModelLoading = false;
+                if (data.status === 'success') {
+                    vggtModelPreloaded = true;
+                    if (modelStatus) {
+                        modelStatus.textContent = '模型已就绪';
+                        modelStatus.className = 'text-green-400';
+                    }
+                    console.log('VGGT model preloaded successfully');
+                } else {
+                    if (modelStatus) {
+                        modelStatus.textContent = '模型加载失败';
+                        modelStatus.className = 'text-red-400';
+                    }
+                    console.error('Failed to preload VGGT model:', data.message);
+                }
+            })
+            .catch(error => {
+                vggtModelLoading = false;
+                if (modelStatus) {
+                    modelStatus.textContent = '模型加载失败';
+                    modelStatus.className = 'text-red-400';
+                }
+                console.error('Error preloading VGGT model:', error);
+            });
+        }
+        
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
@@ -1485,6 +1701,19 @@
             });
             document.querySelector(`[data-tab="${tabId}"]`).classList.add('tab-active');
             document.querySelector(`[data-tab="${tabId}"]`).classList.remove('hover:bg-white/5');
+            
+            // Initialize Three.js when switching to 3D tab
+            if (tabId === '3d' && !threeJSInitialized) {
+                setTimeout(function() {
+                    initThreeJS();
+                    threeJSInitialized = true;
+                }, 100);
+            }
+            
+            // Preload VGGT model when switching to 3D tab
+            if (tabId === '3d') {
+                preloadVGGTModel();
+            }
         }
         
         // 切换自动AI分析功能
@@ -3173,7 +3402,8 @@
             document.getElementById('alertBadge').textContent = '0';
         }
 
-        // Camera Management API
+        // Camera Management API (disabled to avoid unnecessary requests)
+        /*
         let cameraStreams = {};
         let cameraDetectionIntervals = {};
         let cameraDetectionStates = {};
@@ -3307,8 +3537,10 @@
         }
 
         // Initialize camera status check
-        setInterval(checkCameraStatus, 500);
-        checkCameraStatus();
+        // 注释掉相机状态检查，避免发送不必要的请求
+        // setInterval(checkCameraStatus, 500);
+        // checkCameraStatus();
+        */
 
         // Save settings function
         async function saveSettings() {
@@ -3984,6 +4216,459 @@
                         console.error('Export PDF button not found after retry');
                     }
                 }, 1000);
+            }
+        });
+    </script>
+    
+    <!-- 3D Visualization JavaScript -->
+    <script>
+        // Three.js global variables
+        let scene, camera, renderer, controls;
+        let model = null;
+        let uploadedImages = [];
+        let uploadedVideo = null;
+        let currentTaskId = null;
+        let currentTargetDir = null;
+        let progressInterval = null;
+        let lightingEnabled = true;
+        let threeModulesLoaded = false;
+        
+        // Load Three.js modules dynamically
+        async function loadThreeModules() {
+            if (threeModulesLoaded) return true;
+            
+            try {
+                const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
+                const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+                const { DRACOLoader } = await import('three/addons/loaders/DRACOLoader.js');
+                
+                window.THREE.OrbitControls = OrbitControls;
+                window.THREE.GLTFLoader = GLTFLoader;
+                window.THREE.DRACOLoader = DRACOLoader;
+                threeModulesLoaded = true;
+                return true;
+            } catch(e) {
+                console.error('Failed to load Three.js modules:', e);
+                return false;
+            }
+        }
+        
+        // Initialize Three.js scene
+        async function initThreeJS() {
+            // Check if Three.js is loaded
+            if (!window.THREE) {
+                console.log('Waiting for Three.js to load...');
+                setTimeout(initThreeJS, 100);
+                return;
+            }
+            
+            // Load modules if needed
+            if (!window.THREE.OrbitControls) {
+                const loaded = await loadThreeModules();
+                if (!loaded) return;
+            }
+            
+            const container = document.getElementById('threeContainer');
+            if (!container) return;
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x111827);
+            
+            camera = new THREE.PerspectiveCamera(75, container.offsetWidth / container.offsetHeight, 0.1, 1000);
+            camera.position.z = 5;
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.offsetWidth, container.offsetHeight);
+            renderer.shadowMap.enabled = true;
+            
+            const placeholder = document.getElementById('placeholderOverlay');
+            container.innerHTML = '';
+            if (placeholder) container.appendChild(placeholder);
+            container.appendChild(renderer.domElement);
+            
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = 1;
+            controls.maxDistance = 100;
+            
+            addLights();
+            
+            const gridHelper = new THREE.GridHelper(20, 20, 0x444444, 0x222222);
+            scene.add(gridHelper);
+            
+            animate();
+            
+            window.addEventListener('resize', onWindowResize);
+        }
+        
+        function addLights() {
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 10, 7.5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+            
+            const pointLight = new THREE.PointLight(0xffffff, 0.5);
+            pointLight.position.set(-5, 5, 5);
+            scene.add(pointLight);
+        }
+        
+        function onWindowResize() {
+            const container = document.getElementById('threeContainer');
+            if (!container || !camera || !renderer) return;
+            camera.aspect = container.offsetWidth / container.offsetHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.offsetWidth, container.offsetHeight);
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            if (controls) controls.update();
+            if (renderer && scene && camera) renderer.render(scene, camera);
+        }
+        
+        async function loadModel(glbUrl) {
+            // Check if Three.js is loaded
+            if (!window.THREE) {
+                console.log('Waiting for Three.js to load...');
+                setTimeout(() => loadModel(glbUrl), 100);
+                return;
+            }
+            
+            // Load modules if needed
+            if (!window.THREE.GLTFLoader) {
+                const loaded = await loadThreeModules();
+                if (!loaded) return;
+            }
+            
+            if (model) {
+                scene.remove(model);
+                model = null;
+            }
+            
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('loadingText').textContent = '加载3D模型...';
+            document.getElementById('placeholderOverlay').style.display = 'none';
+            
+            const loader = new THREE.GLTFLoader();
+            const dracoLoader = new THREE.DRACOLoader();
+            dracoLoader.setDecoderPath('https://unpkg.com/three@0.160.0/examples/jsm/libs/draco/');
+            loader.setDRACOLoader(dracoLoader);
+            
+            loader.load(
+                glbUrl,
+                function (gltf) {
+                    model = gltf.scene;
+                    model.traverse(function (child) {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+                    scene.add(model);
+                    
+                    const box = new THREE.Box3().setFromObject(model);
+                    const center = box.getCenter(new THREE.Vector3());
+                    model.position.sub(center);
+                    
+                    const size = box.getSize(new THREE.Vector3());
+                    const maxSize = Math.max(size.x, size.y, size.z);
+                    camera.position.z = maxSize * 2;
+                    
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    document.getElementById('modelStatus').textContent = '已加载';
+                    document.getElementById('vertexCount').textContent = Math.round(maxSize * 1000);
+                    
+                    showNotification('3D模型加载成功', 'success');
+                },
+                function (xhr) {
+                    const percent = Math.round(xhr.loaded / xhr.total * 100);
+                    document.getElementById('loadingText').textContent = `加载中 ${percent}%`;
+                },
+                function (error) {
+                    console.error('Error loading model:', error);
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    document.getElementById('modelStatus').textContent = '加载失败';
+                    showNotification('3D模型加载失败', 'error');
+                }
+            );
+        }
+        
+        function resetCamera() {
+            if (camera && controls) {
+                camera.position.set(0, 0, 5);
+                controls.reset();
+            }
+        }
+        
+        function toggleLighting() {
+            lightingEnabled = !lightingEnabled;
+            scene.traverse(function (child) {
+                if (child.isLight) {
+                    child.visible = lightingEnabled;
+                }
+            });
+            showNotification(lightingEnabled ? '光照已开启' : '光照已关闭', 'info');
+        }
+        
+        function exportGLB() {
+            if (!currentTargetDir) {
+                showNotification('请先完成3D重建', 'warning');
+                return;
+            }
+            
+            const confThres = document.getElementById('confThres').value;
+            const predictionMode = document.getElementById('predictionMode').value;
+            const showCam = document.getElementById('showCamToggle').classList.contains('active');
+            const maskSky = document.getElementById('maskSkyToggle').classList.contains('active');
+            const maskBlack = document.getElementById('maskBlackToggle').classList.contains('active');
+            
+            const formData = new FormData();
+            formData.append('target_dir', currentTargetDir);
+            formData.append('conf_thres', confThres);
+            formData.append('prediction_mode', predictionMode);
+            formData.append('show_cam', showCam);
+            formData.append('mask_sky', maskSky);
+            formData.append('mask_black_bg', maskBlack);
+            
+            fetch('/vggt_export/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const link = document.createElement('a');
+                    link.href = data.glb_url;
+                    link.download = '3d_reconstruction.glb';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    showNotification('模型导出成功', 'success');
+                } else {
+                    showNotification('导出失败: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Export error:', error);
+                showNotification('导出失败', 'error');
+            });
+        }
+        
+        function handleVideoUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            uploadedVideo = file;
+            uploadedImages = [];
+            
+            document.getElementById('filePreviewContainer').classList.remove('hidden');
+            document.getElementById('fileList').innerHTML = `<div class="flex items-center gap-2"><span class="text-blue-400">📹</span>${file.name}</div>`;
+            
+            // 自动开始推理
+            start3DReconstruction();
+        }
+        
+        function handleImageUpload(input) {
+            const files = input.files;
+            if (files.length === 0) return;
+            
+            uploadedVideo = null;
+            uploadedImages = Array.from(files);
+            
+            document.getElementById('filePreviewContainer').classList.remove('hidden');
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            uploadedImages.forEach((file, index) => {
+                fileList.innerHTML += `<div class="flex items-center gap-2"><span class="text-green-400">🖼️</span>${file.name}</div>`;
+            });
+            
+            // 自动开始推理
+            start3DReconstruction();
+        }
+        
+        function start3DReconstruction() {
+            if (uploadedImages.length === 0 && !uploadedVideo) {
+                showNotification('请先上传图片或视频', 'warning');
+                return;
+            }
+            
+            const formData = new FormData();
+            
+            if (uploadedVideo) {
+                formData.append('video', uploadedVideo);
+            }
+            
+            if (uploadedImages.length > 0) {
+                uploadedImages.forEach((file) => {
+                    formData.append('images', file);
+                });
+            }
+            
+            // 使用默认参数
+            formData.append('conf_thres', 50.0);
+            formData.append('prediction_mode', 'Depthmap and Camera Branch');
+            formData.append('show_cam', true);
+            formData.append('mask_sky', false);
+            formData.append('mask_black_bg', false);
+            formData.append('frame_filter', 'All');
+            
+            document.getElementById('progressContainer').classList.remove('hidden');
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('progressText').textContent = '初始化...';
+            document.getElementById('progressPercent').textContent = '0%';
+            document.getElementById('processingStatus').classList.remove('hidden');
+            document.getElementById('processingText').textContent = '正在上传文件...';
+            document.getElementById('modelLoadStatus').textContent = '处理中';
+            document.getElementById('modelLoadStatus').className = 'px-2 py-1 text-xs rounded-full bg-yellow-600/30 text-yellow-400';
+            
+            fetch('/vggt_reconstruct/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    currentTaskId = data.task_id;
+                    startProgressPolling();
+                    showNotification('3D重建已开始', 'info');
+                } else {
+                    showNotification('启动失败: ' + data.message, 'error');
+                    resetReconstructUI();
+                }
+            })
+            .catch(error => {
+                console.error('Error starting reconstruction:', error);
+                showNotification('启动失败', 'error');
+                resetReconstructUI();
+            });
+        }
+        
+        function startProgressPolling() {
+            if (progressInterval) clearInterval(progressInterval);
+            
+            progressInterval = setInterval(() => {
+                fetch(`/vggt_status/?task_id=${currentTaskId}`)
+                .then(response => response.json())
+                .then(data => {
+                    updateProgress(data);
+                    
+                    if (data.status === 'completed') {
+                        clearInterval(progressInterval);
+                        currentTargetDir = data.target_dir;
+                        
+                        // 显示"3D文件已生成"提示
+                        document.getElementById('modelReadyOverlay').style.display = 'flex';
+                        document.getElementById('placeholderOverlay').style.display = 'none';
+                        document.getElementById('loadingOverlay').style.display = 'none';
+                        
+                        // 检查是否使用Three.js备用渲染
+                        if (data.use_threejs || !data.gradio_url) {
+                            console.log('Using Three.js fallback for 3D rendering');
+                            // 使用Three.js渲染
+                            setTimeout(async () => {
+                                await loadThreeModules();
+                                if (window.THREE && window.THREE.GLTFLoader) {
+                                    loadModel(data.glb_url);
+                                    document.getElementById('modelReadyOverlay').style.display = 'none';
+                                    // 隐藏Gradio iframe
+                                    document.getElementById('gradioIframe').style.display = 'none';
+                                } else {
+                                    console.error('Three.js modules not available');
+                                    showNotification('3D渲染器加载失败，请刷新页面重试', 'error');
+                                }
+                            }, 1000);
+                        } else if (data.gradio_url) {
+                            // 在新标签页中打开Gradio
+                            console.log('Opening Gradio in new tab:', data.gradio_url);
+                            setTimeout(() => {
+                                // 自动打开新标签页
+                                window.open(data.gradio_url, '_blank');
+                                showNotification('3D渲染已在新标签页中打开', 'success');
+                            }, 2000);
+                        }
+                        
+                        document.getElementById('modelLoadStatus').textContent = '已完成';
+                        document.getElementById('modelLoadStatus').className = 'px-2 py-1 text-xs rounded-full bg-green-600/30 text-green-400';
+                        document.getElementById('processingStatus').classList.add('hidden');
+                        
+                        // 显示弹窗提示
+                        setTimeout(() => {
+                            alert('请在 http://localhost:8080 查看3D渲染结果');
+                        }, 500);
+                        
+                        showNotification('3D重建完成！', 'success');
+                    } else if (data.status === 'error') {
+                        clearInterval(progressInterval);
+                        showNotification('重建失败: ' + data.error, 'error');
+                        document.getElementById('modelLoadStatus').textContent = '失败';
+                        document.getElementById('modelLoadStatus').className = 'px-2 py-1 text-xs rounded-full bg-red-600/30 text-red-400';
+                        document.getElementById('processingStatus').classList.add('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error polling progress:', error);
+                });
+            }, 1000);
+        }
+        
+        function updateProgress(data) {
+            const progress = data.progress || 0;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressPercent').textContent = progress + '%';
+            document.getElementById('progressText').textContent = data.message || '处理中...';
+        }
+        
+        function resetReconstructUI() {
+            document.getElementById('reconstructBtn').disabled = false;
+        }
+        
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-20 right-4 px-4 py-3 rounded-lg shadow-lg z-50 animate-fade-in ${
+                type === 'success' ? 'bg-green-600' :
+                type === 'error' ? 'bg-red-600' :
+                type === 'warning' ? 'bg-yellow-600' : 'bg-blue-600'
+            }`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            const dropZone = document.getElementById('dropZone');
+            if (dropZone) {
+                dropZone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    dropZone.classList.add('border-blue-500');
+                });
+                
+                dropZone.addEventListener('dragleave', function() {
+                    dropZone.classList.remove('border-blue-500');
+                });
+                
+                dropZone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    dropZone.classList.remove('border-blue-500');
+                    
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/*';
+                        input.multiple = true;
+                        input.files = files;
+                        handleImageUpload(input);
+                    }
+                });
             }
         });
     </script>
