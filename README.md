@@ -242,16 +242,31 @@
    pip install -r requirements.txt
    ```
 
-4. **验证安装**
+4. **下载VGGT模型文件**
+   - 由于模型文件较大，未包含在GitHub仓库中
+   - 请从以下链接下载：
+     - 链接：https://pan.quark.cn/s/b7ed453f0f3f
+     - 提取码：mAHM
+   - 下载后将 `model.pt` 文件放置到 `vggt/` 目录下：
+     ```
+     Django-YOLO-detection-system-main/
+     └── vggt/
+         └── model.pt
+     ```
+
+5. **验证安装**
    ```bash
    # 检查 Django 版本
    python -m django --version
    
    # 检查 YOLOv8 安装
    python -c "from ultralytics import YOLO; print('YOLOv8 installed successfully')"
+   
+   # 检查 VGGT 模型文件
+   python -c "import os; print('VGGT model exists' if os.path.exists('vggt/model.pt') else 'VGGT model not found')"
    ```
 
-5. **安装 CUDA 支持（可选）**
+6. **安装 CUDA 支持（可选）**
    - 安装 CUDA Toolkit 11.8
    - 安装 cuDNN 8.9+
    - 验证 CUDA 安装：
