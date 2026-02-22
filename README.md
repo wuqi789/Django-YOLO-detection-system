@@ -247,6 +247,7 @@
    - 请从以下链接下载：
      - 链接：https://pan.quark.cn/s/b7ed453f0f3f
      - 提取码：mAHM
+   - 或者在此处下载 https://huggingface.co/facebook/VGGT-1B/blob/main/model.pt
    - 下载后将 `model.pt` 文件放置到 `vggt/` 目录下：
      ```
      Django-YOLO-detection-system-main/
