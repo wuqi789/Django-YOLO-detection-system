@@ -15,7 +15,6 @@ import logging
 import re
 import uuid
 
-
 VGGT_OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'vggt_output')
 
 # Configure logging
@@ -994,13 +993,23 @@ def get_ai_analysis(request):
 
 
             # 调用AI建议生成函数
-            suggestion = get_ai_suggestion(sensor_data)
-            print(suggestion)
+            ai_result = get_ai_suggestion(sensor_data)
+            print(ai_result)
+            
+            # 提取AI分析结果
+            suggestion = ai_result.get('suggestion', '')
+            risk_level = ai_result.get('risk_level', 1)
+            risk_description = ai_result.get('risk_description', '')
+            
+            # 发送建议到微信公众号
             ai2wxgzh(suggestion)
+            
             # 返回JSON响应
             return JsonResponse({
                 'status': 'success',
                 'suggestion': suggestion,
+                'risk_level': risk_level,
+                'risk_description': risk_description,
                 'sensor_data': sensor_data
             })
         except Exception as e:
@@ -1020,10 +1029,12 @@ def get_ai_analysis(request):
                     "humidity": random.randint(50, 80)
                 }
             }
-            suggestion = get_ai_suggestion(sensor_data)
+            ai_result = get_ai_suggestion(sensor_data)
             return JsonResponse({
                 'status': 'success',
-                'suggestion': suggestion,
+                'suggestion': ai_result.get('suggestion', ''),
+                'risk_level': ai_result.get('risk_level', 1),
+                'risk_description': ai_result.get('risk_description', ''),
                 'sensor_data': sensor_data
             })
     return JsonResponse({
@@ -1514,6 +1525,8 @@ def export_ai_pdf(request):
                 data = json.loads(request.body)
             suggestion = data.get('suggestion', '')
             sensor_data = data.get('sensor_data', {})
+            risk_level = data.get('risk_level', 1)
+            risk_description = data.get('risk_description', '风险等级已评估')
             
             if not suggestion or not sensor_data:
                 return JsonResponse({
@@ -1547,6 +1560,36 @@ def export_ai_pdf(request):
                     return "warning", "警告"
                 else:
                     return "danger", "危险"
+            
+            # 获取风险等级配置
+            risk_config = {
+                0: {
+                    'text': '无风险',
+                    'color': '#28a745',
+                    'bg_color': '#d4edda',
+                    'border_color': '#c3e6cb',
+                    'icon': '✅',
+                    'recommendation': '当前环境条件良好，建议继续保持现有管理措施。'
+                },
+                1: {
+                    'text': '一般风险',
+                    'color': '#ffc107',
+                    'bg_color': '#fff3cd',
+                    'border_color': '#ffeeba',
+                    'icon': '⚠️',
+                    'recommendation': '存在一定风险，建议关注环境变化并采取预防措施。'
+                },
+                2: {
+                    'text': '高风险',
+                    'color': '#dc3545',
+                    'bg_color': '#f8d7da',
+                    'border_color': '#f5c6cb',
+                    'icon': '🚨',
+                    'recommendation': '存在较高风险，建议立即采取相应措施改善环境条件。'
+                }
+            }
+            
+            current_risk = risk_config.get(risk_level, risk_config[1])
             
             # 生成PDF文件的当前时间
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -1597,6 +1640,15 @@ def export_ai_pdf(request):
                         <span class="sensor-value">{current_time}</span>
                     </div>
                 </div>'''
+            
+            # 生成风险等级指示器HTML
+            risk_indicators = ''
+            for i in range(3):
+                if i <= risk_level:
+                    color = '#28a745' if i == 0 else '#ffc107' if i == 1 else '#dc3545'
+                    risk_indicators += f'<div class="risk-indicator active" style="background-color: {color};">{i}</div>'
+                else:
+                    risk_indicators += f'<div class="risk-indicator">{i}</div>'
             
             # 使用更简单的HTML模板，确保weasyprint能够正确处理
             html = f'''<!DOCTYPE html>
@@ -1677,6 +1729,94 @@ def export_ai_pdf(request):
         .info-label {{ 
             font-weight: bold; 
             margin-right: 8px; 
+        }}
+        
+        /* 安全风险预警样式 */
+        .risk-alert {{ 
+            padding: 25px; 
+            margin: 25px 0; 
+            border-radius: 8px; 
+            border-left: 5px solid {current_risk['border_color']}; 
+            background-color: {current_risk['bg_color']}; 
+        }}
+        
+        .risk-header {{ 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+        }}
+        
+        .risk-title {{ 
+            font-size: 20px; 
+            font-weight: bold; 
+            color: {current_risk['color']}; 
+            display: flex; 
+            align-items: center; 
+        }}
+        
+        .risk-badge {{ 
+            padding: 8px 16px; 
+            border-radius: 20px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            color: white; 
+            background-color: {current_risk['color']}; 
+        }}
+        
+        .risk-content {{ 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-top: 15px; 
+        }}
+        
+        .risk-level-display {{ 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 15px; 
+        }}
+        
+        .risk-label {{ 
+            font-size: 14px; 
+            color: #666; 
+            margin-right: 15px; 
+        }}
+        
+        .risk-indicators {{ 
+            display: flex; 
+            gap: 8px; 
+        }}
+        
+        .risk-indicator {{ 
+            width: 35px; 
+            height: 35px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: bold; 
+            font-size: 14px; 
+            background-color: #e9ecef; 
+            color: #6c757d; 
+        }}
+        
+        .risk-indicator.active {{ 
+            color: white; 
+        }}
+        
+        .risk-description {{ 
+            font-size: 14px; 
+            color: #555; 
+            line-height: 1.8; 
+            margin-bottom: 15px; 
+        }}
+        
+        .risk-recommendation {{ 
+            font-size: 13px; 
+            color: #666; 
+            padding-top: 15px; 
+            border-top: 1px dashed #ddd; 
         }}
         
         /* 传感器数据样式 */
@@ -1892,6 +2032,32 @@ def export_ai_pdf(request):
                 <div class="info-item">
                     <span class="info-label">报告编号:</span>
                     <span>REPORT-{current_time.replace('-', '').replace(':', '').replace(' ', '')[:14]}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 安全风险预警 -->
+        <h2>安全风险预警</h2>
+        <div class="risk-alert">
+            <div class="risk-header">
+                <div class="risk-title">
+                    <span style="margin-right: 10px;">{current_risk['icon']}</span>
+                    安全风险预警
+                </div>
+                <div class="risk-badge">{current_risk['text']}</div>
+            </div>
+            <div class="risk-content">
+                <div class="risk-level-display">
+                    <span class="risk-label">风险等级:</span>
+                    <div class="risk-indicators">
+                        {risk_indicators}
+                    </div>
+                </div>
+                <div class="risk-description">
+                    <strong>风险描述：</strong>{risk_description}
+                </div>
+                <div class="risk-recommendation">
+                    {current_risk['icon']} {current_risk['recommendation']}
                 </div>
             </div>
         </div>
