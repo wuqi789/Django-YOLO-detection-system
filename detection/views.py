@@ -24,7 +24,6 @@ logger = logging.getLogger(__name__)
 # Configuration file path
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'config.json')
 
-
 # Load configuration from file
 def load_config():
     """Load configuration from config.json file"""
